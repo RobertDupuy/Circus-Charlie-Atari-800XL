@@ -2,10 +2,48 @@
 
 The delivered type-56 SIC! cartridge targets a stock 64 KB Atari 800XL.
 CAR: 524,304 bytes; raw ROM: 524,288 bytes.
-CAR SHA-256: `3d40b11a0997c3b054397ce8a2e9f82464881b4289559b76f41d5fa5aa26fca4`.
+CAR SHA-256: `cd2d86d6cf3669329ab0117056ff9986b874d5bf881b4ee117f040d1da6f4a87`.
 
-Current reports are in `evidence/act1-fix/`. `complete-candidate/`, earlier
-root-level reports and `act3-revision/` describe previous builds.
+Current reports are in `evidence/tightrope-fix/`. `act1-fix/`,
+`complete-candidate/`, earlier root-level reports and `act3-revision/`
+describe previous builds.
+
+## Tightrope retry and bottom-border correction
+
+Two checkpoint arithmetic defects caused the death trap. An early death
+could round the saved position down to zero; subtracting the 60-pixel page
+origin then wrapped to 65,520 instead of restarting at 48. A later retry
+retained the old high byte of the world position before adding the rebuilt
+page offset, placing the player at 2,480 after a death near the 1,465-pixel
+finish. The subtraction now saturates at zero, and page reconstruction
+clears both position bytes. Late tightrope deaths correctly restart at 1,200.
+The same initialization is shared by rolling balls.
+
+`tests/tightrope_retry.py` uses ordinary joystick/fire input and active
+collisions after selecting each isolated scene/rank fixture. It checks both
+checkpoint pages and all six ranks: four early deaths in tightrope and balls,
+and three near-finish tightrope deaths. In total, 132 deaths and 36 continues
+are followed by 36 successful recovery routes through the actual finish.
+The other player's checkpoint page remains unchanged in the early cases.
+
+The tightrope's DMA-gated DLI path could miss WSYNC and shift a palette/font
+boundary by one scanline. The ordinary interrupt now synchronizes earlier,
+saves Y only when used, and leaves lion-only shade dispatch to a separate
+entry. Player DMA changes occur after the boundary scanline's fetch so a
+nonzero hardware-player latch cannot leave a vertical streak. The lion
+keeps its pre-WSYNC font switch and its three green shades.
+
+`tests/tightrope_hardware.py` selects Act 2 through the native demo entry,
+then disables demo input during the introduction. That is its only setup
+fixture; collisions, retries, continue and recovery use ordinary controls.
+Atari800 NTSC and PAL recordings cover four deaths, a continue, and walking
+away from the restored checkpoint. Static lower-field pixels and the footer
+palette are checked across every complete captured frame, including frames
+with stray sprite colours. Only intentionally blank loading frames are
+excluded. NTSC checks 1,839 complete frames and PAL checks 1,506, with no
+variable lower-field rows, stray footer colours, missed gameplay deadlines
+or renderer faults. Both runs recover from four deaths and one continue.
+Reports include every observed state.
 
 ## Act 1 retry and NTSC raster correction
 
@@ -42,7 +80,7 @@ observations are in the two `lion-hardware-*.json` reports.
 
 ## Complete career and gameplay
 
-All 25 suites in `tests/acceptance.py` pass against this exact cartridge.
+All 26 suites in `tests/acceptance.py` pass against this exact cartridge.
 The uninterrupted career test starts at the title and clears 36 main
 performances plus three water courses: 39 in total. It reaches the final
 completion state after 90,535 simulation ticks and 45,268 rendered pictures,
@@ -127,6 +165,8 @@ python3 tools/build.py
 python3 tests/acceptance.py
 python3 tests/lion_hardware.py ntsc
 python3 tests/lion_hardware.py pal
+python3 tests/tightrope_hardware.py ntsc
+python3 tests/tightrope_hardware.py pal
 ```
 
 Install Python 3, cc65, a C compiler, Pillow, NumPy and SciPy. Atari800 tests

@@ -2,6 +2,11 @@
 
 [Download cartridge (.car)](build/Circus-Charlie-SIC512.car?raw=1) · [Download raw ROM (.rom)](build/Circus-Charlie-SIC512.rom?raw=1)
 
+**Act 1 correction, 2026-10-25:** fixes the slowdown after losing a life,
+the flickering background scanlines, and stray graphics during stage reloads.
+NTSC is supported on the stock 64 KB 800XL; PAL remains supported too.
+Load this cartridge from a fresh boot when replacing an earlier build.
+
 A native 6502 game for a stock 64 KB Atari 800XL and a 512 KB SIC! cartridge. This candidate contains all six main acts, the dolphin/water variation, six difficulty ranks, and a complete career through the final completion screen: 36 main performances plus three water rounds.
 
 The original arcade game is the gameplay reference. This is a complete playable career candidate, with known arcade-fidelity differences recorded in [ARCADE-FIDELITY.md](docs/ARCADE-FIDELITY.md); it is not a claim of bit-for-bit arcade equivalence.
@@ -31,6 +36,7 @@ Each act can be completed six times. Its difficulty follows that act's own compl
 
 ## Changes in this candidate
 
+- Act 1 checkpoints now retain their hoops and fire pots through deaths, continues and alternating players. Display interrupts meet the NTSC scanline deadline, the three green shades stay consistent, and loading blanks graphics before changing the live display lists.
 - All six difficulty ranks are enabled and have complete joystick/fire replay routes.
 - Water uses the recovered four-slot dolphin integrator, source schedules for all six ranks, tall pedestals, original trampoline jump arcs, collisions, prizes and retry checkpoints. An independent MAME trace supplies 543 matching dolphin state transitions.
 - Neutral trampoline input now correctly selects the higher stationary bounces. A fourth stationary bounce fails; moving on resets the sequence.
@@ -47,6 +53,11 @@ Install Python 3 and cc65. Prepared assets are included; building the cartridge 
 python3 tools/build.py
 python3 tests/acceptance.py
 ```
+
+The Act 1 regression includes deliberate collisions and continues. With
+Atari800 and FFmpeg installed, run `python3 tests/lion_hardware.py ntsc`
+and `python3 tests/lion_hardware.py pal` to check normal controller input,
+post-retry timing and every captured background frame.
 
 Set `CC65_BIN` if ca65/ld65 are outside PATH. `tools/assets.py` regenerates graphics using Pillow and NumPy. `tools/make_demo.py` regenerates the demonstration from the included input routes; rebuild afterward. Tests also use a C compiler, NumPy and SciPy. Hardware-emulator checks require Atari800, Xvfb and python-xlib; set `ATARI800_ROOT` to the installation's `usr` directory.
 

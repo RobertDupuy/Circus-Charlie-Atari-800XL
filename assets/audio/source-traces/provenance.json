@@ -1,0 +1,13 @@
+{
+  "set": "circusc",
+  "sound_rom_files": [
+    "380_l14.5c",
+    "380_l15.7c"
+  ],
+  "concatenated_sound_rom_sha256": "ce1f520ad606afc04063ed21d2e7349dee07f4d6048aa6417ad1b50d79758c4d",
+  "sound_cpu_clock": 3579545.25,
+  "sn_clock": 1789772.625,
+  "source_map": "https://github.com/mamedev/mame/blob/master/src/mame/konami/circusc.cpp",
+  "capture": "Executed audio CPU, channel-register snapshots at sequencer boundaries; effects at 240 Hz; DAC writes carry source cycle timestamps",
+  "original_rom_included": false
+}

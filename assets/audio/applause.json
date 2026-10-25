@@ -1,0 +1,11 @@
+{
+  "source_command": "80",
+  "samples": 28956,
+  "bytes": 14478,
+  "ntsc_rate": 7849.956140350877,
+  "pal_rate": 7778.276315789473,
+  "ntsc_seconds": 3.6886830298526645,
+  "pal_seconds": 3.7226756706008133,
+  "source": "Executed original audio CPU DAC writes; not a substitute noise effect",
+  "source_sha256": "a255fb1df010ec01bd0a39016c2289e97669ec29d49fb0ebfc1e10acaaf96a5c"
+}

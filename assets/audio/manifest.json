@@ -1,0 +1,582 @@
+[
+  {
+    "standard": "ntsc",
+    "command": 19,
+    "kind": "music",
+    "file": "ntsc-13.json",
+    "frames": 8112,
+    "loop_frame": 4249,
+    "packets": 1677,
+    "bytes": 9764
+  },
+  {
+    "standard": "ntsc",
+    "command": 20,
+    "kind": "music",
+    "file": "ntsc-14.json",
+    "frames": 3681,
+    "loop_frame": 29,
+    "packets": 726,
+    "bytes": 3824
+  },
+  {
+    "standard": "ntsc",
+    "command": 21,
+    "kind": "music",
+    "file": "ntsc-15.json",
+    "frames": 3373,
+    "loop_frame": 1,
+    "packets": 877,
+    "bytes": 4358
+  },
+  {
+    "standard": "ntsc",
+    "command": 22,
+    "kind": "music",
+    "file": "ntsc-16.json",
+    "frames": 3073,
+    "loop_frame": 124,
+    "packets": 621,
+    "bytes": 3288
+  },
+  {
+    "standard": "ntsc",
+    "command": 23,
+    "kind": "music",
+    "file": "ntsc-17.json",
+    "frames": 279,
+    "loop_frame": null,
+    "packets": 54,
+    "bytes": 298
+  },
+  {
+    "standard": "ntsc",
+    "command": 24,
+    "kind": "music",
+    "file": "ntsc-18.json",
+    "frames": 3478,
+    "loop_frame": 317,
+    "packets": 776,
+    "bytes": 4680
+  },
+  {
+    "standard": "ntsc",
+    "command": 25,
+    "kind": "music",
+    "file": "ntsc-19.json",
+    "frames": 2549,
+    "loop_frame": 21,
+    "packets": 725,
+    "bytes": 3814
+  },
+  {
+    "standard": "ntsc",
+    "command": 26,
+    "kind": "music",
+    "file": "ntsc-1a.json",
+    "frames": 2531,
+    "loop_frame": 1,
+    "packets": 877,
+    "bytes": 4358
+  },
+  {
+    "standard": "ntsc",
+    "command": 27,
+    "kind": "music",
+    "file": "ntsc-1b.json",
+    "frames": 2196,
+    "loop_frame": 89,
+    "packets": 621,
+    "bytes": 3288
+  },
+  {
+    "standard": "ntsc",
+    "command": 28,
+    "kind": "music",
+    "file": "ntsc-1c.json",
+    "frames": 3864,
+    "loop_frame": 1,
+    "packets": 710,
+    "bytes": 4431
+  },
+  {
+    "standard": "ntsc",
+    "command": 29,
+    "kind": "music",
+    "file": "ntsc-1d.json",
+    "frames": 1657,
+    "loop_frame": null,
+    "packets": 304,
+    "bytes": 1596
+  },
+  {
+    "standard": "ntsc",
+    "command": 65,
+    "kind": "effect",
+    "file": "ntsc-41.json",
+    "frames": 121,
+    "loop_frame": null,
+    "packets": 30,
+    "bytes": 167
+  },
+  {
+    "standard": "ntsc",
+    "command": 66,
+    "kind": "effect",
+    "file": "ntsc-42.json",
+    "frames": 109,
+    "loop_frame": null,
+    "packets": 26,
+    "bytes": 115
+  },
+  {
+    "standard": "ntsc",
+    "command": 67,
+    "kind": "effect",
+    "file": "ntsc-43.json",
+    "frames": 91,
+    "loop_frame": null,
+    "packets": 28,
+    "bytes": 135
+  },
+  {
+    "standard": "ntsc",
+    "command": 68,
+    "kind": "effect",
+    "file": "ntsc-44.json",
+    "frames": 33,
+    "loop_frame": null,
+    "packets": 27,
+    "bytes": 135
+  },
+  {
+    "standard": "ntsc",
+    "command": 69,
+    "kind": "effect",
+    "file": "ntsc-45.json",
+    "frames": 55,
+    "loop_frame": null,
+    "packets": 14,
+    "bytes": 76
+  },
+  {
+    "standard": "ntsc",
+    "command": 70,
+    "kind": "effect",
+    "file": "ntsc-46.json",
+    "frames": 84,
+    "loop_frame": null,
+    "packets": 22,
+    "bytes": 115
+  },
+  {
+    "standard": "ntsc",
+    "command": 71,
+    "kind": "effect",
+    "file": "ntsc-47.json",
+    "frames": 36,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 40
+  },
+  {
+    "standard": "ntsc",
+    "command": 72,
+    "kind": "effect",
+    "file": "ntsc-48.json",
+    "frames": 55,
+    "loop_frame": null,
+    "packets": 54,
+    "bytes": 243
+  },
+  {
+    "standard": "ntsc",
+    "command": 73,
+    "kind": "effect",
+    "file": "ntsc-49.json",
+    "frames": 27,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 41
+  },
+  {
+    "standard": "ntsc",
+    "command": 74,
+    "kind": "effect",
+    "file": "ntsc-4a.json",
+    "frames": 43,
+    "loop_frame": null,
+    "packets": 17,
+    "bytes": 81
+  },
+  {
+    "standard": "ntsc",
+    "command": 75,
+    "kind": "effect",
+    "file": "ntsc-4b.json",
+    "frames": 132,
+    "loop_frame": null,
+    "packets": 54,
+    "bytes": 227
+  },
+  {
+    "standard": "ntsc",
+    "command": 76,
+    "kind": "effect",
+    "file": "ntsc-4c.json",
+    "frames": 68,
+    "loop_frame": null,
+    "packets": 49,
+    "bytes": 212
+  },
+  {
+    "standard": "ntsc",
+    "command": 77,
+    "kind": "effect",
+    "file": "ntsc-4d.json",
+    "frames": 81,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 38
+  },
+  {
+    "standard": "ntsc",
+    "command": 78,
+    "kind": "effect",
+    "file": "ntsc-4e.json",
+    "frames": 101,
+    "loop_frame": null,
+    "packets": 74,
+    "bytes": 316
+  },
+  {
+    "standard": "ntsc",
+    "command": 79,
+    "kind": "effect",
+    "file": "ntsc-4f.json",
+    "frames": 18,
+    "loop_frame": null,
+    "packets": 4,
+    "bytes": 33
+  },
+  {
+    "standard": "ntsc",
+    "command": 80,
+    "kind": "effect",
+    "file": "ntsc-50.json",
+    "frames": 137,
+    "loop_frame": null,
+    "packets": 35,
+    "bytes": 155
+  },
+  {
+    "standard": "ntsc",
+    "command": 81,
+    "kind": "effect",
+    "file": "ntsc-51.json",
+    "frames": 194,
+    "loop_frame": null,
+    "packets": 47,
+    "bytes": 203
+  },
+  {
+    "standard": "ntsc",
+    "command": 82,
+    "kind": "effect",
+    "file": "ntsc-52.json",
+    "frames": 33,
+    "loop_frame": null,
+    "packets": 32,
+    "bytes": 169
+  },
+  {
+    "standard": "pal",
+    "command": 19,
+    "kind": "music",
+    "file": "pal-13.json",
+    "frames": 6750,
+    "loop_frame": 3536,
+    "packets": 1676,
+    "bytes": 9754
+  },
+  {
+    "standard": "pal",
+    "command": 20,
+    "kind": "music",
+    "file": "pal-14.json",
+    "frames": 3063,
+    "loop_frame": 24,
+    "packets": 726,
+    "bytes": 3824
+  },
+  {
+    "standard": "pal",
+    "command": 21,
+    "kind": "music",
+    "file": "pal-15.json",
+    "frames": 2807,
+    "loop_frame": 1,
+    "packets": 888,
+    "bytes": 4397
+  },
+  {
+    "standard": "pal",
+    "command": 22,
+    "kind": "music",
+    "file": "pal-16.json",
+    "frames": 2557,
+    "loop_frame": 103,
+    "packets": 621,
+    "bytes": 3288
+  },
+  {
+    "standard": "pal",
+    "command": 23,
+    "kind": "music",
+    "file": "pal-17.json",
+    "frames": 233,
+    "loop_frame": null,
+    "packets": 54,
+    "bytes": 298
+  },
+  {
+    "standard": "pal",
+    "command": 24,
+    "kind": "music",
+    "file": "pal-18.json",
+    "frames": 2894,
+    "loop_frame": 264,
+    "packets": 775,
+    "bytes": 4669
+  },
+  {
+    "standard": "pal",
+    "command": 25,
+    "kind": "music",
+    "file": "pal-19.json",
+    "frames": 2121,
+    "loop_frame": 17,
+    "packets": 726,
+    "bytes": 3824
+  },
+  {
+    "standard": "pal",
+    "command": 26,
+    "kind": "music",
+    "file": "pal-1a.json",
+    "frames": 2106,
+    "loop_frame": 1,
+    "packets": 888,
+    "bytes": 4397
+  },
+  {
+    "standard": "pal",
+    "command": 27,
+    "kind": "music",
+    "file": "pal-1b.json",
+    "frames": 1827,
+    "loop_frame": 74,
+    "packets": 621,
+    "bytes": 3288
+  },
+  {
+    "standard": "pal",
+    "command": 28,
+    "kind": "music",
+    "file": "pal-1c.json",
+    "frames": 3215,
+    "loop_frame": 1,
+    "packets": 710,
+    "bytes": 4431
+  },
+  {
+    "standard": "pal",
+    "command": 29,
+    "kind": "music",
+    "file": "pal-1d.json",
+    "frames": 1379,
+    "loop_frame": null,
+    "packets": 304,
+    "bytes": 1592
+  },
+  {
+    "standard": "pal",
+    "command": 65,
+    "kind": "effect",
+    "file": "pal-41.json",
+    "frames": 101,
+    "loop_frame": null,
+    "packets": 30,
+    "bytes": 167
+  },
+  {
+    "standard": "pal",
+    "command": 66,
+    "kind": "effect",
+    "file": "pal-42.json",
+    "frames": 91,
+    "loop_frame": null,
+    "packets": 25,
+    "bytes": 132
+  },
+  {
+    "standard": "pal",
+    "command": 67,
+    "kind": "effect",
+    "file": "pal-43.json",
+    "frames": 76,
+    "loop_frame": null,
+    "packets": 28,
+    "bytes": 136
+  },
+  {
+    "standard": "pal",
+    "command": 68,
+    "kind": "effect",
+    "file": "pal-44.json",
+    "frames": 28,
+    "loop_frame": null,
+    "packets": 26,
+    "bytes": 133
+  },
+  {
+    "standard": "pal",
+    "command": 69,
+    "kind": "effect",
+    "file": "pal-45.json",
+    "frames": 46,
+    "loop_frame": null,
+    "packets": 14,
+    "bytes": 82
+  },
+  {
+    "standard": "pal",
+    "command": 70,
+    "kind": "effect",
+    "file": "pal-46.json",
+    "frames": 70,
+    "loop_frame": null,
+    "packets": 21,
+    "bytes": 117
+  },
+  {
+    "standard": "pal",
+    "command": 71,
+    "kind": "effect",
+    "file": "pal-47.json",
+    "frames": 31,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 40
+  },
+  {
+    "standard": "pal",
+    "command": 72,
+    "kind": "effect",
+    "file": "pal-48.json",
+    "frames": 46,
+    "loop_frame": null,
+    "packets": 46,
+    "bytes": 213
+  },
+  {
+    "standard": "pal",
+    "command": 73,
+    "kind": "effect",
+    "file": "pal-49.json",
+    "frames": 23,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 44
+  },
+  {
+    "standard": "pal",
+    "command": 74,
+    "kind": "effect",
+    "file": "pal-4a.json",
+    "frames": 36,
+    "loop_frame": null,
+    "packets": 16,
+    "bytes": 77
+  },
+  {
+    "standard": "pal",
+    "command": 75,
+    "kind": "effect",
+    "file": "pal-4b.json",
+    "frames": 110,
+    "loop_frame": null,
+    "packets": 53,
+    "bytes": 223
+  },
+  {
+    "standard": "pal",
+    "command": 76,
+    "kind": "effect",
+    "file": "pal-4c.json",
+    "frames": 57,
+    "loop_frame": null,
+    "packets": 40,
+    "bytes": 174
+  },
+  {
+    "standard": "pal",
+    "command": 77,
+    "kind": "effect",
+    "file": "pal-4d.json",
+    "frames": 68,
+    "loop_frame": null,
+    "packets": 7,
+    "bytes": 38
+  },
+  {
+    "standard": "pal",
+    "command": 78,
+    "kind": "effect",
+    "file": "pal-4e.json",
+    "frames": 84,
+    "loop_frame": null,
+    "packets": 70,
+    "bytes": 301
+  },
+  {
+    "standard": "pal",
+    "command": 79,
+    "kind": "effect",
+    "file": "pal-4f.json",
+    "frames": 16,
+    "loop_frame": null,
+    "packets": 4,
+    "bytes": 33
+  },
+  {
+    "standard": "pal",
+    "command": 80,
+    "kind": "effect",
+    "file": "pal-50.json",
+    "frames": 114,
+    "loop_frame": null,
+    "packets": 33,
+    "bytes": 177
+  },
+  {
+    "standard": "pal",
+    "command": 81,
+    "kind": "effect",
+    "file": "pal-51.json",
+    "frames": 162,
+    "loop_frame": null,
+    "packets": 49,
+    "bytes": 251
+  },
+  {
+    "standard": "pal",
+    "command": 82,
+    "kind": "effect",
+    "file": "pal-52.json",
+    "frames": 28,
+    "loop_frame": null,
+    "packets": 27,
+    "bytes": 146
+  }
+]

@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*.so
+.DS_Store
+build/*
+!build/Circus-Charlie-SIC512.car
+!build/Circus-Charlie-SIC512.rom

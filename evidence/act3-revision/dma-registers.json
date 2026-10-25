@@ -1,0 +1,4 @@
+{
+  "interrupt_cases": 560,
+  "dma_and_player_latches_agree": true
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "standard": "ntsc",
+    "samples": 28956,
+    "exact_payload": true,
+    "duration_seconds": 3.688524,
+    "expected_seconds": 3.688556
+  },
+  {
+    "standard": "pal",
+    "samples": 28956,
+    "exact_payload": true,
+    "duration_seconds": 3.722521,
+    "expected_seconds": 3.722547
+  }
+]

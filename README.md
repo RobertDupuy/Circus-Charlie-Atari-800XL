@@ -2,8 +2,9 @@
 
 [Download cartridge (.car)](build/Circus-Charlie-SIC512.car?raw=1) · [Download raw ROM (.rom)](build/Circus-Charlie-SIC512.rom?raw=1)
 
-**Act 1 correction, 2026-10-25:** fixes the slowdown after losing a life,
-the flickering background scanlines, and stray graphics during stage reloads.
+**Tightrope correction, 2026-10-25:** fixes the flashing bottom border and
+the repeated-death trap near the finish. Includes the earlier Act 1 retry
+and background corrections.
 NTSC is supported on the stock 64 KB 800XL; PAL remains supported too.
 Load this cartridge from a fresh boot when replacing an earlier build.
 
@@ -36,6 +37,7 @@ Each act can be completed six times. Its difficulty follows that act's own compl
 
 ## Changes in this candidate
 
+- Tightrope retries now rebuild from a valid checkpoint, including early deaths and repeated falls near the finishing platform. The shared rolling-ball restart arithmetic is corrected too. Tightrope display interrupts reach the NTSC scanline boundary on time and keep hardware sprite DMA synchronized.
 - Act 1 checkpoints now retain their hoops and fire pots through deaths, continues and alternating players. Display interrupts meet the NTSC scanline deadline, the three green shades stay consistent, and loading blanks graphics before changing the live display lists.
 - All six difficulty ranks are enabled and have complete joystick/fire replay routes.
 - Water uses the recovered four-slot dolphin integrator, source schedules for all six ranks, tall pedestals, original trampoline jump arcs, collisions, prizes and retry checkpoints. An independent MAME trace supplies 543 matching dolphin state transitions.
@@ -54,10 +56,11 @@ python3 tools/build.py
 python3 tests/acceptance.py
 ```
 
-The Act 1 regression includes deliberate collisions and continues. With
-Atari800 and FFmpeg installed, run `python3 tests/lion_hardware.py ntsc`
-and `python3 tests/lion_hardware.py pal` to check normal controller input,
-post-retry timing and every captured background frame.
+Retry regressions include deliberate collisions, continues and successful
+finishes after recovery. With Atari800 and FFmpeg installed, run
+`python3 tests/tightrope_hardware.py ntsc` and the same command with `pal`
+to check joystick recovery, post-retry timing and the bottom raster.
+`tests/lion_hardware.py ntsc` / `pal` check the earlier Act 1 correction.
 
 Set `CC65_BIN` if ca65/ld65 are outside PATH. `tools/assets.py` regenerates graphics using Pillow and NumPy. `tools/make_demo.py` regenerates the demonstration from the included input routes; rebuild afterward. Tests also use a C compiler, NumPy and SciPy. Hardware-emulator checks require Atari800, Xvfb and python-xlib; set `ATARI800_ROOT` to the installation's `usr` directory.
 

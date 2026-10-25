@@ -182,32 +182,17 @@ adjust:
 .endproc
 tramp_font_adjust = gfx_font_table::adjust
 
-; Entry from NMI with A already saved. Display-register writes are kept first.
+; A is already saved by NMI. Keep the ordinary entry short enough to
+; reach WSYNC even at the busiest ANTIC character/PM DMA boundary.
 .proc gfx_dli_entry
  txa
  pha
- tya
- pha
  ldx dli_index
- cpx #9
- bcs field
- ; Reach WSYNC before the last character scanline runs out of CPU cycles.
- ; Computing an unused stripe shade here missed that deadline under ANTIC
- ; DMA, making background/font boundaries jump by one line on NTSC.
+ sta $D40A
+colours:
  lda $DC80,x
  sta $D409
-gfx_dma_branch = *
- bne :+
- lda $DCE0,x
- sta $D400
- ; GRACTL must follow DMACTL: otherwise ANTIC display-list bus reads are
- ; latched as random player graphics while player DMA is disabled.
- lsr
- lsr
- and #2
- sta $D01D
-:
- sta $D40A
+palette:
  lda gfx_bg,x
  sta $D01A
  lda gfx_pf2,x
@@ -216,6 +201,20 @@ gfx_dma_branch = *
  sta $D019
  lda gfx_pf1,x
  sta $D017
+ ; Change player DMA after the boundary scanline's PM fetch. Moving this
+ ; ahead of WSYNC can freeze the previous nonzero player latch as a long
+ ; vertical stripe. The staged bands include three blank guard scanlines.
+ ; CPX leaves Z clear for normal bands; the patched branch selects gating.
+ cpx #9
+gfx_dma_branch = *
+ bne :+
+ lda $DCE0,x
+ sta $D400
+ lsr
+ lsr
+ and #2
+ sta $D01D
+:
 sound:
  lda gfx_field
  beq regular_next
@@ -229,23 +228,44 @@ next_index:
  bne end
  lda pcm_active
  bne end
+ ; Only audio and the extra lion shade interrupts use Y. Saving it here
+ ; keeps the longer DMA-gated path inside the scanline budget as well.
+ tya
+ pha
  cld
  jsr audio_tick
-end:
  pla
  tay
+end:
  pla
  tax
  pla
  rti
+; Only the lion has extra shade interrupts; its separate entry keeps
+; this dispatch out of the other acts' scanline-critical path.
+lion_entry:
+ txa
+ pha
+ ldx dli_index
+ cpx #9
+ bcs field
+ lda $DC80,x
+ sta $D409
+ sta $D40A
+ jmp palette
 field:
+ tya
+ pha
  lda lion_field_colour-9,x
  tay
  lda $FD00,y
  sta $D40A
  sta $D01A
+ pla
+ tay
  jmp sound
 .endproc
+gfx_lion_dli_entry = gfx_dli_entry::lion_entry
 lion_dli_next: .byte 1,2,3,4,9,11,7,8,8,10,5,6
 ; Extra lion boundaries agree with the three shades on the regular bands.
 lion_field_colour: .byte $C8,$C6,$C4

@@ -585,6 +585,11 @@ pm_registers:
 @title:
  lda #<gfx_dli_entry
  ldx #>gfx_dli_entry
+ ldy act
+ bne :+
+ lda #<gfx_lion_dli_entry
+ ldx #>gfx_lion_dli_entry
+:
  ldy mode
  bne :+
  jsr title_init

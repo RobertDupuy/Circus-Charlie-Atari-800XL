@@ -3,6 +3,9 @@
 ; All frame integrators run at the simulation rate, independent of rendering.
 .proc fidelity_init
  lda #0
+ ; Resume rebuilds the page from the course origin. Keeping the restored
+ ; high byte here would add the old position to the page offset twice.
+ sta world+1
  ldx #$13
 @clear:
  sta f_direction,x
@@ -841,6 +844,13 @@ ball_rank_offset: .byte 0,45,90,135,180,180
  sta resume_world
  lda world+1
  sbc #0
+ ; The shared checkpoint saver rounds down to 64 pixels. An early death
+ ; can therefore restore zero, before this course's 60-pixel page origin.
+ ; Saturate the subtraction instead of wrapping to a far-off course page.
+ bcs :+
+ lda #0
+ sta resume_world
+:
  sta resume_world+1
  jsr fidelity_init
  lda #0

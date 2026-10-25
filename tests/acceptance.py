@@ -8,7 +8,7 @@ from pathlib import Path
 import hashlib,json,subprocess,sys
 
 ROOT=Path(__file__).resolve().parents[1]
-TESTS=('mechanics_regression','arcade_lion','hoop_depth','hoop_passage',
+TESTS=('mechanics_regression','arcade_lion','lion_retry','hoop_depth','hoop_passage',
        'bold_render','hud_cache','arcade_rules','water_regression',
        'interrupt_audio','arcade_audio','spring_cache','monkey_cache',
        'rope_cache','hero_compositors','stamp_rows','ranked_playthrough',

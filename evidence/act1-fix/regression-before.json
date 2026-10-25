@@ -1,0 +1,23 @@
+{
+  "car_sha256": "b134ba00c0ce68cb5b6ae361143ad1c0dd980632a6d17d35b5dc753c2381fd55",
+  "natural_first_collision_tick": 104,
+  "saved_lion_block_bytes": 64,
+  "saved_lion_block_all_zero": true,
+  "pot_count_before_death": 5,
+  "pot_count_after_retry": 0,
+  "mean_cpu_cycles_before": 16596.838095238094,
+  "mean_cpu_cycles_after_retry": 52195.1,
+  "ntsc_static_background_probe": {
+    "video_frames": 642,
+    "compared_frames": 370,
+    "frame_range_exclusive": [
+      180,
+      550
+    ],
+    "native_pixel_x": 10,
+    "varying_native_rows": [
+      97,
+      129
+    ]
+  }
+}

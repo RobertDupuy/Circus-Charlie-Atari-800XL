@@ -1,0 +1,422 @@
+[
+  {
+    "scene": 0,
+    "rank": 0,
+    "pictures": 1428,
+    "hero_glyph_max": [
+      0,
+      28,
+      24
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 0,
+    "pictures": 2092,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 0,
+    "pictures": 1726,
+    "hero_glyph_max": [
+      8,
+      27,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 0,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 0,
+    "pictures": 1824,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 0,
+    "pictures": 3331,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 0,
+    "pictures": 1580,
+    "hero_glyph_max": [
+      8,
+      25,
+      0
+    ]
+  },
+  {
+    "scene": 0,
+    "rank": 1,
+    "pictures": 1542,
+    "hero_glyph_max": [
+      0,
+      28,
+      25
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 1,
+    "pictures": 2100,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 1,
+    "pictures": 2056,
+    "hero_glyph_max": [
+      15,
+      27,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 1,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 1,
+    "pictures": 1836,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 1,
+    "pictures": 3181,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 1,
+    "pictures": 1450,
+    "hero_glyph_max": [
+      10,
+      26,
+      0
+    ]
+  },
+  {
+    "scene": 0,
+    "rank": 2,
+    "pictures": 2478,
+    "hero_glyph_max": [
+      0,
+      28,
+      25
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 2,
+    "pictures": 2092,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 2,
+    "pictures": 2442,
+    "hero_glyph_max": [
+      21,
+      27,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 2,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 2,
+    "pictures": 1836,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 2,
+    "pictures": 2772,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 2,
+    "pictures": 1624,
+    "hero_glyph_max": [
+      8,
+      25,
+      0
+    ]
+  },
+  {
+    "scene": 0,
+    "rank": 3,
+    "pictures": 2478,
+    "hero_glyph_max": [
+      0,
+      28,
+      24
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 3,
+    "pictures": 2092,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 3,
+    "pictures": 1662,
+    "hero_glyph_max": [
+      21,
+      25,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 3,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 3,
+    "pictures": 1908,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 3,
+    "pictures": 4785,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 3,
+    "pictures": 1624,
+    "hero_glyph_max": [
+      10,
+      25,
+      0
+    ]
+  },
+  {
+    "scene": 0,
+    "rank": 4,
+    "pictures": 1389,
+    "hero_glyph_max": [
+      0,
+      28,
+      24
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 4,
+    "pictures": 2092,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 4,
+    "pictures": 1312,
+    "hero_glyph_max": [
+      8,
+      27,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 4,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 4,
+    "pictures": 1950,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 4,
+    "pictures": 4524,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 4,
+    "pictures": 1450,
+    "hero_glyph_max": [
+      8,
+      26,
+      0
+    ]
+  },
+  {
+    "scene": 0,
+    "rank": 5,
+    "pictures": 1449,
+    "hero_glyph_max": [
+      0,
+      28,
+      24
+    ]
+  },
+  {
+    "scene": 1,
+    "rank": 5,
+    "pictures": 2144,
+    "hero_glyph_max": [
+      25,
+      18,
+      0
+    ]
+  },
+  {
+    "scene": 2,
+    "rank": 5,
+    "pictures": 1312,
+    "hero_glyph_max": [
+      8,
+      27,
+      0
+    ]
+  },
+  {
+    "scene": 3,
+    "rank": 5,
+    "pictures": 2076,
+    "hero_glyph_max": [
+      14,
+      25,
+      3
+    ]
+  },
+  {
+    "scene": 4,
+    "rank": 5,
+    "pictures": 1962,
+    "hero_glyph_max": [
+      0,
+      21,
+      8
+    ]
+  },
+  {
+    "scene": 5,
+    "rank": 5,
+    "pictures": 5057,
+    "hero_glyph_max": [
+      21,
+      21,
+      13
+    ]
+  },
+  {
+    "scene": 6,
+    "rank": 5,
+    "pictures": 1672,
+    "hero_glyph_max": [
+      10,
+      25,
+      0
+    ]
+  }
+]

@@ -20,6 +20,7 @@ parser.add_argument('--name')
 parser.add_argument('--cart', type=Path)
 args = parser.parse_args()
 cart = args.cart or R / 'build/Circus-Charlie-SIC512.car'
+capture_started = time.time()
 a = Atari(args.standard, args.name or 'lion-retry-' + args.standard,
           sound=True, cart=cart)
 samples = []
@@ -75,6 +76,8 @@ try:
     a.record()
 finally:
     a.close()
+
+assert (a.out / 'capture.avi').stat().st_mtime >= capture_started, 'Stale video capture'
 
 # Compare the background across the whole field, ignoring the moving actors'
 # non-green pixels. Checking two fixed columns alone confuses passing hoops

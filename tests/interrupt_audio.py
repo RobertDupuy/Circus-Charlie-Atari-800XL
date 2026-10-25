@@ -10,10 +10,14 @@ def setup(a):
 cases=0
 for a in range(7):
  m=setup(a);m.call('render_frame');expected=bytes(m.m[0x3400:0x6800])
- for kind in (0x40,0x80):
+ # Normal bands preserve Y without a stack save; audio and lion shade
+ # bands save it only when used. Interrupt real render work on each path.
+ interrupts=[(0x40,1)]+[(0x80,i) for i in (0,1,2,8)]
+ if a==0:interrupts += [(0x80,i) for i in (9,10,11)]
+ for kind,index in interrupts:
   for delay in (20,150,500,1100,3000,7000,15000,21000):
-   m=setup(a);m.m[0xd40f]=kind;m.set('dli_index',1);m.c.at_force_nmi(delay);m.call('render_frame')
-   assert bytes(m.m[0x3400:0x6800])==expected,(a,kind,delay)
+   m=setup(a);m.m[0xd40f]=kind;m.set('dli_index',index);m.c.at_force_nmi(delay);m.call('render_frame')
+   assert bytes(m.m[0x3400:0x6800])==expected,(a,kind,index,delay)
    assert m.get('fault')==0;cases+=1
 # Decimal addition can be interrupted inside the bank-zero score routine.
 for kind in (0x40,0x80):

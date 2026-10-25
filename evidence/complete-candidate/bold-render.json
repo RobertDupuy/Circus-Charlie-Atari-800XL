@@ -1,0 +1,10 @@
+{
+  "edge_restore_frames": 520,
+  "edge_pixels_identical": true,
+  "crowd_reference_cases": 560,
+  "scrolling_rows": 6,
+  "bunting_scrolls_with_camera": true,
+  "clipped_object_reference_cases": 544,
+  "money_bag_reference_cases": 336,
+  "hoop_restore_reference_cases": 292
+}

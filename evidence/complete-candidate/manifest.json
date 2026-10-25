@@ -1,0 +1,9 @@
+{
+  "candidate": "Complete playable career candidate",
+  "car_sha256": "b134ba00c0ce68cb5b6ae361143ad1c0dd980632a6d17d35b5dc753c2381fd55",
+  "car_bytes": 524304,
+  "rom_sha256": "1f202e89aefdb9507e8a89c53a837b4100a5bdc4cb4f234d5b83262f91f7e8f9",
+  "rom_bytes": 524288,
+  "cpu_suites_passed": 24,
+  "physical_hardware_tested": false
+}

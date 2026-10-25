@@ -1,0 +1,10 @@
+{
+  "mame_fire_samples": 65,
+  "mame_sword_samples": 113,
+  "observed_actor_spawns": 12,
+  "bidirectional_window_cases": 3256,
+  "stationary_attack_frames": 48400,
+  "max_visible_projectiles": 6,
+  "projectile_bitmap_cases": 4400,
+  "projectile_interrupt_cases": 80
+}

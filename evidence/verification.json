@@ -1,0 +1,142 @@
+{
+  "car_sha256": "53ebafb2634bae33129b2cdf2be0fc9f4ec4456017e26ae2eeec88bbe55b7454",
+  "rom_sha256": "4cb3f069ade6ce696bd6b4217e92bd8d3e07696a921579c9cc4443f5bfbbe101",
+  "car_bytes": 524304,
+  "rom_bytes": 524288,
+  "cpu_suites": 20,
+  "full_hardware_runs": 2,
+  "additional_rank_fixtures": 28,
+  "visual_review": {
+    "source": "Native lossless Atari800 recording used to encode the delivered MP4",
+    "full_video_samples": 96,
+    "sampling": "One representative frame per three-second window; sheet labels identify window starts.",
+    "detail_windows": [
+      {
+        "course": "balls",
+        "start_seconds": 145.6,
+        "duration_seconds": 1.2,
+        "sample_fps": 10
+      },
+      {
+        "course": "pink monkey entry",
+        "start_seconds": 44.5,
+        "duration_seconds": 1.2,
+        "sample_fps": 10
+      },
+      {
+        "course": "pink monkey leap",
+        "start_seconds": 46,
+        "duration_seconds": 1.2,
+        "sample_fps": 10
+      },
+      {
+        "course": "trapeze goal",
+        "start_seconds": 254,
+        "duration_seconds": 5,
+        "sample_fps": 2
+      }
+    ],
+    "findings": [
+      "No stray lines above balls in the reviewed phases.",
+      "No pink/white player streaks above or below their actors.",
+      "Rope swings, recovery contacts and goal legs remain intact.",
+      "GREAT/FAROUT stay visible during applause.",
+      "Title lettering, tent, credits, moving stars and palette cycling verified independently."
+    ],
+    "limits": "Sampled visual review, not an assertion that every possible gameplay history or every video frame was inspected."
+  },
+  "audio": {
+    "retained_voice_pitch": {
+      "samples": 170864,
+      "median_abs_cents": 3.61,
+      "p95_abs_cents": 14.5,
+      "max_abs_cents": 19.11
+    },
+    "recorded_pokey": {
+      "seconds": 288.889,
+      "rms": 0.1229,
+      "peak": 0.4594,
+      "clipped_samples": 0
+    },
+    "applause_in_recording": {
+      "start_seconds": 25.249,
+      "normalized_correlation": 0.7219
+    }
+  },
+  "video_sha256": "bb10e57d0f39fb714a050ba4ffac2fcee23f1969c823bdcef90bbcb3478c61b4",
+  "mame_replays": {
+    "rom_sha256": "a3356f8a621b7b234b8a8342bcfce03a89e64775259621f25c05ddd0f67280c0",
+    "emulator": "MAME 0.251",
+    "replay_script": "research/arcade-replay.lua",
+    "ordinary_input_only": true,
+    "gameplay_ram_writes": false,
+    "runs": [
+      {
+        "act": 1,
+        "course": "lion",
+        "run": "release-lion-replay",
+        "first_global_clear_frame": 2300,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 2300,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 2202
+      },
+      {
+        "act": 2,
+        "course": "tightrope",
+        "run": "release-tightrope-replay",
+        "first_global_clear_frame": 2885,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 3000,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 2784
+      },
+      {
+        "act": 3,
+        "course": "trampolines",
+        "run": "act2-complete-replay",
+        "first_global_clear_frame": 2298,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 2137,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 2196
+      },
+      {
+        "act": 4,
+        "course": "balls",
+        "run": "act3-corrected-replay",
+        "first_global_clear_frame": 3146,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 2985,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 3048
+      },
+      {
+        "act": 5,
+        "course": "horse",
+        "run": "act4-complete-replay",
+        "first_global_clear_frame": 3009,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 2752,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 2910
+      },
+      {
+        "act": 6,
+        "course": "trapeze",
+        "run": "release-trapeze-ending",
+        "first_global_clear_frame": 5749,
+        "first_input_frame": 1,
+        "logged_from_frame": 780,
+        "input_frames": 6012,
+        "deaths_before_clear": 0,
+        "completion_image_frame": 5016
+      }
+    ]
+  }
+}

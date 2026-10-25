@@ -1,0 +1,18 @@
+{
+  "retained_voice_pitch": {
+    "samples": 170864,
+    "median_abs_cents": 3.61,
+    "p95_abs_cents": 14.5,
+    "max_abs_cents": 19.11
+  },
+  "recorded_pokey": {
+    "seconds": 288.889,
+    "rms": 0.1229,
+    "peak": 0.4594,
+    "clipped_samples": 0
+  },
+  "applause_in_recording": {
+    "start_seconds": 25.249,
+    "normalized_correlation": 0.7219
+  }
+}

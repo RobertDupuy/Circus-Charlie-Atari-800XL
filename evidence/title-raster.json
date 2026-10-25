@@ -1,0 +1,144 @@
+{
+  "colour_cycle": true,
+  "moving_stars": true,
+  "samples": [
+    {
+      "sample": 0,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 32,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          255,
+          187,
+          195
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    },
+    {
+      "sample": 1,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 30,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          249,
+          179,
+          255
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    },
+    {
+      "sample": 2,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 60,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          204,
+          196,
+          255
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    },
+    {
+      "sample": 3,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 56,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          164,
+          226,
+          255
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    },
+    {
+      "sample": 4,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 34,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          163,
+          243,
+          171
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    },
+    {
+      "sample": 5,
+      "field_top": 48,
+      "missing_static_pixels": 0,
+      "star_pixels": 38,
+      "palette": [
+        [
+          235,
+          215,
+          126
+        ],
+        [
+          200,
+          234,
+          118
+        ],
+        [
+          132,
+          55,
+          63
+        ]
+      ]
+    }
+  ]
+}

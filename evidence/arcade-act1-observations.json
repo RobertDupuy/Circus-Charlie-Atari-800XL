@@ -1,0 +1,56 @@
+{
+  "method": "Direct KONAMI-1 disassembly plus per-frame MAME RAM observations",
+  "original_rom_sha256": "a3356f8a621b7b234b8a8342bcfce03a89e64775259621f25c05ddd0f67280c0",
+  "mame_version": "0.251",
+  "mame_frame_hz": 60,
+  "physical_arcade_hz": 60.60606060606061,
+  "jump_samples": 64,
+  "jump_apex_display_pixels": 55,
+  "sweep_warning": "Clearance RAM frozen each frame to isolate uninterrupted waves; not ordinary gameplay",
+  "ordinary_input_play_warning": "Reactive joystick/fire player cleared Act 1 after one death",
+  "sweep_pot_distances_from_initial_hero": [
+    768.0,
+    997.5,
+    1249.5,
+    1635.0,
+    1723.5
+  ],
+  "pot_filter": "Subtract initial hero screen X=64; require at least four stable observations to exclude end-camera clamp transients",
+  "ordinary_play_state_transitions": [
+    {
+      "frame": 780,
+      "act1_state_2800": 0,
+      "raw_2220": 0
+    },
+    {
+      "frame": 789,
+      "act1_state_2800": 1,
+      "raw_2220": 0
+    },
+    {
+      "frame": 1691,
+      "act1_state_2800": 3,
+      "raw_2220": 0
+    },
+    {
+      "frame": 1759,
+      "act1_state_2800": 0,
+      "raw_2220": 0
+    },
+    {
+      "frame": 1851,
+      "act1_state_2800": 1,
+      "raw_2220": 0
+    },
+    {
+      "frame": 2355,
+      "act1_state_2800": 2,
+      "raw_2220": 0
+    },
+    {
+      "frame": 2613,
+      "act1_state_2800": 0,
+      "raw_2220": 0
+    }
+  ]
+}

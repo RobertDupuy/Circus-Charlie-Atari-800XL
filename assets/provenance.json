@@ -1,0 +1,36 @@
+{
+  "sources": [
+    {
+      "file": "inputs/circus-c64.prg",
+      "sha256": "ccaff7ef2c2e5f3ff0cbdbe12ddab0387561248e9420e9975f508ca35d43a5ec"
+    },
+    {
+      "file": "inputs/circus-sg-taiwan.sg",
+      "sha256": "00341d9d2e9a896c775d213598b1339c6453b7fed08faf2419d85ab46519ac7a"
+    },
+    {
+      "file": "inputs/arcade/circusc.zip",
+      "sha256": "a3356f8a621b7b234b8a8342bcfce03a89e64775259621f25c05ddd0f67280c0"
+    }
+  ],
+  "extraction": "C64 running RAM sprite slots 128..154 and crowd pixels; SG running VDP horse patterns 144,156,160; see tools/make_reference.py.",
+  "reference_sha256": "7df9ab308c3d1a2ba18e8b0f445d466f2402ee0f739792f1fd71192746945ea0",
+  "bold_arcade": {
+    "actor_reference": "Arcade sprite pixels/palette lookup and the accepted Act 1 combined lion/rider frames.",
+    "builder": "tools/bold_art.py and tools/assets.py",
+    "canonical_arrays": [
+      {
+        "file": "assets/arcade-sprites.npz",
+        "sha256": "2075a88ea6e634c4eae76c02624e9dde228385867e560bff1344f8bb6912baef"
+      },
+      {
+        "file": "assets/hero.npz",
+        "sha256": "96bf71616033135f41616d38c25c73446976171c4458ea4e71a01d0647324bfe"
+      },
+      {
+        "file": "assets/pal-map.bin",
+        "sha256": "e272a3161e09993cf62e358533b135795cd1d68e8dddc1a180bbddff27e67d9c"
+      }
+    ]
+  }
+}

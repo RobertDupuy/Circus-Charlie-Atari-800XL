@@ -1,0 +1,28 @@
+{
+  "font_counts": [
+    114,
+    115,
+    75
+  ],
+  "compressed_bytes": 2611,
+  "star_count": 32,
+  "storage_bank": 2,
+  "storage_ranges": [
+    [
+      16,
+      1024
+    ],
+    [
+      1472,
+      2048
+    ],
+    [
+      2168,
+      3072
+    ],
+    [
+      3952,
+      4096
+    ]
+  ]
+}

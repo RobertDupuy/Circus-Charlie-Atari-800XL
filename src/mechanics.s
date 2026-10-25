@@ -252,6 +252,9 @@ gfx_dma_opcode: .byte $D0,$F0,$F0,$D0,$F0,$F0
  jeq apparatus_save_horse
  cmp #5
  jeq apparatus_save_rope
+ ; Only Act 1 owns the lion block. Do not branch on the preceding CMP #5:
+ ; that skipped this save for every lion death, then restored an empty block.
+ cmp #0
  bne @saved
  ldx #0
 @lion:

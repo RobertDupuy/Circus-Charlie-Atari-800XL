@@ -355,10 +355,20 @@ pm_registers:
 .endproc
 
 .proc load_stage
- jsr setup_lists
- jsr apparatus_restore_common
+ ; Blank before changing the live display lists or copying shared data.
+ ; DLIs and GTIA player output must also stay off while DMA is disabled.
+ ; Otherwise retries expose several frames of mismatched DLI scheduling
+ ; and latch display-list bytes as vertical player stripes.
  lda #1
  sta loading
+ lda #$40
+ sta $D40E
+ lda #0
+ sta $D400
+ sta $D01D
+ sta $D01A
+ jsr setup_lists
+ jsr apparatus_restore_common
  lda #1
  ldx act
  bne :+
@@ -366,9 +376,6 @@ pm_registers:
 :
  sta $D01B
  lda #0
- sta $D400
- ldx #2
- stx $D01D
  sta need_stage
  sta ready
  sta dirty_count
@@ -588,6 +595,8 @@ pm_registers:
  stx nmi::display+2
  lda #0
  sta loading
+ lda #$C0
+ sta $D40E
  rts
 .endproc
 

@@ -188,14 +188,12 @@ tramp_font_adjust = gfx_font_table::adjust
  pha
  tya
  pha
- cld
  ldx dli_index
  cpx #9
  bcs field
- lda gfx_bg,x
- sec
- sbc gfx_stripe,x
- tay
+ ; Reach WSYNC before the last character scanline runs out of CPU cycles.
+ ; Computing an unused stripe shade here missed that deadline under ANTIC
+ ; DMA, making background/font boundaries jump by one line on NTSC.
  lda $DC80,x
  sta $D409
 gfx_dma_branch = *
@@ -210,18 +208,14 @@ gfx_dma_branch = *
  sta $D01D
 :
  sta $D40A
- sty $D01A
+ lda gfx_bg,x
+ sta $D01A
  lda gfx_pf2,x
  sta $D018
  lda gfx_pf3,x
  sta $D019
  lda gfx_pf1,x
  sta $D017
- lda gfx_stripe,x
- beq sound
- lda gfx_bg,x
- sta $D40A
- sta $D01A
 sound:
  lda gfx_field
  beq regular_next
@@ -235,6 +229,7 @@ next_index:
  bne end
  lda pcm_active
  bne end
+ cld
  jsr audio_tick
 end:
  pla
@@ -252,7 +247,8 @@ field:
  jmp sound
 .endproc
 lion_dli_next: .byte 1,2,3,4,9,11,7,8,8,10,5,6
-lion_field_colour: .byte $C8,$C4,$C4
+; Extra lion boundaries agree with the three shades on the regular bands.
+lion_field_colour: .byte $C8,$C6,$C4
 
 .proc gfx_tag_hero
  lda sprite_x

@@ -104,6 +104,6 @@ def bags(bg,im,water=False):
    blob=bytes([len(record)//10])+record
    if blob not in unique:unique[blob]=len(data);data.extend(blob)
    addr=(0x9000 if water else 0xa000)+unique[blob];offset=(i*4+sx)*2;data[offset:offset+2]=bytes((addr&255,addr>>8))
- assert len(data)<=4096,len(data)
+ assert len(data)<=(1536 if water else 4096),len(data)
  (R/('assets/water-bags.bin' if water else 'assets/act3-bags.bin')).write_bytes(data.ljust(2048 if water else 4096,b'\xff'))
  print('Act 3 exact prize cache:',len(data),'bytes')

@@ -86,7 +86,8 @@ def distance_sign(label):
  tiny={'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],
  '2':['111','001','111','100','111'],'3':['111','001','111','001','111'],
  '4':['101','101','111','001','001'],'5':['111','100','111','001','111'],
- '6':['111','100','111','101','111'],'M':['101','111','111','101','101'],
+ '6':['111','100','111','101','111'],'7':['111','001','010','010','010'],
+ '8':['111','101','111','101','111'],'9':['111','101','111','001','111'],'M':['101','111','111','101','101'],
  'G':['111','100','101','101','111'],'O':['111','101','101','101','111'],
  'A':['010','101','111','101','101'],'L':['100','100','100','100','111']}
  a=np.zeros((8,16),np.uint8);a[:]=4
@@ -120,11 +121,21 @@ def monkey(phase,pink=False):
  d.line((3,10,0,12),fill=body);d.point((0,9),fill=1)
  return np.array(im)
 
-def spring(phase):
- im=Image.new('L',(16,12));d=ImageDraw.Draw(im)
- d.rectangle((0,0,15,2),fill=2);d.line((1,0,14,0),fill=4)
- d.line((2,4,12,5,3,7,12,9,3,11),fill=3 if phase==0 else 2)
+def spring(phase,width=16):
+ # Two decks with two distinct coils between them. The lower deck rests
+ # on separately prepared legs reaching the arena floor.
+ im=Image.new('L',(width,16));d=ImageDraw.Draw(im)
+ for top in (0,10):
+  d.rectangle((0,top,width-1,min(top+1,11)),fill=2)
+  d.line((1,top,width-2,top),fill=4)
+ for cx in (max(2,width//4),min(width-3,width*3//4)):
+  dx=1 # Resting coils keep their shape; contact physics supplies the bounce.
+  d.line((cx,2,cx+dx,3,cx-dx,5,cx+dx,7,cx-dx,9,cx,10),fill=3)
+ d.line((1,12,1,15),fill=2);d.line((width-2,12,width-2,15),fill=2)
  return np.array(im)
+
+def spring_leg(top):
+ return np.full((166-(top+16),1),2,np.uint8)
 
 def trampoline():
  im=Image.new('L',(16,10));d=ImageDraw.Draw(im)
@@ -136,6 +147,16 @@ def bag():
  d.polygon([(1,0),(6,0),(5,3),(7,6),(7,11),(5,13),(1,13),(0,10),(0,6),(2,3)],fill=3)
  d.line((2,5,2,10),fill=4);d.line((4,5,4,10),fill=4);d.line((1,7,5,7),fill=4);d.line((1,9,5,9),fill=4)
  return np.array(im)
+
+def money_bag():
+ # A light sack and a readable blue dollar sign. Gold and blue cannot share
+ # a mode-4 cell; the light body keeps the blue sign through character packing.
+ a=bag();a[a!=0]=2
+ sign=('00100','01111','10100','10100','01110','00101','00101','11110','00100')
+ for y,row in enumerate(sign,4):
+  for x,pixel in enumerate(row,1):
+   if pixel=='1':a[y,x]=4
+ return a
 
 def dolphin(phase):
  im=Image.new('L',(16,24));d=ImageDraw.Draw(im)
@@ -170,7 +191,7 @@ def actors(legacy,names):
    d.polygon([(x-1,27),(x-2,16),(x+1,top),(x,15),(x+2,27)],fill=1)
    d.polygon([(x,26),(x+1,top+6),(x+1,26)],fill=3)
   d.line((2,25,5,25),fill=2);ims[82+phase]=np.array(im)
- ims[93]=trampoline();ims[94]=bag()
+ ims[93]=trampoline();ims[94]=money_bag()
  a=Image.new('L',(32,4));d=ImageDraw.Draw(a);d.rectangle((0,0,31,1),fill=4);d.line((0,2,31,2),fill=2);d.line((0,3,31,3),fill=1);ims[95]=np.array(a)
  for label,frames in [('hoop',[hoop(i) for i in range(4)]),('pot',[pot(i) for i in range(2)]),('brown-monkey',[monkey(i) for i in range(4)]),('pink-monkey',[monkey(i,True) for i in range(4)]),('spring',[spring(i) for i in range(2)]),('dolphin',[dolphin(i) for i in range(4)])]:
   for i,a in enumerate(frames):

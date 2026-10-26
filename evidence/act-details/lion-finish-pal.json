@@ -1,0 +1,12 @@
+{
+  "standard": "pal",
+  "car_sha256": "3cced8898f5dc62a97f6aa1645683a1bb2eb3092f33766feda78b02778a3ff55",
+  "finish_state_fixture": true,
+  "distinct_animation_frames": {
+    "dance-arms": "9302c06740eef91091d3af7403de7510c8ea84547920b03b5c26923bc5b591ac",
+    "dance-step": "ed72e0f8f0d87d79be5719c8789b7b1e71d3f96f61de94e72f3cc02d90301bda",
+    "bird-and-bag": "d09849bf42fb41db249d0656aebb9b1273e67e62b4e26f5907f5b28f06b4ca26",
+    "money-drop": "c3c1f08ff6da18f066d7762b85ad6ad1b5ad0751bfe30bf82109ea561efa9cb5"
+  },
+  "renderer_faults": 0
+}

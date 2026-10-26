@@ -1,0 +1,18 @@
+{
+  "implementation_commit": "e3239981e61dc137851c25350d1b567433ae709f",
+  "target": "64 KB Atari 800XL, SIC! 512 KB cartridge (type 56)",
+  "profiles": {
+    "arcade": {
+      "car_sha256": "3cced8898f5dc62a97f6aa1645683a1bb2eb3092f33766feda78b02778a3ff55",
+      "rom_sha256": "f2ae2c870eb4fc31db91fc278f4cbdecfe74dc45b032a14085af9463bfde691c",
+      "car_bytes": 524304,
+      "rom_bytes": 524288
+    },
+    "automatic": {
+      "car_sha256": "2ca30b4da6fdc0e3faf31502c3d173a51af2889c9163409da56ac33069b647f3",
+      "rom_sha256": "292a3b80bd4ce042a1c7d8ec599b420c28f8cf66355f1f813a7c9779f722bd14",
+      "car_bytes": 524304,
+      "rom_bytes": 524288
+    }
+  }
+}

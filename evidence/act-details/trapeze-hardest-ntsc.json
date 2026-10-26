@@ -1,0 +1,16 @@
+{
+  "scene": 5,
+  "rank": 5,
+  "completed": true,
+  "host_frames": 4855,
+  "presented_frames": 2427,
+  "fps": 29.955,
+  "missed_deadlines": 0,
+  "max_refresh_interval": 2,
+  "renderer_faults": 0,
+  "max_dirty_cells": 33,
+  "lives": 3,
+  "monkey_leaps": 0,
+  "trampoline_rescues": 8,
+  "pm_overflow": 0
+}

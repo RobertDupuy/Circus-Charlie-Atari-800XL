@@ -14,8 +14,9 @@ scheduling of work, not the tick count or game rules.
 
 The renderer writes the hidden screen, fonts and PM DMA buffer. VBI publishes
 only a completed combination. A late buffer retains the previous complete
-frame and increments the deadline counter. Loading, applause and title/menu
-states have separate contracts and are excluded from active-play timing.
+frame and increments the deadline counter. Loading and title/menu states have separate contracts and are excluded from
+active-play timing. Celebration continuity is checked separately, including
+the first two buffers that install the victory text.
 
 ## ANTIC and DLI schedule
 
@@ -60,7 +61,16 @@ Ordinary objects have compact ten-byte cell records. Cached fixed-Y objects
 hold resident glyphs and prepared screen stores, with explicit clipped paths.
 Hoop prize bags include the adjacent hoop pixels offline. Brown monkeys and
 variable-width springboards mark immutable patterns inside their ten-byte
-records; overlaps retain the generic mask. Rope records use three bytes per
+records; overlaps retain the generic mask. Horse supports share one restore
+rectangle per platform and use clipped native column stores, including the
+floor-line glyphs. The 35 cached-object entries use a native directory at
+ROM bank 20 offset $0000 and a record directory at $0380; the builder asserts
+that neither reaches the prize-copy directory at $0580. Prepared spring-deck
+stores clip both edges and fall back to masked stamps on overlaps. Their ROM
+allocator accounts for already-placed hoop foreground programs before taking
+an animation-bank tail. The lowered horse death/continue/game-over pose reserves
+16 bottom-band glyphs rather than the 12 needed during play, so actor glyphs
+cannot overwrite the spring cache. Rope records use three bytes per
 cell, with separate full-cell and endpoint counts for each recovered rope
 length. Lookup maps select resident glyphs; uncommon patterns use the dynamic
 pool. Native hero mask routines share exact instruction suffixes in unused
@@ -126,6 +136,14 @@ RAM wrappers restore the required bank after nested drawing calls. Audio IRQ
 work preserves the full SIC control byte and uses private zero page. Interrupt
 entry clears decimal mode; RTI restores interrupted scoring flags.
 
+Horse spring contact compares the previous foot height with the deck top.
+A descending foot at exactly that height is included in the landing boundary.
+The former strict comparison rejected this edge contact after horizontal
+movement entered the spring, producing a fatal side-impact result. Feet
+already below the deck and rising contacts with the body retain the existing
+collision rules. This adds one conditional branch and no state or rendering
+work; checkpoint reconstruction and airborne speed remain unchanged.
+
 ## SIC layout and build boundaries
 
 The image has 32 banks of 16 KB, with a common 256-byte boot/vector tail in
@@ -147,15 +165,24 @@ common reset tail. The ROM is exactly 524,288 bytes. The emulator CAR adds a
 
 ## Sound and limits
 
+Continue uses a deadline in the VBI-owned 16-bit TV frame counter: 300 NTSC
+frames or 250 PAL frames. A coherent high/low/high read handles counter carry;
+the foreground derives the displayed seconds without charging extra time for
+multiple simulation steps in a frame. Expiry is checked before a new fire
+press. Declining or expiring saves the exhausted player, transfers to a living
+second player, or reloads the title. No permanent game-over state remains.
+The trampoline resume wrapper restores bank 31 before returning to `sys_stage`.
+
 Two prepared register streams drive music and effects. Runtime code does not
 execute an arcade CPU, convert notes or decode PCM during active play. The
-unrolled decoder reproduces all 58 verified PAL/NTSC streams. Applause uses
-foreground PCM during a frozen intermission after an eight-VBI presentation
-delay. Playfield DMA and DLIs remain active so GREAT/FAROUT and the last
-completed picture remain visible. The audio packer protects the common ball
-flags, title code and generated native-code ranges.
-The sample clock advances on its original two-scanline timeline, catching up
-after a display interrupt instead of accumulating playback drift.
+unrolled decoder reproduces all 58 verified PAL/NTSC streams. Celebrations
+continue using those ordinary interrupts; the old blocking applause player
+is retained only as a reference and has no runtime trigger. The audio packer
+protects the common ball flags, title code and generated native-code ranges.
+Victory text glyphs are cached independently in each display buffer. Act 1's
+static top-row text stays mapped until the next stage load; other acts keep
+normal dirty-cell restoration. Stage loading invalidates both text caches and
+resets the death-only vertical offset before restoring a checkpoint.
 
 Hardware-emulator deadlines, font limits, object capacity, pixel-reference
 comparisons and actual input tests are the acceptance checks. CPU cycle totals
@@ -198,3 +225,14 @@ Green ground scenes use the existing font-boundary DLIs for C8/C6/C4 shading; ex
 Spring/monkey/detail cache decoding is inline in the sprite cell loop. The generic masked reference path remains available to the pixel tests. The trapeze finish clears the staged positions of unused hardware players before drawing its two-character celebration, preventing the old blue hero accent from remaining beside the couple.
 
 Audio packets fold the ninth register-mask bit into duration bit 7. Long waits split into empty packets; bank links and all output register frames are preserved. This saves 16,994 bytes over the earlier encoding. The packer protects the bank28 code/prize region before allocating its audio tail.
+
+## Upright Act 1 victory poses
+
+Two authored front-facing poses replace the reused side-facing action frames.
+The performer is 28 scanlines tall; his head, straight torso and feet are
+identical in both poses. Only the raised arms wave. The two 24-by-48 composite
+stamps retain identical 20-line lion artwork. Their fixed X=108, Y=107 anchor
+keeps the lion's feet at Y=154 and the platform at Y=155. Only the used X and Y
+alignment is stored; all directory aliases point to that prepared artwork.
+Stage completion fixes this anchor in every difficulty rank. No live scaling
+or extra animation calculation is added to the 6502 loop.

@@ -14,7 +14,7 @@ All six main arcade acts were completed in fresh MAME replays using coin/start, 
 
 The native tests execute the assembled 6502 cartridge. Search tools may save and restore test states while finding a route; each accepted route is then replayed from a fresh stage with ordinary input. Atari800 supplies the ANTIC/GTIA/POKEY and display-deadline checks. Its ranked fixtures install only an initial rank/stage state and an input stream; they do not change active gameplay code or collision handling.
 
-The native candidate covers seven scenes at six ranks, and an uninterrupted 39-course career reaches the final ending. The water integrator is also compared against 543 transitions captured from MAME. This is not a claim that all 36 original arcade performances have been independently replayed.
+The native candidate covers seven scenes at six ranks, and an uninterrupted 65-course career clears two shows and opens the third. The water integrator is also compared against 543 transitions captured from MAME. This is not a claim that all 36 original arcade performances have been independently replayed.
 
 ## Recovered behavior
 
@@ -31,13 +31,13 @@ The first normal trapeze pivots in Atari color pixels are 84, 183, 282, 378, 474
 
 ## Presentation and speed
 
-The title uses 32 procedural particles and palette cycling. It includes the original lettering adapted to the Atari resolution, a big top, KONAMI and copyright text, and player selection. START and fire begin play without an instruction prompt.
+The title uses 32 procedural particles and palette cycling. It includes the original lettering adapted to the Atari resolution, a big top, KONAMI and copyright text, and player selection. START and fire open the optional arcade chooser, or begin Act 1 directly in the automatic build.
 
 The horizontal marks above rolling balls had two concrete causes addressed here: an audio allocation could overwrite the common ball flags, and CHBASE changed too late at a font boundary. The packer now protects that data and the display code writes CHBASE before the scanline wait.
 
 Trapeze ropes use prepared angle tiles, clipped endpoints and immutable glyphs. Hero composites and springboards use cached or native drawing paths with generic reference paths retained for pixel comparison. Finish-platform legs use two player objects so they do not paste static rectangles over the moving crowd. Graphics optimizations do not change the input or physics rules.
 
-Video review also found stray player graphics when DMA was disabled without disabling the corresponding GTIA graphics input. DMACTL and GRACTL now change together, and an interrupt-level regression checks both registers. A separate title raster test caught and fixed the tent-pole pixel retaining a HUD color. The applause clock now catches up after display interrupts, keeping the complete clear picture visible without cumulative sample drift.
+Video review also found stray player graphics when DMA was disabled without disabling the corresponding GTIA graphics input. DMACTL and GRACTL now change together, and an interrupt-level regression checks both registers. A separate title raster test caught and fixed the tent-pole pixel retaining a HUD color. The retained applause reference has a corrected two-scanline clock, but it is no longer triggered: its blocking playback paused the new celebration. Continuous command-1C victory music now accompanies the animation.
 
 ## Act 3 attack revision
 
@@ -64,9 +64,9 @@ that begins from the disabled state.
 
 Water now uses four independent arcade dolphin slots, the original fixed-point vertical integrator and six rank schedules. The source observation fixture is `evidence/water-mame.json`; the compact schedule data is `assets/water-arcade.json`. Upright/inverted phases, normal and high bounces, retry, collision and prize rules are active. Its pedestal artwork and dolphin silhouettes remain scaled Atari artwork.
 
-All six native ranks are selectable through actual act progression. Normal trampoline and monkey schedules were extended from source tables; balls use the last source schedule where it saturates. The complete-career regression clears 36 main performances and three water courses without forcing completion.
+All six native ranks are selectable through actual act progression. Normal trampoline and monkey schedules were extended from source tables; balls use the last source schedule where it saturates. The complete-career regression clears 60 main performances and five water courses without forcing completion.
 
-The pony departs during the clear picture. The trapeze partner approaches for a kiss, using adapted source frames. Retry reattachment recomputes geometry while freezing pendulum phase. Clear pays the remaining countdown, with a separate no-death lion bird/coin sequence. Money hoops now use the 1,000–5,000 ladder; third-bounce prizes use 300–900. A reverse-jump collectible, score cap and existing extra-life/continue careers are active.
+The pony departs during the clear picture. The trapeze partner approaches for a kiss, using adapted source frames. Retry reattachment recomputes geometry while freezing pendulum phase. Clear pays the remaining countdown, with an authored upright, front-facing Charlie wave, bird, blue-dollar sack and coin shower after every win. The extra 400 coin points still require an unharmed run. Meter boards now cover all acts and water; the horse boards sit along the back edge of its track. Trapeze approach boards stay fixed while GOAL follows the selected final platform. Main trampoline bags are placed above the second-bounce apex; the third bounce collects them, and the fourth visibly tears the big top before Charlie falls. This compressed Atari roof-impact sequence is an adaptation of the arcade's scrolling high jump. Money hoops now use the 1,000–5,000 ladder; third-bounce prizes use 300–900. A reverse-jump collectible, score cap and existing extra-life/continue careers are active.
 
 The ground-level green palette uses existing display boundaries for its brighter-to-darker bands. Water pedestals and prizes use clipped/precomposed drawing paths; their gameplay coordinates are unchanged. Horse spring artwork is aligned to two colour pixels; collision and motion keep their full native precision.
 
@@ -79,7 +79,8 @@ The playable career is complete, but the following are not established as exact 
 | Lion repeat courses | Later pot positions extend the earlier measured layouts; the entire reverse-travel/repeat-pot allocator has not been translated. Hoop variation uses a deterministic seed. |
 | Hidden rewards | Reverse-jump/doll and bird/coin sequences are implemented, but their complete arcade trigger/reset choreography is not exhaustively reproduced. The special extra-life hoop and every act-specific hidden/end reward are not implemented. |
 | Trapeze finish | The goal position still uses the earlier inferred construction/rounding. All six ranks have valid ordinary-input routes and a rendered celebration. |
-| Career/continue | Native two-player careers and the 36-clear ending work; every arcade set/DIP-specific progression and continue policy has not been exhaustively mapped. |
+| Career/continue | Independent two-player progress, five-use chooser lockouts and continuing harder shows work. The all-30 reset follows the requested policy; every arcade set/DIP-specific progression and continue policy has not been exhaustively mapped. |
+| Horse retry | Restarts rebuild an earlier scrolling page and clear stale airborne state/overlapping objects. This supplies a recoverable approach; the exact arcade checkpoint policy has not been established. |
 | Presentation | Character resolution, palette, transition pacing and some art are Atari adaptations. Music is a POKEY arrangement, not sound-chip emulation. Pictures update every two Atari refreshes. |
 
 These notes distinguish a complete playable candidate from a claim of perfect arcade parity. They remain visible so unverified or absent arcade details cannot silently become accepted specifications.

@@ -35,12 +35,13 @@ cross-bank links, loop destinations and one-shot endings. The candidate stores t
 | Other jump/release / trampoline bounce | 44 / 45 |
 | Horse jump/rebound arrangement | 4B |
 | Point reward / extra life | 49 / 50 |
-| Act-clear intermission | Converted original DAC command 80 applause |
+| Animated act-clear celebration | Source command 1C through the ordinary music stream |
 
 All 11 music commands and 18 effect commands have prepared PAL and NTSC
 streams (58 in total), including cues not yet assigned to gameplay events.
-Command 1C is retained in the catalogue; the act-clear state initially selects
-it, then the intermission applause takes over and leaves silence afterward.
+Command 1C now plays continuously throughout the act-clear animation. It is
+not interrupted by the blocking DAC player, and the stream is not discarded
+halfway through the celebration.
 Some event assignments are port arrangements; this is not a claim of exact
 arcade mixing or an exact transcription of every event trigger.
 The death pause lasts 2.5 seconds so its 2.32-second tune finishes before retry.
@@ -73,25 +74,19 @@ Both interrupts restore the complete SIC control byte and use private scratch
 state. An interrupt test covers 136 positions during all seven scene renderers
 and decimal scoring.
 
-## Sampled applause
+## Retained applause reference
 
-The actual command-80 DAC waveform is centred, quantised to four bits and packed
-into 14,478 bytes. Its 28,956 samples play once per two scanlines using POKEY's
-volume-only mode. It lasts about 3.69 seconds on NTSC and 3.72 seconds on PAL;
-the shared sample has the small line-clock pitch/duration difference. It is
-restricted to act-clear/completion intermissions. The completed playfield and
-GREAT/FAROUT remain visible, with normal DMA and display interrupts. Playback
-starts after an eight-VBI presentation delay. Its two-scanline clock catches up
-after interruptions instead of stretching the sample timeline. The complete
-payload is checked under PAL/NTSC VBI interrupts, and a recorded POKEY waveform
-is checked against the original prepared sample.
-There is no PCM decoding or sample interrupt during active gameplay.
+The original command-80 DAC waveform and its four-bit player remain in the
+source and cartridge for reference, with the standalone PAL/NTSC payload test.
+They are no longer triggered by normal gameplay or celebrations. That player
+held the foreground for about 3.7 seconds and then cleared the music state,
+which caused the reported animation freeze and silence. Animated celebrations
+now use the existing interrupt-driven command-1C arrangement throughout.
 
-This preserves the audience cue without using the game's collision/rendering
-budget. The longer command-81 and shorter command-82 variants are not separately
-implemented. The four-bit conversion has less dynamic range than the arcade
-DAC. Physical-hardware listening and subjective mix approval remain necessary
-before describing the audio as release-final.
+This changes the clear-state mix: the sampled crowd applause is not played.
+No music notes or event-stream payloads were changed. The 58 source-derived
+POKEY streams, death cue, jump sounds and scoring cues remain. There is no PCM
+decoding or sample interrupt during active gameplay or the celebration.
 
 ## Validation and remaining sound work
 

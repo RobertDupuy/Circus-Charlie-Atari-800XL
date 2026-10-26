@@ -1,0 +1,286 @@
+{
+  "early": [
+    {
+      "player": 1,
+      "rank": 1,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 1,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 2,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 2,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 3,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 3,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 4,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 4,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 5,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 5,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 6,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 6,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 1,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 1,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 2,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 2,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 3,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 3,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 4,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 4,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 5,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 5,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 6,
+      "act": 2,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 6,
+      "act": 4,
+      "deaths": 4,
+      "continues": 1,
+      "recovered_and_cleared": true
+    }
+  ],
+  "late": [
+    {
+      "player": 1,
+      "rank": 1,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 2,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 3,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 4,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 5,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 1,
+      "rank": 6,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 1,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 2,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 3,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 4,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 5,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    },
+    {
+      "player": 2,
+      "rank": 6,
+      "deaths": 3,
+      "continues": 1,
+      "recovered_and_cleared": true
+    }
+  ],
+  "natural_deaths": 132,
+  "continues": 36,
+  "completed_recovery_routes": 36,
+  "independent_checkpoint_pages": true
+}

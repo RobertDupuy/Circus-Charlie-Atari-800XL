@@ -1,0 +1,19 @@
+{
+  "standard": "ntsc",
+  "selection": "arcade",
+  "car_sha256": "1a24a4816bdc7188722d337741dc12250df6b81b2ecb191d47693c9124c55bae",
+  "title_player_controls": true,
+  "start_and_fire": true,
+  "reset_returns_title": true,
+  "natural_stage_entries": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "lockout_fixture": true,
+  "static_menu_frames": 133,
+  "varying_rows": []
+}

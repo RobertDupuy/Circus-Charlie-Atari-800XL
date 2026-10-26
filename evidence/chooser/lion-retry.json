@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "player": 1,
+      "rank": 1,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 21758
+    },
+    {
+      "player": 1,
+      "rank": 2,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 23112
+    },
+    {
+      "player": 1,
+      "rank": 3,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 23032
+    },
+    {
+      "player": 1,
+      "rank": 4,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 22334
+    },
+    {
+      "player": 1,
+      "rank": 5,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 22794
+    },
+    {
+      "player": 1,
+      "rank": 6,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 24920
+    },
+    {
+      "player": 2,
+      "rank": 1,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 21758
+    },
+    {
+      "player": 2,
+      "rank": 2,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 23112
+    },
+    {
+      "player": 2,
+      "rank": 3,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 23032
+    },
+    {
+      "player": 2,
+      "rank": 4,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 22334
+    },
+    {
+      "player": 2,
+      "rank": 5,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 22794
+    },
+    {
+      "player": 2,
+      "rank": 6,
+      "deaths": 4,
+      "continues": 1,
+      "max_retry_cycles": 24920
+    }
+  ],
+  "alternating_turns": [
+    1,
+    2,
+    1,
+    2
+  ],
+  "natural_collisions": 52,
+  "continues": 12,
+  "independent_checkpoints": true
+}

@@ -55,7 +55,9 @@ def run(a,rank=0):
    start=m.m[0xdc90+band];end=m.m[0xdc93+band]
    assert start==255 or m.m[0x650+band]+end-start<=128,('hero font boundary',a,rank,band,start,end)
   assert m.m[0xdcc0]<=252 and m.m[0xdcc1]<=252,'rectangle capacity'
-  if a==3:assert m.m[0x655]==98,'Charlie would alter a shared ball font'
+  if a==3:
+   start=m.m[m.labels['bg_count']+2]
+   assert start<=m.m[0x655]<=start+31<=128,'Ball merging exceeded its private font range'
   if m.get('fault'):reason='render fault';break
   if m.get('mode')!=2:
    reason='clear' if m.get('mode')==4 else 'death';break

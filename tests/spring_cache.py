@@ -14,6 +14,16 @@ def run(reference):
  for rank in range(6):
   m=Machine();m.stage(4,rank)
   if reference:
+   p=m.labels['gfx_spring_board'];target=m.labels['draw_stamp'];m.m[p]=0x4c;m.m[p+1]=target&255;m.m[p+2]=target>>8
+   # Independent ordinary-stamp reference for both columns. The production
+   # helper draws the pair in one native call; this fixture lives in test RAM.
+   def absolute(op,name):
+    address=m.labels[name];return [op,address&255,address>>8]
+   code=absolute(0x20,'draw_stamp')+[0xa6,m.labels['z_hazard']]+absolute(0xbd,'h_width')
+   code += [0x0a,0x18]+absolute(0x7d,'h_width')+[0x0a,0x38,0xe9,3,0x18]
+   code += absolute(0x6d,'sprite_x')+absolute(0x8d,'sprite_x')+[0x90,3]+absolute(0xee,'sprite_xhi')+absolute(0x4c,'draw_stamp')
+   for i,v in enumerate(code):m.m[0x300+i]=v
+   p=m.labels['gfx_spring_leg'];m.m[p]=0x4c;m.m[p+1]=0;m.m[p+2]=3
    p=m.labels['ds_spring_cache'];target=m.labels['ds_spring_fallback'];m.m[p]=0x4c;m.m[p+1]=target&255;m.m[p+2]=target>>8
    m.m[m.labels['bg_count']+1]=11;m.m[m.labels['bg_count']+2]=48
    m.m[m.labels['gfx_alt_base']+7]=11;m.m[m.labels['gfx_alt_base']+8]=48

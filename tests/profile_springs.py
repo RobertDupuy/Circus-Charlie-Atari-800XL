@@ -3,7 +3,7 @@ from cpu import Machine,ROOT
 from collections import Counter
 import json
 rom=(ROOT/'build/Circus-Charlie-SIC512.rom').read_bytes();weights=Counter()
-for rank in range(4):
+for rank in range(6):
  for parity in range(2):
   m=Machine();m.stage(4,rank);seq=json.loads((ROOT/f'assets/routes/mechanics-route-4-{rank}.json').read_text())
   if parity:
@@ -17,13 +17,15 @@ for rank in range(4):
     if not w:continue
     x=m.m[m.labels['hazard_xlo']+i]+256*m.m[m.labels['hazard_xhi']+i]-3*w-m.word('camera')
     if x>=160 or x+6*w<=0:continue
+    x &= ~1
     pose=w*2+26+((m.get('anim_clock')>>2)&1)
     d=7*16384+pose*128+(x&3)*32
     bank=rom[d];address=int.from_bytes(rom[d+1:d+3],'little');count=rom[d+3]
     start=bank*16384+address-0x8000
     for j in range(count):
      cell=rom[start+j*10:start+(j+1)*10]
-     if 0<=x//4+(cell[0]&31)<40:visible.append(bytes(cell[2:]))
+     row=cell[1]&3 if cell[0]&32 else cell[1]
+     if m.m[m.labels['horse_y']+i]+row*8>=136 and 0<=x//4+(cell[0]&31)<40:visible.append(bytes(cell[2:]))
    m.set('back',f&1);cyc+=m.call('render_frame')
    factor=max(1,(cyc-26000)//100)
    for p in visible:weights[p]+=factor

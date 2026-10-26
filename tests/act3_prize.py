@@ -1,4 +1,6 @@
-"""Prepared prizes must preserve generic pixels over the moving crowd."""
+"""The water prize cache preserves generic pixels over the moving crowd.
+The high main-act bags are covered by presentation_details.py.
+"""
 from cpu import Machine,ROOT
 import numpy as np,json
 
@@ -11,7 +13,7 @@ def pixels(m):
  return np.where((values==3)&((screen[:,:,None,None]&128)!=0),4,values)
 
 cases=0;saved=0
-for scene in (2,6):
+for scene in (6,):
  m=Machine();m.stage(scene);m.c.at_save_slot(0)
  for index in range(25):
   world=(48 if scene==6 else 52)+index//3*192+index%3*66

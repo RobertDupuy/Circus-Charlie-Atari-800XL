@@ -22,6 +22,7 @@ for rank in range(6):
    if m.get('need_stage'):break
    m.set('back',tick&1);m.call('render_frame');pictures+=1
    assert not m.get('fault'),('glyph capacity',scene,rank,tick,m.get('mode'))
+   if scene in (2,5):assert m.m[m.labels['free_glyph']+2]<=124,('Distance board pool',scene,rank,tick)
    for band in range(3):
     start=m.m[m.labels['gfx_range_start']+band]
     end=m.m[m.labels['gfx_range_end']+band]

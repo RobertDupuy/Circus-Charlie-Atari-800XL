@@ -1,8 +1,7 @@
 """Tightrope deaths, continue, joystick recovery and footer raster in Atari800.
 
-The only setup edit selects Act 2 via the game's native demo entry and turns
-demo input off during its introduction. The release code is unchanged;
-subsequent collisions/retries use ordinary controls and read-only observations.
+The unmodified cartridge enters Act 2 through the arcade chooser. Selection,
+collisions, retries and continue use ordinary controls; observations are read-only.
 """
 from emulator import Atari, R
 import argparse
@@ -36,15 +35,17 @@ def sample():
                presented=word(0x606), missed=word(0x608), interval=mem[0x68c],
                fault=mem[0x61d], world=word(0x620), end=word(0x648),
                restores=mem[0xdc07], scroll=word(0x978), pal=mem[0x610],
-               loading=mem[0x61a], demo=mem[0x6ab])
+               loading=mem[0x61a], demo=mem[0x6ab], scene_clock=word(0x62c))
     samples.append(row)
     return row
 
 
 try:
-    a.monitor(['c 0638 01', 'c 0618 01'])
-    time.sleep(.25)
-    a.monitor(['c 06ab 00'])
+    a.tap('F4')
+    time.sleep(.4)
+    a.tap('Right')
+    time.sleep(.1)
+    a.tap('Control_R')
     a.record()
     started = time.monotonic()
     escape_host = None
@@ -105,7 +106,7 @@ assert len(strip) > 500, 'Insufficient complete tightrope frames'
 varying = np.any(strip != strip[0], axis=(0, 2, 3))
 report = dict(standard=args.standard,
               car_sha256=hashlib.sha256((R / 'build/Circus-Charlie-SIC512.car').read_bytes()).hexdigest(),
-              setup_fixture='Act 2 selection only; demo input disabled before play',
+              natural_input=True,
               continues=continues, samples=samples, captured_frames=len(frames),
               checked_frames=len(strip), checked_native_rows=[180 + offset, 199 + offset],
               footer_boundary_rows=[200 + offset, 201 + offset],
@@ -118,7 +119,9 @@ assert all(r['pal'] == int(args.standard == 'pal') for r in samples)
 assert all(48 <= r['world'] < r['end'] for r in samples if not r['loading'])
 assert max(r['restores'] for r in samples) >= 4 and continues >= 1
 assert samples[-1]['mode'] == 2 and samples[-1]['world'] > 72, 'Joystick cannot escape retry'
+# The monitor can stop between publishing mode=2 and resetting intro timing.
+# Require an actual gameplay tick before judging the gameplay-only counters.
 assert all(not r['missed'] and not r['fault'] and r['interval'] <= 2
-           for r in samples if r['mode'] == 2), 'Gameplay deadline or renderer failure'
+           for r in samples if r['mode'] == 2 and r['scene_clock'] > 0), 'Gameplay deadline or renderer failure'
 assert not varying.any(), 'Tightrope bottom scanlines flash or contain player streaks'
 assert not footer_bad.any(), 'Tightrope footer boundary contains a stray colour'

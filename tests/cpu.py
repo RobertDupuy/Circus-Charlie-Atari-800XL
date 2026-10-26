@@ -22,6 +22,8 @@ class Machine:
  def word(self,n):p=self.labels[n];return self.m[p]+256*self.m[p+1]
  def wordset(self,n,v):p=self.labels[n];self.m[p]=v&255;self.m[p+1]=(v>>8)&255
  def stage(self,a,rank=0):
+  # Isolated stage fixtures represent players who already entered gameplay.
+  self.m[self.labels['player_started']]=1;self.m[self.labels['player_started']+1]=1
   self.m[0x603]=3;self.m[0x600]=1;self.m[0x601]=2 if a==6 else a;self.m[0x60e]=1
   self.set('water',int(a==6))
   self.m[0x6d3+(2 if a==6 else a)]=rank;self.set('round',rank+1);self.set('difficulty',0);self.set('next_extra',2);self.set('players',1)

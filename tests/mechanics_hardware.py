@@ -36,13 +36,14 @@ for scene,rank in cases:
  tag=os.environ.get('CIRCUS_RUN_TAG','')
  machine=Atari(standard,f'mechanics-{tag+"-" if tag else ""}{standard}-{scene}-{rank}',cart=fixture,sound=True)
  try:
-  # Choose the fixture's title state explicitly. Rapid SELECT key taps can
-  # be missed when several host emulators run concurrently. OPTION's normal
-  # game_tick path still initializes the demonstration and native stage.
-  # Use the normal SELECT latch so game_tick changes scene at a safe boundary.
-  # Editing act directly while the monitor stops inside rendering can combine
-  # old fonts with new objects and contaminate the pre-play fault counter.
-  machine.monitor([f'c 0638 {scene:02x}','c 0618 01']);time.sleep(.5)
+  # Enter the correct scene using the real chooser, then reload this same
+  # scene with the prerecorded input stream enabled. No hidden title selector.
+  def press(key):
+   machine.key(key,True);time.sleep(.13);machine.key(key,False);time.sleep(.14)
+  press('F4');time.sleep(.3)
+  for _ in range(a):press('Right')
+  press('Control_R');time.sleep(.3)
+  machine.monitor(['c 06ab 01','c 0639 01']);time.sleep(.3)
   machine.monitor(commands+['m 0600 06bf'])
   setup={}
   for line in (machine.out/f'{standard}.log').read_text().splitlines():

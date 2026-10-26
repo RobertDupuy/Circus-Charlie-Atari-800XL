@@ -2,7 +2,7 @@
 import os,subprocess,time,sys,secrets,shutil
 from pathlib import Path
 from PIL import Image
-from Xlib import X,XK,display
+from Xlib import X,XK,display,error
 from Xlib.ext import xtest
 R=Path(__file__).resolve().parents[1]
 T=Path(os.environ.get('ATARI800_ROOT','/usr'))
@@ -22,19 +22,59 @@ class Atari:
   time.sleep(2)
   self.w=next(w for w in self.d.screen().root.query_tree().children if 'Atari' in (w.get_wm_name() or ''))
   self.w.set_input_focus(X.RevertToParent,X.CurrentTime);self.d.sync()
- def key(self,n,down):xtest.fake_input(self.d,X.KeyPress if down else X.KeyRelease,self.d.keysym_to_keycode(XK.string_to_keysym(n)));self.d.sync()
+ def visible_window(self):
+  for w in self.d.screen().root.query_tree().children:
+   try:
+    if 'Atari' in (w.get_wm_name() or '') and w.get_attributes().map_state==X.IsViewable:return w
+   except error.BadWindow:continue
+  return None
+ def key(self,n,down):
+  # SDL can replace its X window when leaving the monitor or changing mode.
+  # Xvfb has no window manager to restore keyboard focus to the replacement.
+  w=self.visible_window()
+  if w is not None:
+   try:self.w=w;w.set_input_focus(X.RevertToParent,X.CurrentTime)
+   except error.BadWindow:pass
+  xtest.fake_input(self.d,X.KeyPress if down else X.KeyRelease,self.d.keysym_to_keycode(XK.string_to_keysym(n)));self.d.sync()
  def tap(self,n):self.key(n,True);time.sleep(.06);self.key(n,False)
  def record(self):
   self.key('Alt_L',True);self.tap('v');self.key('Alt_L',False);time.sleep(.15);self.tap('Return');time.sleep(.1)
  def shot(self,path=None):
-  self.w=next(w for w in self.d.screen().root.query_tree().children if 'Atari' in (w.get_wm_name() or ''))
-  g=self.w.get_geometry();r=self.w.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff)
+  for attempt in range(20):
+   try:
+    w=self.visible_window()
+    if w is None:time.sleep(.02);continue
+    self.w=w;g=w.get_geometry();r=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);break
+   except error.BadWindow:time.sleep(.02)
+  else:raise AssertionError(('Atari800 screenshot window unavailable',self.out))
   im=Image.frombytes('RGB',(g.width,g.height),r.data,'raw','BGRX')
   if path:im.save(self.out/path)
   return im
  def monitor(self,cmd,resume=True):
-  self.tap('F8');time.sleep(.08)
-  self.p.stdin.write(('\n'.join(cmd+(['cont'] if resume else []))+'\n').encode());self.p.stdin.flush();time.sleep(.08)
+  # A fixed host delay can read an empty/stale dump under parallel test load.
+  # Wait for the monitor's prompt both when entering and after the commands.
+  path=Path(self.log.name)
+  def wait_prompt(offset,seconds=5):
+   until=time.monotonic()+seconds
+   while ' PC=' not in path.read_bytes()[offset:].decode(errors='replace'):
+    assert time.monotonic()<until,('Atari800 monitor did not respond',self.out)
+    time.sleep(.01)
+  offset=path.stat().st_size
+  self.tap('F8')
+  try:wait_prompt(offset,.5)
+  except AssertionError:
+   # SDL occasionally drops the entry key while replacing its window.
+   # Retry only if the emulator is alive and still showing that window;
+   # a process failure or an already-entered monitor must not be hidden.
+   if ' PC=' not in path.read_bytes()[offset:].decode(errors='replace'):
+    assert self.p.poll() is None,('Atari800 process stopped',self.out)
+    if self.visible_window() is not None:self.tap('F8')
+   wait_prompt(offset)
+  offset=path.stat().st_size
+  self.p.stdin.write(('\n'.join(cmd+['show'])+'\n').encode());self.p.stdin.flush()
+  wait_prompt(offset)
+  if resume:
+   self.p.stdin.write(b'cont\n');self.p.stdin.flush();time.sleep(.15)
  def close(self):
   if self.p.poll() is None:
    self.p.terminate()

@@ -8,11 +8,11 @@ from pathlib import Path
 import hashlib,json,subprocess,sys
 
 ROOT=Path(__file__).resolve().parents[1]
-TESTS=('mechanics_regression','arcade_lion','lion_retry','tightrope_retry','hoop_depth','hoop_passage',
-       'bold_render','hud_cache','arcade_rules','water_regression',
+TESTS=('mechanics_regression','arcade_lion','lion_retry','tightrope_retry','ball_horse_retry','ball_contacts','trapeze_bars','horse_contacts','continue_rules','hoop_depth','hoop_passage',
+       'bold_render','hud_cache','arcade_rules','chooser_rules','water_regression',
        'interrupt_audio','arcade_audio','spring_cache','monkey_cache',
        'rope_cache','hero_compositors','stamp_rows','ranked_playthrough',
-       'complete_campaign','completion_rules','dma_windows','every_tick_render','dma_registers','pcm_payload','act3_arcade','act3_prize')
+       'complete_campaign','completion_rules','dma_windows','every_tick_render','dma_registers','pcm_payload','act3_arcade','act3_prize','presentation_details','celebration_audio')
 out=ROOT/'build/acceptance';out.mkdir(exist_ok=True)
 car=ROOT/'build/Circus-Charlie-SIC512.car'
 digest=hashlib.sha256(car.read_bytes()).hexdigest()

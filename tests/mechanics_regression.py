@@ -107,7 +107,10 @@ for a in (1,3,4,5):
  assert m.get('mode')==2;rope=m.get('held_rope');before=m.word('world');m.call('hurt')
  for _ in range(160):tick(m)
  m.call('load_stage');assert m.get('checkpoint_restores')==1 and m.get('lives')==2
- assert abs(m.word('world')-before)<220,(a,before,m.word('world'))
+ if a==4:
+  assert 192<=before-m.word('world')<448,(a,before,m.word('world'))
+  assert not m.word('f_horse_h') and not m.word('f_horse_v')
+ else:assert abs(m.word('world')-before)<220,(a,before,m.word('world'))
  if a==5:assert m.get('held_rope')==rope and not m.get('flying')
  retries.append(a+1)
 out['ordinary_retry_acts']=retries

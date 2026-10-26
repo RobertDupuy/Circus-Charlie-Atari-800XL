@@ -64,7 +64,8 @@ report.update(crowd_reference_cases=crowds,scrolling_rows=6,bunting_scrolls_with
 # The native money-bag copy must match its prepared clipped stamp, including
 # negative X and both font buffers. Its parent hoop owns the dirty rectangle.
 m=Machine();m.stage(0);m.set('back',0);m.call('render_frame');m.c.at_save_slot(0)
-bags=0
+bags=blue_dollar_pixels=0
+dollar=('00100','01111','10100','10100','01110','00101','00101','11110','00100')
 for x in range(-8,160):
  for back in range(2):
   results=[]
@@ -76,7 +77,13 @@ for x in range(-8,160):
    m.call('lion_arcade_bag_draw' if native else 'draw_stamp')
    results.append(pixels(m,back))
   assert results[0]==results[1],('money bag',x,back);bags+=1
+  for dy,row in enumerate(dollar,4):
+   for dx,pixel in enumerate(row,1):
+    if pixel=='1' and 0<=x+dx<160:
+     assert results[1][(96+dy)*160+x+dx]==4,('Dollar sign lost its blue colour',x,back,dx,dy)
+     blue_dollar_pixels+=1
 report['money_bag_reference_cases']=bags
+report['blue_dollar_pixels_checked']=blue_dollar_pixels
 
 # Native clearing of the fixed hoop rectangles must restore the same screen
 # bytes as the general rectangle loop at every legal column and buffer.

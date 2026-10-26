@@ -93,6 +93,12 @@ for kind,phase,height in [(1,24,19),(2,24,32)]:
  for dx,expected in [(0,3),(8,2)]:
   m=projectile(kind,phase,56+dx);m.set('grace',0);m.set('jump_pixels',height)
   bankcall(m,'tramp_projectile_step');assert m.get('mode')==expected,(kind,dx,m.get('mode'))
+  if expected==3:
+   assert m.get('tramp_death_reason')==kind+1
+   assert m.get('jump_pixels')==height, 'Show the actual projectile contact before falling'
+   m.call('render_frame')
+   hud=bytes(m.m[0x6a00+m.get('back')*160+80:0x6a00+m.get('back')*160+120])
+   assert (b'HIT THE FIRE!' if kind==1 else b'HIT THE BLADE!') in hud
 
 # Retry discards attacks and restores the last actual trampoline, with grace.
 m=projectile(1);m.set('tramp_index',12);m.call('tramp_resume_entry')

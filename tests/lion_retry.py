@@ -16,6 +16,9 @@ def tick(m, joy=0, fire=0):
 
 
 def begin(m):
+    if m.get('mode') == 7:
+        tick(m, fire=1)
+        m.call('load_stage')
     while m.get('mode') == 1:
         tick(m)
     assert m.get('mode') == 2
@@ -39,8 +42,11 @@ def after_death(m):
     if continued:
         tick(m, fire=1)
         assert m.get('lives') == 3
-    assert m.get('need_stage') and m.get('mode') == 1
+    assert m.get('need_stage') and m.get('mode') in (1, 7)
     m.call('load_stage')
+    if m.get('mode') == 7:
+        tick(m, fire=1)
+        m.call('load_stage')
     return continued
 
 

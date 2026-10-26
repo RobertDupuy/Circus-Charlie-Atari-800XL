@@ -40,7 +40,7 @@ def sample():
                presented=word(0x606), missed=word(0x608), fault=mem[0x61d],
                interval=mem[0x68c], world=word(0x620), potcount=mem[0xd938],
                restores=mem[0xdc07], player=mem[0x6b5], pal=mem[0x610],
-               loading=mem[0x61a])
+               loading=mem[0x61a], scene_clock=word(0x62c))
     samples.append(row)
     return row
 
@@ -48,6 +48,9 @@ def sample():
 try:
     a.record()
     a.tap('F4')
+    time.sleep(.4)
+    if json.loads((R / 'build/build-profile.json').read_text())['selection'] == 'arcade':
+        a.tap('Control_R')
     started = time.monotonic()
     final_host = None
     previous = None
@@ -135,8 +138,8 @@ assert max(r['restores'] for r in samples) >= 4 and continues >= 1, 'Retry/conti
 assert max(r['world'] for r in samples) > 160, 'Joystick did not move Charlie'
 assert all(r['pal'] == int(args.standard == 'pal') for r in samples), 'Wrong TV mode'
 assert all(r['potcount'] == 5 and not r['fault'] for r in samples if r['mode'] == 2), 'Lost or corrupted lion state'
-assert all(not r['missed'] for r in samples if r['mode'] == 2), 'Missed gameplay deadlines'
-assert all(r['interval'] <= 2 for r in samples if r['mode'] == 2), 'Slow presentation after retry'
+assert all(not r['missed'] for r in samples if r['mode'] == 2 and r['scene_clock'] > 0), 'Missed gameplay deadlines'
+assert all(r['interval'] <= 2 for r in samples if r['mode'] == 2 and r['scene_clock'] > 0), 'Slow presentation after retry'
 assert not varying.any(), 'Background scanlines change between TV frames'
 assert not mixed_rows and len(set(tops)) == 1, 'Background boundary shifts across/along a line'
 assert not banner_varying.any(), 'Banner palette flickers at its character boundary'

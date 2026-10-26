@@ -1,0 +1,22 @@
+{
+  "arcade-acceptance.json": "33855777c6dd2b3347f8faea5fdc456c6b616c46bc5acd0a86abd100bb71e1ff",
+  "arcade-ball-horse-retry.json": "031f5968189486b43df2a18648be52bb961f3bf06bd9dbcf6df6e135e662220c",
+  "arcade-contacts.json": "842b15a0d974e9232a319bfe34657b78b691ae09fe227802ef4c74d15fa496d6",
+  "arcade-continue-rules.json": "8a7136f475b76744bc9d955f3f26da2359642a71b4c450dc8a20ad9de4584518",
+  "arcade-demo-ntsc.json": "75209806b43f5ba7764a4aecf8224ebed3b362472abe138188dddafdf5b0715a",
+  "arcade-demo-pal.json": "4a9c741f1cc664cb3fe09b77dc0b30505a690ddda72aeb42d391d766096990db",
+  "automatic-acceptance.json": "244fc0a108b8fb33ea93a8d27f73dea4c8d456a3ae87bd7c6396e48ca9c7bff3",
+  "automatic-ball-horse-retry.json": "031f5968189486b43df2a18648be52bb961f3bf06bd9dbcf6df6e135e662220c",
+  "automatic-contacts.json": "3e8b79b603198a8a17665090eaf8658c793c966d4d6ca7619dc7b1569c0d8894",
+  "automatic-continue-rules.json": "b752e337fb1f11b43eaf694d4c1e12c721eb9826af54c74dd6155c1b749de7c8",
+  "automatic-demo-ntsc.json": "75209806b43f5ba7764a4aecf8224ebed3b362472abe138188dddafdf5b0715a",
+  "automatic-demo-pal.json": "4a9c741f1cc664cb3fe09b77dc0b30505a690ddda72aeb42d391d766096990db",
+  "before-ntsc.json": "44784afe6adf6febdb0cb71c1c37d93cac4e3bf365e5dd671136974a4f9dabd7",
+  "before-ntsc.png": "778313a2dcfbba4743ccfef6fbc7e8c8bd2d63da42aaf63abdc1dce21d5b614c",
+  "fixed-ntsc.json": "5b4476b3581949228d046b541c58917da5a426c53168b37757646c5d0c8bf180",
+  "fixed-ntsc.png": "16d4005975439967db4b436108f7e8ee70905cd9a9335974e8f4ee13e9d63b46",
+  "fixed-pal.json": "b32c5b3eae0ade59850fbea0739e01d12446f9a88addc6eca6e99aa5b4f73a2e",
+  "fixed-pal.png": "b1cc7a3cb9b545d9af5a6c2e23eae1fd77e7e1f511dcb4d141d1f0b1acc32c3c",
+  "investigation.json": "3be6030dee2211a1b5b84f9b3286fce08209b3cb4a36f1fe422c50f9fd6e4930",
+  "reproducibility.json": "de465a48461e9a75406e484df4fa3f8a050413f57149b4442d6f4861246abe36"
+}

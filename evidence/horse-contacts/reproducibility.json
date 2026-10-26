@@ -1,0 +1,11 @@
+{
+  "separate_tree_rebuild_identical": true,
+  "arcade": {
+    "car": "f9eb5408386489adaa58c434a1948f00ca55f5f51f778e45febe4296d08df162",
+    "rom": "c39d1ce903280e5f362e36c9d80b170bd4cb3ad8ef93b81fa1440b665f49000a"
+  },
+  "automatic": {
+    "car": "a8fb2a7d6b20c0ac6c6f3138add7673859cf0af82da43637ee40a107cab31eac",
+    "rom": "72107f67525c68c424b825fd7579545c260d2ca6a1cc66fbdc0bcefc8d930a66"
+  }
+}

@@ -1,0 +1,114 @@
+[
+  {
+    "scene": 0,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 1,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 2,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 3,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 4,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 5,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 6,
+    "standard": "ntsc",
+    "celebration_tv_frames": 224,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 0,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 1,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 2,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 3,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 4,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 5,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  },
+  {
+    "scene": 6,
+    "standard": "pal",
+    "celebration_tv_frames": 187,
+    "longest_silent_audio_updates": 1,
+    "peak_foreground_audio_cycles": 15,
+    "continuous_animation": true
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "car_sha256": "4aac136f2b8b6602dac4a0d457e8b12d149a5e5450de1a2fbb2d3e8a57418809",
+  "result": {
+    "scene": 5,
+    "rank": 5,
+    "completed": true,
+    "host_frames": 4855,
+    "presented_frames": 2427,
+    "fps": 29.955,
+    "missed_deadlines": 0,
+    "max_refresh_interval": 2,
+    "renderer_faults": 0,
+    "max_dirty_cells": 33,
+    "lives": 3,
+    "monkey_leaps": 0,
+    "trampoline_rescues": 8,
+    "pm_overflow": 0
+  }
+}

@@ -1,5 +1,6 @@
 .setcpu "6502"
 .macpack longbranch
+.include "build-options.inc"
 .include "memory.inc"
 .export start,game_tick,render_frame,mode,act,world,height,velocity,jumping,host_frames,presented,missed,fault,ready,front,back,input,fire_latch,scene_clock,stage_end,finish_count,clear_count,max_interval,paused,need_stage
 .segment "CODE"
@@ -34,8 +35,14 @@
 
 .segment "TRAMPOLINE"
 .include "trampoline.s"
+.segment "DETAILS"
+.include "trampoline-motion.s"
+.include "details.s"
 
 .include "title.s"
+.if ::ARCADE_CHOOSER
+.include "chooser.s"
+.endif
 
 .segment "MASK"
 .repeat 256,I

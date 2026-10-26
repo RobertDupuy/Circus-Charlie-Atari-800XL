@@ -1,4 +1,11 @@
 .proc render_frame
+.if ::ARCADE_CHOOSER
+ lda mode
+ cmp #7
+ bne :+
+ jmp chooser_render_entry
+:
+.endif
  lda mode
  bne :+
  jmp title_render
@@ -104,8 +111,16 @@
  sta pm_color,x
  dex
  bpl @hide
- jsr draw_scene
+ jsr detail_track_signs
+ lda act
+ bne :+
  jsr draw_finish
+:
+ jsr draw_scene
+ lda act
+ beq :+
+ jsr draw_finish
+:
  jsr fidelity_clear_text_entry
  jsr complete_draw_entry
 pm_prepare_dispatch:
@@ -751,8 +766,7 @@ ds_done:
  lda act_messages+1,x
  sta z_src+1
 @message:
- ldy #80
- jsr hud_text
+ jsr detail_hud_entry
 @numbers:
  jsr gfx_hud_needed
  bcc @hud_done
@@ -850,8 +864,29 @@ ds_done:
  and #3
  tax
  lda ball_font_high,x
+ sta band_font+2
  ldx back
  sta frame_ballfont,x
+ ; Immutable patterns occupy 0..65. Each screen owns 31 private glyphs in
+ ; every phase font, so merging touching balls cannot alter the front buffer.
+ lda #66
+ cpx #0
+ beq :+
+ lda #97
+:
+ sta bg_count+2
+ clc
+ adc #27
+ sta ball_merge_limit
+ lda bg_count+2
+ ldx mode
+ cpx #2
+ beq :+
+ ; The fallen actor also occupies this font. Reserve its four bottom rows.
+ clc
+ adc #20
+:
+ sta free_glyph+2
  lda anim_clock
  lsr
  lsr
@@ -865,11 +900,21 @@ ds_done:
 .endproc
 
 .proc draw_ball
- ; Only 24 screen bytes per ball; all pixels are shared prepared ROM glyphs.
+ lda #$3C
+ sta $D500
+ jmp complete_draw_ball
+.endproc
+
+.segment "COMPLETE"
+.proc complete_draw_ball
+ ; Prepared glyphs cover the 24-cell ball box; only shared edge cells
+ ; need blending.
  lda sprite_x
  and #3
  tax
  lda ball_glyph_base,x
+ sec
+ sbc #2
  sta z_new
  lda sprite_x
  lsr
@@ -881,7 +926,7 @@ ds_done:
  sta z_col
  lda #17
  sta z_row
-@row:
+ball_row:
  ldx z_row
  lda row_lo,x
  sta z_cell
@@ -889,35 +934,112 @@ ds_done:
  clc
  adc z_map+1
  sta z_cell+1
- lda #0
- sta z_iter
-@col:
+ ; Unroll the six columns: this also keeps the contact-cell compositing
+ ; within the NTSC frame budget when several balls are visible together.
+ .repeat 6,I
+ .scope
  lda z_col
+ .if I>0
  clc
- adc z_iter
+ adc #I
+ .endif
  cmp #40
- bcs @skip
+ bcs skip
  sta z_left
- lda z_new
- sec
- sbc #2
- tay
+ ldy z_new
  lda (gfx_ball_flags),y
- ora z_new
+ beq skip
+ sta gfx_sprite_alt
  ldy z_left
+ lda (z_cell),y
+ cmp #2
+ bcc plain
+ cmp gfx_sprite_alt
+ beq skip
+ jsr ball_merge_cell
+ jmp skip
+plain:
+ lda gfx_sprite_alt
  sta (z_cell),y
-@skip:
+skip:
  inc z_new
- inc z_iter
- lda z_iter
- cmp #6
- bne @col
+ .endscope
+ .endrepeat
  inc z_row
  lda z_row
  cmp #21
- bne @row
+ jne ball_row
  rts
 .endproc
+
+.proc ball_merge_cell
+ ; Full-cell stores used to erase a neighbour's rim before the balls met.
+ ; Blend only shared cells, using the same palette conversion as the masked
+ ; sprite renderer. All inputs are resident RAM; no source-bank switches.
+ sta z_colorflag
+ and #127
+ sta z_old
+ tax
+ lda glyph_lo,x
+ sta z_bg
+ lda glyph_hi,x
+ ora band_font+2
+ sta z_bg+1
+ lda gfx_sprite_alt
+ and #127
+ tax
+ lda glyph_lo,x
+ sta z_src
+ lda glyph_hi,x
+ ora band_font+2
+ sta z_src+1
+ lda z_old
+ cmp #66
+ bcs @destination
+ lda free_glyph+2
+ cmp ball_merge_limit
+ bcs @overflow
+ inc free_glyph+2
+@destination:
+ tax
+ lda glyph_lo,x
+ sta z_glyph
+ lda glyph_hi,x
+ ora band_font+2
+ sta z_glyph+1
+ txa
+ ldx gfx_sprite_alt
+ bpl :+
+ ora #128
+:
+ ldy z_left
+ sta (z_cell),y
+ lda z_colorflag
+ eor gfx_sprite_alt
+ sta z_colorflag
+ ldy #7
+@byte:
+ lda (z_bg),y
+ bit z_colorflag
+ bpl :+
+ tax
+ lda $7C00,x
+:
+ sta z_value
+ lda (z_src),y
+ tax
+ lda $FC00,x
+ and z_value
+ ora (z_src),y
+ sta (z_glyph),y
+ dey
+ bpl @byte
+ rts
+@overflow:
+ inc fault
+ rts
+.endproc
+.segment "CODE"
 
 .proc gfx_hud_needed
  lda back

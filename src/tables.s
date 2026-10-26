@@ -100,18 +100,18 @@ act5: .asciiz "6 TRAPEZE         BONUS"
 act6: .asciiz "3 WATER DOLPHINS  BONUS"
 .endif
 mode_messages: .word title_text,intro_text,play_text,death_text,clear_text,over_text,continue_text,choose_text,complete_text
-title_text: .asciiz "CIRCUS CHARLIE  FIRE: START SELECT: ACT "
+title_text: .asciiz "CIRCUS CHARLIE  FIRE: START SELECT: 1/2P "
 intro_text: .asciiz "GET READY!                              "
 play_text: .byte 0
 death_text: .asciiz "OUCH! TRY AGAIN                         "
 clear_text: .asciiz "GREAT!             FAROUT!             "
-over_text: .asciiz "GAME OVER - FIRE TO PLAY AGAIN          "
+over_text: .asciiz "GAME OVER                             "
 continue_text: .asciiz "CONTINUE 5 FIRE:YES SELECT:NO           "
 pause_text: .asciiz "PAUSED - OPTION TO CONTINUE             "
 act_messages: .word help0,help1,help2,help3,help4,help5,help6
 help0: .asciiz "JUMP THROUGH HOOPS AND OVER FIRE POTS"
 help1: .asciiz "JUMP THE MONKEYS - PURPLE ONES LEAP!"
-help2: .asciiz "BOUNCE THEN MOVE - THREE BOUNCES MAX"
+help2: .asciiz "3 BOUNCES: MONEY BAG / 4TH: BIG TOP!"
 help3: .asciiz "JUMP TO THE NEXT BALL BEFORE THEY TOUCH"
 help4: .asciiz "L/R: PACE - FIRE: JUMP, ALSO AT FINISH"
 help5: .asciiz "L/R: SWING - FIRE: RELEASE AND CATCH"
@@ -128,7 +128,7 @@ glyph_hi:
 
 ball_glyph_base: .byte 2,26,50,74
 
-title_controls: .asciiz "SEL:ACT FIRE:PLAY OPT:DEMO START:LIVES  "
+title_controls: .asciiz "FIRE/START:PLAY SEL:1/2P OPT:DEMO      "
 demo_controls: .asciiz "DEMO - FIRE RETURNS TO TITLE            "
 
 hud_template_lo:
@@ -142,5 +142,5 @@ hud_template_hi:
 
 ball_font_high: .byte $48,$54,$6C,$70
 
-choose_text: .asciiz "CHOOSE ACT: LEFT/RIGHT  FIRE: PERFORM   "
-complete_text: .asciiz "ALL 36 ACTS COMPLETE! FIRE: NEW SHOW    "
+choose_text: .byte 0
+complete_text: .byte 0

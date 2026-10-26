@@ -28,7 +28,7 @@
  lda #0
  sta demo
  sta mode
- jsr select_scene
+ jsr title_scene
  lda #1
  sta need_stage
  rts
@@ -48,14 +48,19 @@
  jeq @title
  cmp #5
  jeq @gameover
+ .if ::ARCADE_CHOOSER
  cmp #7
- jeq arcade_choose
- cmp #8
- jeq arcade_complete
+ jeq chooser_tick_entry
+ .endif
  cmp #6
  jeq continue_entry
  cmp #2
  jeq @play
+ cmp #3
+ bne :+
+ jsr death_step
+:
+ lda mode
  cmp #4
  bne :+
  ldx #1
@@ -107,7 +112,7 @@
  lda #0
  sta demo
  sta mode
- jsr select_scene
+ jsr title_scene
  lda #1
  sta need_stage
  rts
@@ -143,23 +148,10 @@
 @newgame:
  jmp newgame_entry
 @gameover:
- lda select_latch
- beq :+
- lda #0
- sta select_latch
- sta mode
- jsr select_scene
- lda #1
- sta need_stage
- rts
-:
- lda z_fire
- beq :+
- lda #0
- sta demo
- jmp @newgame
-:
- rts
+ ; Retire the old unbounded GAME OVER / FIRE TO PLAY AGAIN state.
+ lda #$3F
+ sta $D500
+ jmp sys_title
 @play:
  jsr complete_play
  jsr advance_hazards
@@ -387,6 +379,7 @@
  sta sound_fx
  lda #0
  sta sound_age
+ sta death_drop
  sta height
  sta height+1
  sta jumping
@@ -470,6 +463,19 @@
  sec
  sbc jump_pixels
  sta feet
+ lda mode
+ cmp #3
+ beq @fallen_feet
+ cmp #5
+ beq @fallen_feet
+ cmp #6
+ bne @scene
+@fallen_feet:
+ lda feet
+ clc
+ adc death_drop
+ sta feet
+@scene:
  lda act
  cmp #5
  jeq @trapeze
@@ -537,6 +543,20 @@
  lda #84
  sta sprite_pose
 :
+ lda mode
+ cmp #4
+ bne :+
+ lda clear_elapsed
+ lsr
+ lsr
+ lsr
+ and #3
+ tax
+ lda lion_dance_poses,x
+ sta sprite_pose
+ lda #107 ; Upright front-facing Charlie; lion feet remain at Y=154.
+ sta sprite_y
+:
  jsr gfx_tag_hero
  jsr draw_stamp
  jmp lion_hoop_foreground
@@ -558,6 +578,8 @@
  lda #130
  sec
  sbc jump_pixels
+ clc
+ adc death_drop
  sta feet
  jmp @plainchar
 @horse:
@@ -659,7 +681,12 @@
  sta sprite_pose
  lda mode
  cmp #3
+ beq @fallen
+ cmp #5
+ beq @fallen
+ cmp #6
  bne @normal
+@fallen:
  lda #CHAR_FALL
  sta sprite_pose
  jmp @draw
@@ -728,7 +755,10 @@
 .proc tramp_resume_entry
  lda #$3A
  sta $D500
- jmp tramp_resume
+ jsr tramp_resume
+ lda #$3F
+ sta $D500
+ rts
 .endproc
 
 .proc draw_finish
@@ -795,15 +825,9 @@
  rts
 .endproc
 
-.proc select_scene
+.proc title_scene
  lda #0
  sta water
- lda selected
- cmp #6
- bne :+
- inc water
- lda #2
-:
  sta act
  rts
 .endproc
@@ -968,7 +992,7 @@ speed_masks: .byte 255,7,3,1,1,1
  rts
 .endproc
 .proc fidelity_tramp_entry
- lda #$3A
+ lda #$31
  sta $D500
  jmp fidelity_tramp_step
 .endproc
@@ -1148,10 +1172,10 @@ speed_masks: .byte 255,7,3,1,1,1
  rts
 .endproc
 .proc complete_entry
- ; X selects a bounded bank-28 routine. Preserve the caller's mapped bank.
+ ; X selects a bounded bank-17 routine. Preserve the caller's mapped bank.
  lda $D500
  pha
- lda #$3C
+ lda #$31
  sta $D500
  jsr complete_dispatch
  pla
@@ -1160,7 +1184,7 @@ speed_masks: .byte 255,7,3,1,1,1
 .endproc
 .proc complete_stamp
  jsr draw_stamp
- lda #$3C
+ lda #$31
  sta $D500
  rts
 .endproc
@@ -1190,25 +1214,14 @@ speed_masks: .byte 255,7,3,1,1,1
  rts
 .endproc
 .proc complete_draw_entry
- lda mode
- cmp #4
- beq @draw
- lda secret_visible
- beq @done
- lda act
- bne @done
-@draw:
- ldx #2
- jmp complete_entry
-@done:
- rts
+ lda #$31
+ sta $D500
+ jmp detail_draw
 .endproc
+
 .proc complete_tramp_prize
  ldx #6
- jsr complete_entry
- lda #$3A
- sta $D500
- rts
+ jmp complete_entry
 .endproc
 
 .segment "CODE"
@@ -1217,3 +1230,124 @@ speed_masks: .byte 255,7,3,1,1,1
  jmp complete_entry
 .endproc
 
+
+.proc horse_resume_entry
+ lda #$3E
+ sta $D500
+ jsr fidelity_horse_resume
+ lda #$3F
+ sta $D500
+ rts
+.endproc
+
+.proc rope_bar_entry
+ lda #$3C
+ sta $D500
+ jmp complete_rope_bar_endpoint
+.endproc
+
+; Non-top endpoint cells have a single contiguous run of visible scanlines.
+; Clip once per cell instead of rechecking the rope's Y bound on every byte.
+.proc rope_partial_fast
+ lda #7
+ ldx r_draw_row
+ cpx r_draw_bottomrow
+ bcc :+
+ lda r_draw_lastline
+:
+ sta z_body
+ ldy #0
+ lda r_draw_sign
+ bne @mirror
+@plain:
+ lda (z_data),y
+ and r_draw_mask
+ sta (z_glyph),y
+ cpy z_body
+ beq @tail
+ iny
+ bne @plain
+@mirror:
+ lda (z_data),y
+ tax
+ lda $7A00,x
+ and r_draw_mask
+ sta (z_glyph),y
+ cpy z_body
+ beq @tail
+ iny
+ bne @mirror
+@tail:
+ iny
+ cpy #8
+ beq @done
+ lda #0
+@clear:
+ sta (z_glyph),y
+ iny
+ cpy #8
+ bne @clear
+@done:
+ rts
+.endproc
+
+.segment "CODE"
+.proc detail_entry
+ ldx #8
+ jmp complete_entry
+.endproc
+.proc detail_hud_entry
+ ldx #9
+ jmp complete_entry
+.endproc
+.proc detail_hurt_entry
+ sta tramp_death_reason
+ ldx #10
+ jmp complete_entry
+.endproc
+.proc detail_death_entry
+ ldx #11
+ jmp complete_entry
+.endproc
+.proc detail_tramp_entry
+ lda #$31
+ sta $D500
+ jmp detail_trampolines
+.endproc
+.proc detail_cached
+ jsr gfx_native_cached
+ lda #$31
+ sta $D500
+ rts
+.endproc
+.proc tramp_attacks_entry
+ lda #$3A
+ sta $D500
+ jmp tramp_attacks
+.endproc
+
+lion_dance_poses: .byte 0,5,0,5
+.proc detail_hurt_call
+ jsr hurt
+ lda #$31
+ sta $D500
+ rts
+.endproc
+
+.proc detail_points
+ jsr add_points
+ lda #$31
+ sta $D500
+ rts
+.endproc
+
+.proc detail_track_signs
+ lda act
+ cmp #4
+ bne @done
+ lda #$31
+ sta $D500
+ jmp detail_signs
+@done:
+ rts
+.endproc

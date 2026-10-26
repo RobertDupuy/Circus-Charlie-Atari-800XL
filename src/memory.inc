@@ -507,3 +507,34 @@ secret_paid=$09E1
 
 money_chain=$06F0
 
+
+; Isolated show progression and optional arcade menu state.
+show_cycle=$06F1
+death_drop=$06F2
+resume_steps=$06F3
+continue_deadline=$06F4
+ball_merge_limit=$06F6
+player_cycles=$0820
+player_started=$0822
+
+; Persistent failure cause, independent of the reused apparatus pages.
+tramp_death_reason=$06F7
+tramp_death_age=$06F8
+; Presentation scratch only; never read by interrupts or gameplay.
+detail_sign_end=$09F0
+detail_sign_world=$09F2
+detail_sign_index=$09F4
+detail_sign_col=$09F5
+detail_sign_glyph=$09F6
+detail_sign_cell=$09F7
+detail_bird_x=$09F8
+detail_bag_offset=$09F9
+
+; A sign's four glyphs persist in its buffer until a different board/pool
+; uses them. The other screen never writes these private codes.
+sign_cache_label=$06F9
+sign_cache_base=$06FB
+sign_cache_font=$06FD
+sign_copy=$06FF
+detail_fast_try=$09FA
+clear_text_cache=$09FB ; Private top-font base, one per display buffer.

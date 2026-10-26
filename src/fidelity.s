@@ -165,15 +165,32 @@
  beq @next
  lda f_active,x
  beq @next
- lda ball_lo,x
+ ; Compare the two rendered ball centres. Charlie can be offset from his
+ ; support for several ticks after landing; that offset is not ball contact.
+ ldy current_ball
+ lda ball_lo,y
+ sec
+ sbc ball_lo,x
  sta z_pos
- lda ball_hi,x
+ lda ball_hi,y
+ sbc ball_hi,x
  sta z_pos+1
- jsr distance_to_player
+ bpl :+
+ lda z_pos
+ eor #255
+ clc
+ adc #1
+ sta z_pos
+ lda z_pos+1
+ eor #255
+ adc #0
+ sta z_pos+1
+:
  lda z_pos+1
  bne @next
  lda z_pos
- cmp #21
+ ; The prepared silhouette spans 14 colour pixels, including both edges.
+ cmp #15
  jcc hurt
 @next:
  dex
@@ -773,6 +790,13 @@ ball_rank_offset: .byte 0,45,90,135,180,180
  rts
 :
  sta z_new
+ lda act
+ bne @cell
+ ldx back
+ lda z_new
+ cmp clear_text_cache,x
+ beq @done ; Nothing in the lion celebration touches this top row/font.
+ sta clear_text_cache,x
 @cell:
  lda z_new
  asl
@@ -793,6 +817,7 @@ ball_rank_offset: .byte 0,45,90,135,180,180
  sta (z_glyph),y
  dey
  bpl @pixels
+@map:
  lda #<(1*40+7)
  clc
  adc z_index
@@ -800,12 +825,15 @@ ball_rank_offset: .byte 0,45,90,135,180,180
  lda z_new
  ora #128
  sta (z_map),y
+ lda act
+ beq @advance ; Keep Act 1's static text until the next stage load.
  tya
  ldy z_num
  sta (z_dirtylo),y
  lda #0
  sta (z_dirtyhi),y
  inc z_num
+@advance:
  lda z_src
  clc
  adc #8
@@ -833,6 +861,7 @@ ball_rank_offset: .byte 0,45,90,135,180,180
  bne @cell
  lda z_new
  sta free_glyph
+@done:
  rts
 .endproc
 .include "fidelity-text.inc"
@@ -1037,7 +1066,12 @@ monkey_page_hi: .byte >(monkey_schedule+0),>(monkey_schedule+0),>(monkey_schedul
  sec
  sbc previous_height
  cmp horse_y,x
+ ; A descending foot exactly level with the deck is a top contact too.
+ ; Rejecting equality kills edge landings after the horizontal step enters
+ ; the spring, even though Charlie's visible feet reached its top surface.
+ beq @land_on_spring
  bcs @crash
+@land_on_spring:
  lda #152
  sec
  sbc horse_y,x
@@ -1285,3 +1319,80 @@ h_width_table: .byte 7,7,7,7,7,7,7,7,7,6,7,6,7,6,7,6,7,6,5,6,7,7,6,5,7,6,7,5,6,6
 h_height_table: .byte 144,144,144,144,144,144,144,144,144,128,144,144,144,128,144,144,144,136,144,136,144,128,136,136,144,144,136,144,128,136,144,136,136,128,136,128,144,144,128,136,136,136,128,144,128,136,144,144,136,128,136,136,128,136,144,136,136,136,128,128,136,128,136,136,144,128,136,136,128,136,128,136,136,144,128,136,128,144,136,136,136,128,136,136,128,136,128,144,128,144,136,144,144,128,128,136,144,128,128,144,128,136,128,144
 
 h_gap_table: .byte 80,248,80,248,80,248,80,248,80,248,80,248,80,248,80,248,80,224,80,232,80,216,80,240,80,208,80,232,80,216,80,224,80,200,80,184,80,224,80,176,80,216,80,224,80,176,80,200,80,176,80,152,80,232,80,200,80,224,80,120,80,128,80,176,80,152,80,120,80,184,80,104,80,96,80,200,80,208,80,152,80,128,80,80,80,184,80,152,80,176,80,72,80,128,80,104,80,108,80,132,80,84,80,132
+
+; Rebuild a horse checkpoint in complete 256-source-pixel (192 Atari-pixel)
+; pages. Leave a full approach before the final gap and reset airborne state.
+; Replaying the generator only affects stage setup, never active play timing.
+.proc fidelity_horse_resume
+ lda world
+ sec
+ sbc #47
+ sta resume_world
+ lda world+1
+ sbc #0
+ bcs :+
+ lda #0
+ sta resume_world
+:
+ sta resume_world+1
+ lda #0
+ sta world+1
+ jsr fidelity_horse_init
+ lda #2
+ sta h_speed
+ lda #0
+ sta f_horse_v
+ sta f_horse_v+1
+ sta jumping
+ sta velocity
+ sta jump_pixels
+ sta scene_clock
+ sta scene_clock+1
+ sta grace
+ ; One page of approach is retained behind the failed performance.
+ lda resume_world
+ sec
+ sbc #192
+ sta resume_world
+ lda resume_world+1
+ sbc #0
+ bcs :+
+ lda #0
+ sta resume_world
+:
+ sta resume_world+1
+@page:
+ lda resume_world
+ cmp #192
+ lda resume_world+1
+ sbc #0
+ bcc @ready
+ lda resume_world
+ sec
+ sbc #192
+ sta resume_world
+ lda resume_world+1
+ sbc #0
+ sta resume_world+1
+ lda #128
+ sta resume_steps
+@advance:
+ jsr fidelity_horse_tick
+ jsr fidelity_horse_move
+ dec resume_steps
+ bne @advance
+ jmp @page
+@ready:
+ ; Discard old objects crossing the fresh start. Newly scheduled apparatus
+ ; begins ahead of the horse, giving the player a visible approach to jump.
+ lda #0
+ ldx #15
+@clear:
+ sta h_width,x
+ dex
+ bpl @clear
+ lda #8
+ sta f_idle
+ inc checkpoint_restores
+ jmp update_camera
+.endproc

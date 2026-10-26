@@ -10,6 +10,11 @@ choice_prev=$06D9
  dex
  bpl @clear
  sta choice_prev
+ sta show_cycle
+ sta player_cycles
+ sta player_cycles+1
+ sta player_started
+ sta player_started+1
  rts
 .endproc
 .proc arcade_save
@@ -22,6 +27,9 @@ choice_prev=$06D9
  iny
  cpy #6
  bne @copy
+ ldx player
+ lda show_cycle
+ sta player_cycles,x
  rts
 .endproc
 .proc arcade_restore
@@ -33,22 +41,45 @@ choice_prev=$06D9
  iny
  cpy #6
  bne @copy
+ ldx player
+ lda player_cycles,x
+ sta show_cycle
  rts
 .endproc
 .proc arcade_rank
  ldx act
  lda act_clears,x
+ ldy show_cycle
+ beq :+
+ ; The next show starts at the sixth, hardest source schedule. Arcade
+ ; schedules saturate; difficulty never wraps back to the easy course.
+ lda #5
+:
+ pha
  clc
  adc #1
  sta round
- sec
- sbc #1
- clc
- ldy difficulty
- beq :+
- adc #2
-:
+ pla
+ rts
+.endproc
 
+.proc arcade_next_available
+ ldx #6
+@next:
+ inc selected
+ lda selected
+ cmp #6
+ bcc :+
+ lda #0
+ sta selected
+:
+ tay
+ lda act_clears,y
+ cmp #5
+ bcc @done
+ dex
+ bne @next
+@done:
  rts
 .endproc
 
@@ -74,119 +105,40 @@ choice_prev=$06D9
  lda #0
  sta water
  sta choice_prev
- lda #7
- sta mode
- lda #1
- sta need_stage
- ; Default to the next unfinished act; the stick can select any available act.
- ldx #6
-@next:
- inc act
- lda act
- cmp #6
- bcc :+
- lda #0
- sta act
-:
- txa
- pha
- ldx act
+ ; A show is thirty main performances. Keep score/lives, clear the six
+ ; availability counters, and enter the harder show without a game ending.
+ ldx #5
+@all:
  lda act_clears,x
- cmp #6
- pla
- tax
- bcc @done
+ cmp #5
+ bcc @select
  dex
- bne @next
- lda #8
- sta mode
+ bpl @all
+ lda show_cycle
+ cmp #98
+ bcs :+
+ inc show_cycle
+:
  lda #0
- sta lives
- lda #$3F
- sta $D500
- jsr save_player
-@done:
- rts
-.endproc
-
-.proc arcade_choose
- lda z_fire
- beq @move
- lda #1
- sta mode
- sta need_stage
- lda #90
- sta mode_timer
- lda #0
- sta choice_prev
- lda #$52
- jsr arcade_cue
- rts
-@move:
- lda z_joy
- and #12
- cmp choice_prev
- beq @done
- sta choice_prev
- cmp #0
- beq @done
- cmp #12
- beq @done
- lda #1
- sta z_step
- lda choice_prev
- and #4
- beq @scan
- lda #255
- sta z_step
-@scan:
+ ldx #5
+@reset:
+ sta act_clears,x
+ dex
+ bpl @reset
+@select:
  lda act
- clc
- adc z_step
- bmi @last
- cmp #6
- bcc @test
- lda #0
- beq @test
-@last:
- lda #5
-@test:
- sta act
- tax
- lda act_clears,x
- cmp #6
- bcs @scan
- lda #1
- sta need_stage
- lda #$52
- jsr arcade_cue
-@done:
- rts
-.endproc
-
-.proc arcade_complete
- lda z_fire
- beq @done
- lda players
- cmp #2
- bne @new
- lda player
- eor #1
- sta player
- lda #$3F
- sta $D500
- jsr player_offset
- lda player_records+3,x
- beq @new
- jsr restore_player
+ sta selected
+ jsr arcade_next_available
+.if ::ARCADE_CHOOSER
  lda #7
+.else
+ lda selected
+ sta act
+ lda #1
+.endif
  sta mode
  lda #1
  sta need_stage
- rts
-@new:
- jmp newgame_entry
-@done:
  rts
 .endproc
 
@@ -196,37 +148,6 @@ choice_prev=$06D9
  rts
 .endproc
 
-.proc arcade_hud
- lda mode
- cmp #7
- beq @counts
- cmp #8
- beq @counts
- rts
-@counts:
- lda #<completion_text
- sta z_src
- lda #>completion_text
- sta z_src+1
- ldy #120
- jsr hud_text
- ldx #0
- ldy #122
-@each:
- lda act_clears,x
- clc
- adc #'0'
- sta (z_hud),y
- tya
- clc
- adc #6
- tay
- inx
- cpx #6
- bne @each
- rts
-.endproc
-completion_text: .asciiz "1:0/6 2:0/6 3:0/6 4:0/6 5:0/6 6:0/6   "
 audio_request=$06DA
 
 start_latch=$06E1
@@ -297,3 +218,22 @@ life_text: .asciiz "LIVES:A1 "
 life_letter: .byte 'C','A','A'
 life_digit: .byte '6','1','2'
 life_tail: .byte '4',' ',' '
+
+; A missed ball or the horse's final gap drops Charlie to the arena floor.
+; Continue/game-over retain this landing instead of drawing him upright again.
+.proc death_step
+ jmp detail_death_entry
+.endproc
+
+; Fast opaque copy on the empty sky behind a high trampoline bag.
+.proc detail_bag_blank
+ ldy #0
+@pixel:
+ lda detail_bag_pixels,x
+ sta (z_glyph),y
+ inx
+ iny
+ cpy #8
+ bne @pixel
+ rts
+.endproc

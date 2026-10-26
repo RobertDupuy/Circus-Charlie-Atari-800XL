@@ -153,7 +153,7 @@ water_hazards = *
  bne @flame
  inc passed,x
  inc water_bags
- jsr complete_prize
+ jsr complete_tramp_prize
 @flame:
  jmp water_actors
 .endproc

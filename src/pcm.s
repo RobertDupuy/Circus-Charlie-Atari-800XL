@@ -1,3 +1,5 @@
+; Retained reference player and payload test. Normal gameplay/celebrations
+; never queue pcm_pending: this foreground player would freeze animation.
 ; Intermission-only 4-bit DAC playback. Foreground pauses; ANTIC keeps displaying
 ; the completed playfield. Normal DMA/DLIs retain its colours and fonts.
 ; No timer IRQ or PCM

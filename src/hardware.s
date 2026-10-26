@@ -279,6 +279,11 @@ display_frozen:
  lda #$AA
  sta $D019
  lda #$3A
+.if ::ARCADE_CHOOSER
+ ldy mode
+ cpy #7
+ beq @no_top_players
+.endif
  ldy act
  cpy #1
  beq @no_top_players
@@ -368,6 +373,13 @@ pm_registers:
  sta $D01D
  sta $D01A
  jsr setup_lists
+.if ::ARCADE_CHOOSER
+ lda mode
+ cmp #7
+ bne :+
+ jmp chooser_load_entry
+:
+.endif
  jsr apparatus_restore_common
  lda #1
  ldx act

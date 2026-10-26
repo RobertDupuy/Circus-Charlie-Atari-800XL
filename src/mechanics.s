@@ -360,6 +360,7 @@ gfx_dma_opcode: .byte $D0,$F0,$F0,$D0,$F0,$F0
  cmp #4
  bne :+
  jsr apparatus_restore_horse
+ jmp horse_resume_entry
 :
  lda act
  bne @minimum
@@ -509,50 +510,19 @@ arcade_tramp_lo: .byte 52,118,184,244,54,120,180,246,56,116,182,248,52,118,184,2
 arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
 
 .segment "XL"
-; Reserve only the rows Charlie can occupy in each font band. His 16-pixel
-; image spans at most five cells per row; unused bands remain available for
-; rare prepared rope tiles, without changing any pixels or physics.
+; Share the row budget with the handlebar renderer's ROM bank. The caller
+; selects the crowd bank next, so there is no bank to restore here.
 .proc rope_glyph_budget
  lda act
+ cmp #4
+ bne :+
+ jmp horse_glyph_budget
+:
  cmp #5
  bne @done
- lda #0
- sta gfx_reserve
- sta gfx_reserve+1
- sta gfx_reserve+2
- lda r_depth+1
- bpl :+
- lda #0
-:
- lsr
- lsr
- lsr
- sta z_tmp
- lda r_depth+1
- clc
- adc #37
- cmp #175
- bcc :+
- lda #175
-:
- lsr
- lsr
- lsr
- sta z_tmp2
- ldy z_tmp
-@row:
- cpy #22
- bcs @done
- lda row_band,y
- tax
- lda gfx_reserve,x
- clc
- adc #5
- sta gfx_reserve,x
- cpy z_tmp2
- beq @done
- iny
- bne @row
+ lda #$3C
+ sta $D500
+ jmp complete_rope_budget
 @done:
  rts
 .endproc
@@ -919,6 +889,7 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  beq :+
  jsr apparatus_draw_cells
 :
+ jsr rope_bar_entry
 @next:
  inc r_draw_index
  lda r_draw_index
@@ -1079,6 +1050,11 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  asl
  asl
  sta r_draw_top
+ lda r_draw_row
+ beq :+
+ jsr rope_partial_fast
+ jmp @dirty
+:
  ldy #0
 @byte:
  lda (z_data),y
@@ -1356,6 +1332,11 @@ leg_offsets: .byte 24,4
  adc #13
 :
  sta @column_add+1
+ lda r_draw_cachepage
+ sta @cache_read+2
+ clc
+ adc #1
+ sta @cache_high+2
 @cell:
  ldx r_draw_offset
  lda r_record,x
@@ -1380,6 +1361,24 @@ leg_offsets: .byte 24,4
  sta z_off+1
  ora z_map+1
  sta z_cell+1
+ ; Select the cached page directly from the prepared ID's ninth bit.
+ ; The full atlas address is needed only on the uncommon uncached path.
+ ldy r_record+2,x
+ lda r_record,x
+ bmi @high_id
+@cache_read:
+ lda $7800,y
+ jmp @cached
+@high_id:
+@cache_high:
+ lda $7900,y
+@cached:
+ cmp #255
+ beq @allocate
+ ldy #0
+ sta (z_cell),y
+ jmp @dirty
+@allocate:
  lda r_record+2,x
  sta r_draw_id
  lda r_record,x
@@ -1388,18 +1387,6 @@ leg_offsets: .byte 24,4
  lda #0
  rol
  sta r_draw_id+1
- clc
- adc r_draw_cachepage
- sta @cache_read+2
- ldx r_draw_id
-@cache_read:
- lda $7800,x
- cmp #255
- beq @allocate
- ldy #0
- sta (z_cell),y
- jmp @dirty
-@allocate:
  lda free_glyph
  cmp #128
  jcs @overflow
@@ -1511,6 +1498,7 @@ leg_offsets: .byte 24,4
 
 ; The six crowd rows are rebuilt before objects on every frame. Do not erase
 ; those same cells a second time when restoring a trapeze actor rectangle.
+.segment "XL"
 .proc apparatus_clip_rect
  txa
  clc
@@ -1544,6 +1532,7 @@ leg_offsets: .byte 24,4
  clc
  rts
 .endproc
+.segment "MECHANICS"
 
  ; The row/cache hot path lives inline in draw_stamp, avoiding two calls per cell.
 horse_cell_row=draw_stamp::spring_row_anchor

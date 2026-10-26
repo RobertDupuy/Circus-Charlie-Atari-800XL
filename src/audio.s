@@ -104,8 +104,8 @@ za_limit=$F9
  lda #$4F
  jne @effect
 @clear:
- lda #8
- sta f_clear_hold
+ ; Keep the original victory music on the ordinary interrupt-driven stream.
+ ; The foreground PCM player freezes animation, then silences this stream.
  lda #9
 @music:
  sta a_cmd
@@ -113,13 +113,6 @@ za_limit=$F9
  jsr audio_start
  jmp @done
 @event:
- lda f_clear_hold
- beq :+
- dec f_clear_hold
- bne :+
- lda #1
- sta pcm_pending
-:
  lda mode
  cmp #2
  bne @pending

@@ -102,6 +102,16 @@
  sta gfx_pf2+6
 @water:
  lda act
+ cmp #2
+ bne @not_tramp
+ lda #$2E
+ sta gfx_pf2
+ sta gfx_pf2+1
+ lda #$86
+ sta gfx_pf3
+ sta gfx_pf3+1
+@not_tramp:
+ lda act
  bne :+
  lda #$0E
  sta gfx_pf1+4
@@ -166,6 +176,11 @@
  sta $DC84
  sta $DC85
  adc #4
+.if ::ARCADE_CHOOSER
+ ldy mode
+ cpy #7
+ beq :+
+.endif
  ldy act
  cpy #3
  bne :+
@@ -544,79 +559,17 @@ lion_field_colour: .byte $C8,$C6,$C4
 
 .segment "CODE"
 .proc gfx_trampolines
- ; Three pedestals repeat every 192 pixels. Start one 64-pixel cell before
- ; the camera; this is always at or before the first visible pedestal.
- lda camera+1
- asl
- asl
- sta z_tmp
- lda camera
- .repeat 6
- lsr
- .endrepeat
- ora z_tmp
- beq :+
- sec
- sbc #1
-:
- sta z_hazard
-@next:
- ldx z_hazard
- lda arcade_tramp_lo,x
- sec
- sbc #4
- sta z_pos
- lda arcade_tramp_hi,x
- sbc #0
- sta z_pos+1
- jsr screen_position
- lda sprite_xhi
- bmi :+
- bne @prize
- lda sprite_x
- cmp #160
- bcs @prize
-:
- lda #24
- jsr gfx_visible_width
- bcs @skip
- lda #1
- sta gfx_cached_kind
- jsr gfx_native_cached
-@skip:
- inc z_hazard
- lda z_hazard
- cmp #25
- bne @next
-@prize:
- ldx tramp_index
- lda passed,x
- bne @done
- lda arcade_tramp_lo,x
- sta z_pos
- lda arcade_tramp_hi,x
- sta z_pos+1
- jsr screen_position
- lda #16
- jsr gfx_visible_width
- bcs @done
- lda #48
- sta sprite_y
- lda #94
- sta sprite_pose
- jmp tramp_bag
-@done:
- rts
+ jmp detail_tramp_entry
 .endproc
 
-.segment "GFX"
+.segment "XL"
 .proc gfx_springs
  lda #0
  sta z_hazard
 @next:
  ldx z_hazard
  lda h_width,x
- beq @skip
+ jeq @skip
  asl
  clc
  adc h_width,x
@@ -632,7 +585,7 @@ lion_field_colour: .byte $C8,$C6,$C4
  lda z_tmp
  asl
  jsr gfx_visible_width
- bcs @skip
+ jcs @skip
  ldx z_hazard
  lda horse_y,x
  sta sprite_y
@@ -641,25 +594,108 @@ lion_field_colour: .byte $C8,$C6,$C4
  clc
  adc #26
  sta sprite_pose
- lda anim_clock
- lsr
- lsr
- and #1
- clc
- adc sprite_pose
- sta sprite_pose
  lda sprite_x
  and #254
  sta sprite_x
- jsr draw_stamp
+ ; Both decks are supported by narrow legs reaching the arena floor.
+ jsr gfx_spring_board
+ ldx z_hazard
+ lda horse_y,x
+ sec
+ sbc #128
+ lsr
+ lsr
+ lsr
+ tay
+ clc
+ adc #32
+ sta gfx_cached_kind
+ lda horse_leg_pose,y
+ sta sprite_pose
+ lda horse_y,x
+ clc
+ adc #16
+ sta sprite_y
+ inc sprite_x
+ bne :+
+ inc sprite_xhi
+:
+ jsr gfx_spring_leg
 @skip:
  inc z_hazard
  lda z_hazard
  cmp #16
- bne @next
+ jne @next
  rts
 .endproc
-
+.include "horse-legs.inc"
+.segment "XL"
+.proc horse_glyph_budget
+ lda #12
+ ldx mode
+ cpx #3
+ beq @fallen
+ cpx #5
+ beq @fallen
+ cpx #6
+ bne @store
+@fallen:
+ lda #16
+@store:
+ sta gfx_reserve+2
+ rts
+.endproc
+.segment "GFX"
+.proc gfx_spring_leg
+ ; Draw both supports with independently clipped native columns.
+ ldx z_hazard
+ lda h_width,x
+ asl
+ clc
+ adc h_width,x
+ asl
+ sec
+ sbc #2
+ sta gfx_rect_w
+ lda #166
+ sec
+ sbc sprite_y
+ sta gfx_rect_h
+ jsr gfx_mark_rect
+ ldx z_hazard
+ lda h_width,x
+ asl
+ clc
+ adc h_width,x
+ asl
+ sec
+ sbc #3
+ clc
+ adc sprite_x
+ sta z_left
+ lda sprite_xhi
+ adc #0
+ tax
+ lda z_left
+ lsr
+ lsr
+ cpx #0
+ beq :+
+ ora #$C0
+:
+ sta z_tmp2
+ ; Reuse the native directory's four subpixel slots for alignment/parity.
+ ldx z_hazard
+ lda h_width,x
+ and #1
+ sta z_left
+ lda sprite_x
+ and #254
+ ora z_left
+ sta sprite_x
+ jsr gfx_native_cached
+ rts
+.endproc
 
 .proc gfx_finish
  lda act
@@ -853,6 +889,13 @@ gfx_glyph_hi:
  lda z_ptr+1
  adc #$83
  sta z_ptr+1
+ lda z_ptr
+ clc
+ adc #$80
+ sta z_ptr
+ bcc :+
+ inc z_ptr+1
+:
  ldy #0
  lda (z_ptr),y
  pha
@@ -932,16 +975,24 @@ gfx_glyph_hi:
  lda #16
  ldx sprite_pose
  cpx #84
- bcc :+
- lda #24
-:
+ bcs @lion_size
+ cpx #0
+ beq @dance_size
+ cpx #5
+ beq @dance_size
  sta gfx_rect_w
  lda #38
- ldx sprite_pose
- cpx #84
- bcc :+
+ bne @height_size
+@dance_size:
+ lda #24
+ sta gfx_rect_w
+ lda #40
+ bne @height_size
+@lion_size:
+ lda #24
+ sta gfx_rect_w
  lda #32
-:
+@height_size:
  sta gfx_rect_h
  jsr gfx_mark_rect
  ldy #0
@@ -1334,6 +1385,12 @@ gfx_glyph_hi:
  sta z_ptr
  lda z_ptr+1
  adc #$80
+ ldx gfx_cached_kind
+ cpx #32
+ bcc :+
+ clc
+ adc #3
+:
  sta z_ptr+1
  ldy #0
  lda (z_ptr),y
@@ -1408,9 +1465,9 @@ gfx_glyph_hi:
 .segment "CODE"
 .segment "CODE"
 .segment "MECHANICS"
-gfx_cached_w: .byte 16,24,16,16,16,8,8,30,30,30,32,32,32,32,32,32,16,32,16,16,16,16,16,16,16,32,32,16,16,16,16,24
-gfx_cached_h: .byte 72,48,10,24,24,28,28,32,32,32,48,48,4,4,4,4,56,11,8,8,8,8,8,8,8,4,10,32,32,32,32,48
-gfx_cached_y: .byte 72,128,164,142,142,138,138,134,134,134,128,128,164,164,164,164,72,155,168,168,168,168,168,168,168,64,164,144,144,144,144,128
+gfx_cached_w: .byte 16,24,16,16,16,8,8,30,30,30,32,32,32,32,32,32,16,32,16,16,16,16,16,16,16,32,32,16,16,16,16,24,1,1,1
+gfx_cached_h: .byte 72,48,10,24,24,28,28,32,32,32,48,48,4,4,4,4,56,11,8,8,8,8,8,8,8,4,10,32,32,32,32,48,22,14,6
+gfx_cached_y: .byte 72,128,164,142,142,138,138,134,134,134,128,128,164,164,164,164,72,155,168,168,168,168,168,168,168,64,164,144,144,144,144,128,144,152,160
 
 .segment "AUX"
 .proc gfx_mark_rect
@@ -1897,3 +1954,98 @@ gfx_edge_groups: .byte 0,0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,3,4
  jmp (z_rom)
 .endproc
 .segment "GFX"
+
+.segment "CODE"
+.proc gfx_spring_board
+ ldx z_hazard
+ lda h_width,x
+ asl
+ clc
+ adc h_width,x
+ asl
+ sta gfx_rect_w
+ lda #16
+ sta gfx_rect_h
+ jsr gfx_mark_rect
+ lda sprite_x
+ lsr
+ lsr
+ ldx sprite_xhi
+ beq :+
+ ora #$C0
+:
+ sta z_col
+ lda sprite_y
+ lsr
+ lsr
+ lsr
+ tay
+ lda row_lo,y
+ clc
+ adc z_col
+ sta z_cell
+ lda row_hi,y
+ adc #0
+ ldx sprite_xhi
+ beq :+
+ sec
+ sbc #1
+:
+ ora z_map+1
+ sta z_cell+1
+ lda z_cell
+ clc
+ adc #40
+ sta z_bg
+ lda z_cell+1
+ adc #0
+ sta z_bg+1
+ lda #0
+ ldx sprite_xhi
+ beq :+
+ lda z_col
+ eor #255
+ clc
+ adc #1
+:
+ tay
+ clc
+ adc gfx_rect_w
+ sta z_tmp2
+@blank:
+ lda (z_cell),y
+ ora (z_bg),y
+ bne @slow
+ iny
+ cpy z_tmp2
+ bne @blank
+ ldx z_hazard
+ lda h_width,x
+ sec
+ sbc #2
+ asl
+ asl
+ sta z_tmp
+ lda sprite_x
+ and #2
+ ora z_tmp
+ sta z_tmp
+ lda sprite_y
+ cmp #128
+ bne :+
+ inc z_tmp
+:
+ ldx z_tmp
+ lda horse_board_lo,x
+ sta z_rom
+ lda horse_board_hi,x
+ sta z_rom+1
+ lda #HORSE_BOARD_BANK
+ sta $D500
+ ldx z_col
+ jmp (z_rom)
+@slow:
+ jmp draw_stamp
+.endproc
+.segment "XL"
+.include "horse-boards.inc"

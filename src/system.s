@@ -306,7 +306,17 @@
  sta round
  sta mode
  sta need_stage
- jsr select_scene
+ lda #0
+ sta act
+ sta water
+ sta selected
+.if ::ARCADE_CHOOSER
+ lda demo
+ bne :+
+ lda #7
+ sta mode
+:
+.endif
  jsr save_player
  inc player
  jsr save_player
@@ -386,16 +396,30 @@
 .proc sys_after_death
  lda lives
  bne switch_turn
- lda #6
- sta mode
+ ; Five television seconds, independent of the act's simulation cadence.
  lda #<300
+ ldx #>300
+ ldy pal
+ beq :+
+ lda #<250
+ ldx #>250
+:
  sta continue_ticks
- lda #>300
- sta continue_ticks+1
+ stx continue_ticks+1
+ jsr continue_read_clock
+ lda z_value
+ clc
+ adc continue_ticks
+ sta continue_deadline
+ lda z_step
+ adc continue_ticks+1
+ sta continue_deadline+1
  lda #5
  sta continue_secs
  lda #0
  sta select_latch
+ lda #6
+ sta mode
  rts
 .endproc
 .proc switch_turn
@@ -418,6 +442,23 @@
 @other:
  jsr restore_player
 @same:
+.if ::ARCADE_CHOOSER
+ ldx player
+ lda player_started,x
+ bne :+
+ lda demo
+ bne :+
+ lda lives
+ beq @over
+ lda act
+ sta selected
+ lda #7
+ sta mode
+ lda #1
+ sta need_stage
+ rts
+:
+.endif
  lda lives
  beq @over
  lda #1
@@ -425,12 +466,53 @@
  sta mode
  rts
 @over:
- lda #5
+ jmp sys_title
+.endproc
+
+.proc sys_title
+ lda #0
  sta mode
+ sta demo
+ sta paused
+ sta resume_pending
+ sta player
+ sta fire_latch
+ sta start_latch
+ sta select_latch
+ sta continue_ticks
+ sta continue_ticks+1
+ sta continue_secs
+ jsr title_scene
+ lda #1
+ sta need_stage
+ rts
+.endproc
+
+.proc continue_read_clock
+ ; VBI can roll the low byte while the foreground reads it. Retry on carry.
+@read:
+ lda host_frames+1
+ sta z_step
+ lda host_frames
+ sta z_value
+ lda host_frames+1
+ cmp z_step
+ bne @read
  rts
 .endproc
 
 .proc sys_continue
+ jsr continue_read_clock
+ lda continue_deadline
+ sec
+ sbc z_value
+ sta continue_ticks
+ lda continue_deadline+1
+ sbc z_step
+ sta continue_ticks+1
+ bmi @expired
+ ora continue_ticks
+ beq @expired
  lda z_fire
  beq @count
  lda #3
@@ -449,33 +531,31 @@
  sta select_latch
  jmp switch_turn
 :
- lda continue_ticks
- bne :+
- dec continue_ticks+1
+ lda #60
+ ldx pal
+ beq :+
+ lda #50
 :
- dec continue_ticks
+ sta z_step
  lda continue_ticks
- ora continue_ticks+1
- beq @expired
- lda #5
- ldx continue_ticks+1
- bne @seconds
- ldx continue_ticks
- lda #1
- cpx #61
- bcc @seconds
- lda #2
- cpx #121
- bcc @seconds
- lda #3
- cpx #181
- bcc @seconds
- lda #4
- cpx #241
- bcc @seconds
- lda #5
+ sta z_value
+ lda continue_ticks+1
+ sta z_tmp2
+ ldx #0
 @seconds:
- sta continue_secs
+ inx
+ lda z_value
+ sec
+ sbc z_step
+ sta z_value
+ lda z_tmp2
+ sbc #0
+ sta z_tmp2
+ bmi @shown
+ ora z_value
+ bne @seconds
+@shown:
+ stx continue_secs
  rts
 @expired:
  jmp switch_turn
@@ -532,7 +612,7 @@
  sta bonus+1
  lda #0
  sta bonus
- ; Six performances per act use all source schedules, saturating at the ROM limit.
+ ; Five picks per show; later shows retain the hardest source schedule.
  jsr arcade_rank
  cmp #6
  bcc :+
@@ -555,7 +635,6 @@ spacings: .byte 128,120,112,104
 
 .proc sys_hud
  jsr arcade_settings_hud
- jsr arcade_hud
  ldy #26
  lda player
  clc

@@ -1,0 +1,7 @@
+{
+  "pixel_reference_cases": 1440,
+  "route_frames": 22450,
+  "endpoint_pixels_identical": true,
+  "all_six_ranks": true,
+  "max_actor_glyphs": 25
+}

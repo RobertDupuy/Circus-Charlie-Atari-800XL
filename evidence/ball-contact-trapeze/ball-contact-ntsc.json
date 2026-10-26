@@ -1,0 +1,12 @@
+{
+  "standard": "ntsc",
+  "car_sha256": "ce8a7c3c4b2877558a281fa35f1e730c93c3a8a862ff37402241007d77bd1c0e",
+  "physical_joystick_controls": true,
+  "old_failure_expected": false,
+  "centre_distance": 14,
+  "visible_diameter": 14,
+  "visible_gap": 0,
+  "world": 155,
+  "renderer_faults": 0,
+  "missed_deadlines": 0
+}

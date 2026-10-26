@@ -1,0 +1,12 @@
+{
+  "standard": "pal",
+  "selection": "automatic",
+  "car_sha256": "0049fff74111d37dc4775e96eca0667a1768759ed6b595f00db3294781623ee3",
+  "title_player_controls": true,
+  "start_and_fire": true,
+  "reset_returns_title": true,
+  "natural_stage_entries": [
+    1
+  ],
+  "lockout_fixture": false
+}

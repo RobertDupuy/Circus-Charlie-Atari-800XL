@@ -1,0 +1,338 @@
+{
+  "completed": true,
+  "performances": 65,
+  "water_visits": 5,
+  "shows": 2,
+  "third_show_available": true,
+  "game_ticks": 152868,
+  "rendered_frames": 76434,
+  "deaths": 0,
+  "final_mode": 7,
+  "acts": [
+    {
+      "scene": 0,
+      "rank": 0,
+      "ticks": 1228
+    },
+    {
+      "scene": 1,
+      "rank": 0,
+      "ticks": 1892
+    },
+    {
+      "scene": 2,
+      "rank": 0,
+      "ticks": 1526
+    },
+    {
+      "scene": 3,
+      "rank": 0,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 0,
+      "ticks": 1624
+    },
+    {
+      "scene": 5,
+      "rank": 0,
+      "ticks": 3131
+    },
+    {
+      "scene": 0,
+      "rank": 1,
+      "ticks": 1342
+    },
+    {
+      "scene": 1,
+      "rank": 1,
+      "ticks": 1900
+    },
+    {
+      "scene": 2,
+      "rank": 1,
+      "ticks": 1856
+    },
+    {
+      "scene": 6,
+      "rank": 2,
+      "ticks": 1424
+    },
+    {
+      "scene": 3,
+      "rank": 1,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 1,
+      "ticks": 1636
+    },
+    {
+      "scene": 5,
+      "rank": 1,
+      "ticks": 2981
+    },
+    {
+      "scene": 0,
+      "rank": 2,
+      "ticks": 2278
+    },
+    {
+      "scene": 1,
+      "rank": 2,
+      "ticks": 1892
+    },
+    {
+      "scene": 2,
+      "rank": 2,
+      "ticks": 2242
+    },
+    {
+      "scene": 3,
+      "rank": 2,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 2,
+      "ticks": 1636
+    },
+    {
+      "scene": 5,
+      "rank": 2,
+      "ticks": 2572
+    },
+    {
+      "scene": 0,
+      "rank": 3,
+      "ticks": 2278
+    },
+    {
+      "scene": 1,
+      "rank": 3,
+      "ticks": 1892
+    },
+    {
+      "scene": 2,
+      "rank": 3,
+      "ticks": 1462
+    },
+    {
+      "scene": 6,
+      "rank": 4,
+      "ticks": 1250
+    },
+    {
+      "scene": 3,
+      "rank": 3,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 3,
+      "ticks": 1708
+    },
+    {
+      "scene": 5,
+      "rank": 3,
+      "ticks": 4585
+    },
+    {
+      "scene": 0,
+      "rank": 4,
+      "ticks": 1189
+    },
+    {
+      "scene": 1,
+      "rank": 4,
+      "ticks": 1892
+    },
+    {
+      "scene": 2,
+      "rank": 4,
+      "ticks": 1112
+    },
+    {
+      "scene": 3,
+      "rank": 4,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 4,
+      "ticks": 1750
+    },
+    {
+      "scene": 5,
+      "rank": 4,
+      "ticks": 4324
+    },
+    {
+      "scene": 0,
+      "rank": 5,
+      "ticks": 1249
+    },
+    {
+      "scene": 1,
+      "rank": 5,
+      "ticks": 1944
+    },
+    {
+      "scene": 2,
+      "rank": 5,
+      "ticks": 1112
+    },
+    {
+      "scene": 6,
+      "rank": 5,
+      "ticks": 1472
+    },
+    {
+      "scene": 3,
+      "rank": 5,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 5,
+      "ticks": 1762
+    },
+    {
+      "scene": 5,
+      "rank": 5,
+      "ticks": 4857
+    },
+    {
+      "scene": 0,
+      "rank": 5,
+      "ticks": 1249
+    },
+    {
+      "scene": 1,
+      "rank": 5,
+      "ticks": 1944
+    },
+    {
+      "scene": 2,
+      "rank": 5,
+      "ticks": 1112
+    },
+    {
+      "scene": 3,
+      "rank": 5,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 5,
+      "ticks": 1762
+    },
+    {
+      "scene": 5,
+      "rank": 5,
+      "ticks": 4857
+    },
+    {
+      "scene": 0,
+      "rank": 5,
+      "ticks": 1249
+    },
+    {
+      "scene": 1,
+      "rank": 5,
+      "ticks": 1944
+    },
+    {
+      "scene": 2,
+      "rank": 5,
+      "ticks": 1112
+    },
+    {
+      "scene": 6,
+      "rank": 5,
+      "ticks": 1472
+    },
+    {
+      "scene": 3,
+      "rank": 5,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 5,
+      "ticks": 1762
+    },
+    {
+      "scene": 5,
+      "rank": 5,
+      "ticks": 4857
+    },
+    {
+      "scene": 0,
+      "rank": 5,
+      "ticks": 1249
+    },
+    {
+      "scene": 1,
+      "rank": 5,
+      "ticks": 1944
+    },
+    {
+      "scene": 2,
+      "rank": 5,
+      "ticks": 1112
+    },
+    {
+      "scene": 3,
+      "rank": 5,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 5,
+      "ticks": 1762
+    },
+    {
+      "scene": 5,
+      "rank": 5,
+      "ticks": 4857
+    },
+    {
+      "scene": 0,
+      "rank": 5,
+      "ticks": 1249
+    },
+    {
+      "scene": 1,
+      "rank": 5,
+      "ticks": 1944
+    },
+    {
+      "scene": 2,
+      "rank": 5,
+      "ticks": 1112
+    },
+    {
+      "scene": 6,
+      "rank": 5,
+      "ticks": 1472
+    },
+    {
+      "scene": 3,
+      "rank": 5,
+      "ticks": 1876
+    },
+    {
+      "scene": 4,
+      "rank": 5,
+      "ticks": 1762
+    },
+    {
+      "scene": 5,
+      "rank": 5,
+      "ticks": 4857
+    }
+  ]
+}

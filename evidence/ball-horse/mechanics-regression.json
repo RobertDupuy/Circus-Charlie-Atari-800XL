@@ -1,0 +1,40 @@
+{
+  "57_mame_jump_samples_and_no_air_steering": true,
+  "pink_leaps_by_rank": [
+    6,
+    17,
+    10,
+    7
+  ],
+  "closest_monkey_gaps": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "horse_takeoff_locks_all_three_speeds": true,
+  "horse_width_units": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "horse_heights": [
+    128,
+    136,
+    144
+  ],
+  "ground_crossing_never_clears": true,
+  "trapeze_original_pivots_and_phase_pump": true,
+  "trapeze_release_has_no_air_steering": true,
+  "recovery_contacts_on_all_four_ranks": true,
+  "ordinary_retry_acts": [
+    2,
+    4,
+    5,
+    6
+  ],
+  "safe_landing_and_contact_rewards": true
+}

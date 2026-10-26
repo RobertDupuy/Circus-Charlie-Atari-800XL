@@ -1,0 +1,26 @@
+{
+  "arcade": {
+    "car": {
+      "sha256": "f273be3ba304a812c5f120af6ecfa37a81278966fe865631e950b92c646e884f",
+      "bytes": 524304,
+      "byte_identical": true
+    },
+    "rom": {
+      "sha256": "48353a9eca7115ce2bfde8e297585f887a7cc1954328eb2f2f326bd13fcf6de6",
+      "bytes": 524288,
+      "byte_identical": true
+    }
+  },
+  "automatic": {
+    "car": {
+      "sha256": "0049fff74111d37dc4775e96eca0667a1768759ed6b595f00db3294781623ee3",
+      "bytes": 524304,
+      "byte_identical": true
+    },
+    "rom": {
+      "sha256": "7377f0c733b0a0430dd1f47cd0620b8037ba6a409fc6a2875c4abfdedc9f3877",
+      "bytes": 524288,
+      "byte_identical": true
+    }
+  }
+}

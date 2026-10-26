@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-25",
+  "description": "Blue Act 1 dollar sign; five TV-second continue timeout; automatic title return; trampoline continue bank restoration",
+  "builds": {
+    "arcade": {
+      "car": {
+        "sha256": "a2764cb1265c025a4794ec455ddec3907249781fb4d62bf78f71f0d15ed24b7e",
+        "bytes": 524304,
+        "byte_identical": true
+      },
+      "rom": {
+        "sha256": "b08edb7f1837edf2c0384983dddf3e99908090340a6c3774b42dd6d9a011605c",
+        "bytes": 524288,
+        "byte_identical": true
+      }
+    },
+    "automatic": {
+      "car": {
+        "sha256": "54fd6619d022fe2a81b0b92fd7e5397bbcedb9a9c0832984e92b0da18eac6a4d",
+        "bytes": 524304,
+        "byte_identical": true
+      },
+      "rom": {
+        "sha256": "6dfa2d57388017590f3c128cb34f2372867278fc7346092c7c88009b09f9565b",
+        "bytes": 524288,
+        "byte_identical": true
+      }
+    }
+  },
+  "acceptance_suites_per_build": 29,
+  "native_timeout_scenes_per_standard": 7,
+  "native_standards": [
+    "ntsc",
+    "pal"
+  ],
+  "physical_hardware_tested": false,
+  "reports": {
+    "README.md": "4359be784874b6890900a080ef82629a166313dba211869ad021c1c7853687cc",
+    "acceptance.json": "0eb4e54c43980d9f2750006ae6abfff0f58460c942d6a42a4178c4b502c5acf0",
+    "arcade-audio-validation.json": "701ab80bbc762ca150f391b8e11fe890b91aaddd8f559d521e959cefd714b4d2",
+    "automatic-acceptance.json": "8c750a7ebf993b24637b44e4abc061e64d24180aa1f23ba3b436b25b1f498bab",
+    "automatic-arcade-audio-validation.json": "42116e47bf00ac99cd67626babfb155b576324e7a7d503f906b789e8a3695462",
+    "automatic-ball-horse-retry.json": "031f5968189486b43df2a18648be52bb961f3bf06bd9dbcf6df6e135e662220c",
+    "automatic-bold-render.json": "d756386e7ede46dc47997a9e409ecd69a2b53f7c617e8812d02bef8c7cef27be",
+    "automatic-complete-campaign.json": "7d37f389bb2f0cd4ec57ee19992b5ad3449487a3b8109db8024af69bbed335a8",
+    "automatic-continue-rules.json": "b752e337fb1f11b43eaf694d4c1e12c721eb9826af54c74dd6155c1b749de7c8",
+    "automatic-hoop-depth.json": "175ccc9457183306bcbf26c690754dd6d9543c3be3d40dd1e27adcb3f8c296f8",
+    "automatic-interrupt-audio.json": "c316f0f482053256f0ac2021d5249f06dee8d7719a8cbc9a27e81664bb13b43c",
+    "automatic-native-full-ntsc.json": "75209806b43f5ba7764a4aecf8224ebed3b362472abe138188dddafdf5b0715a",
+    "automatic-native-full-pal.json": "4a9c741f1cc664cb3fe09b77dc0b30505a690ddda72aeb42d391d766096990db",
+    "automatic-pcm-payload.json": "5c6fa942d9cc42bcd9c15adbe511efabcf277f982214b4b91c6e95e8dee11e3d",
+    "automatic-ranked-playthrough.json": "124853a7732075aa1e36a5a4351c870346785ea4b8f98cd9c04b1037bbdc3594",
+    "ball-horse-retry.json": "031f5968189486b43df2a18648be52bb961f3bf06bd9dbcf6df6e135e662220c",
+    "bold-render.json": "d756386e7ede46dc47997a9e409ecd69a2b53f7c617e8812d02bef8c7cef27be",
+    "complete-campaign.json": "0ef0738458f6ff96e8bde585c1f7ad95e9d628b6758902395b514bb4db261c00",
+    "continue-hardware-ntsc.json": "4bf7e247a5350111a97eb55a2ae10f364432f0f8b1c06ad4c1cb8a398c20804b",
+    "continue-hardware-pal.json": "6a0245c6bd7ad3088cd56f17118769bebfcc9076fac7de52f796a51db26b7bda",
+    "continue-rules.json": "8a7136f475b76744bc9d955f3f26da2359642a71b4c450dc8a20ad9de4584518",
+    "hoop-depth.json": "0e7efbb1e7f7e784a4b8a397cea64b270d907e15b45ff5cc8135456472046c84",
+    "horse-ranked-ntsc.json": "12c8b114b126777d65f19e77076a72a82647c054d4453fb99dba803753ce5d86",
+    "interrupt-audio.json": "9a4eaf3e6408c841b9ff557a994117475c117955cc0d81f3140d58f922e2212e",
+    "native-full-ntsc.json": "75209806b43f5ba7764a4aecf8224ebed3b362472abe138188dddafdf5b0715a",
+    "native-full-pal.json": "4a9c741f1cc664cb3fe09b77dc0b30505a690ddda72aeb42d391d766096990db",
+    "ntsc-act-0-continue-5.png": "64abc3e7bf6f2f98916c7665d552e84c95ddcfb7b3b507ca8db0a00c5f5c01f2",
+    "ntsc-act-0-title.png": "02b956899d5e730194025363e189632cb687aaed9c9f58912de741c7012896d9",
+    "ntsc-act-1-continue-5.png": "e617f56a6a4d94afa66108cbd50cb90e03722cc2e58838d67b4a48e2920df5c2",
+    "ntsc-act-1-title.png": "02b956899d5e730194025363e189632cb687aaed9c9f58912de741c7012896d9",
+    "ntsc-act-2-accepted-continue.png": "e3f43a82181b42d272c615f7f5787e7044f0b0826583f67d1ed6c0b11bb7597f",
+    "ntsc-act-2-continue-5.png": "d6e8a122652f6a14797dbfe1bbcf47e7e984145a9575b0e540c3321d5cb21e59",
+    "ntsc-act-2-title.png": "88a3ea33c21f1ef21dc57ab4e2d34986f0a2d498a68e65256045f0ac717f9e53",
+    "ntsc-act-3-continue-5.png": "f54accc0e0cc30ee3a79d5b854eac076616c66c2a3a0415a061828f388471b9b",
+    "ntsc-act-3-title.png": "88a3ea33c21f1ef21dc57ab4e2d34986f0a2d498a68e65256045f0ac717f9e53",
+    "ntsc-act-4-accepted-continue.png": "6cbcbeb90992f0ee29bab29498724707b4a1818ef351d619b4693729e6112c62",
+    "ntsc-act-4-continue-1.png": "a80861e4510d9e9e5f81b63cf4e50f35c6cd7f1077c7ada68509305038575cc4",
+    "ntsc-act-4-continue-5.png": "c5a51533cc6b7d305279a9ff00ff3166790e361a9c1b50d61e7df6abbb462e09",
+    "ntsc-act-4-title.png": "882a773d9be2a57dbafb74114d40ea52c921d1a1c8faf3e55543071cd6ad649b",
+    "ntsc-act-5-continue-5.png": "64eef0f011446575d82dd360f55c6fe7968c3c44855511acf6403e1a657afc8d",
+    "ntsc-act-5-title.png": "c3279355c2cc71955d368be8961e4c3a4d38c2ce8f032d29024db4891affa5d7",
+    "ntsc-act-6-continue-5.png": "e17b6fc1987cb911b4abcc933f66d3c83270bf6c0a18350c49f899b2504d1236",
+    "ntsc-act-6-title.png": "d220feb0f5d936a051023007cadb80e3085d0db0e9460bf01a1500d6824d708d",
+    "ntsc-money-bag.png": "392e56c4122d8aa62a1bf1e9746a9932951ebc88e69b51f5257c28cf38313391",
+    "pal-act-0-continue-5.png": "eda2cc1b66e89084ac48c5e5161a2280b60532c3ae1564d9f7c5a077c4408ab1",
+    "pal-act-0-title.png": "13d6c549c3972473f5d1fb07578c49e4369d191a5b20e21cdc9fecfbf6ba175c",
+    "pal-act-1-continue-5.png": "d9598beb01b68fcbb760c7aec36d52a6723d2e18484a19f7d2705b3e0407a0eb",
+    "pal-act-1-title.png": "13d6c549c3972473f5d1fb07578c49e4369d191a5b20e21cdc9fecfbf6ba175c",
+    "pal-act-2-accepted-continue.png": "c9cf50762416b107214194e97ccf6e30cbcec2f662d22695fd9a70d68cf2f590",
+    "pal-act-2-continue-5.png": "834f83b3aba25098568c90bce108eb7a4e200daa86b6329c74e0881ce57be847",
+    "pal-act-2-title.png": "13d6c549c3972473f5d1fb07578c49e4369d191a5b20e21cdc9fecfbf6ba175c",
+    "pal-act-3-continue-5.png": "3e37c651eab3023c46966b22807d19f29bfc16e975c247c5dc78c772f6585416",
+    "pal-act-3-title.png": "2414c3be6c8bbc360fd533a4734760adaf3a938a7f55d6fa0b3346bea20f19cb",
+    "pal-act-4-accepted-continue.png": "b736e71591d081e379cf5085e523a87150074a01cc62a25f5a6eaceeb6375955",
+    "pal-act-4-continue-1.png": "a45ffafcaefd0eb1f916918f7b9f58b97c2975c3e3478045732e4000c248dbbb",
+    "pal-act-4-continue-5.png": "0dbd4355085df4fab408f14c61022295974cec3f7483be33a9b767d5b69fdd31",
+    "pal-act-4-title.png": "2414c3be6c8bbc360fd533a4734760adaf3a938a7f55d6fa0b3346bea20f19cb",
+    "pal-act-5-continue-5.png": "b804282d984433359282649a34ea2db98ec1c79b7f000bd10896a183c3c7efb8",
+    "pal-act-5-title.png": "6e95ec4d3c26cccc5820bda6b2daadb4cef4248734d524059cb1b586ce2fde60",
+    "pal-act-6-continue-5.png": "25f4b12a681fa5012928f1528a924554a3892f82da6e269416e7bed17efcd9e3",
+    "pal-act-6-title.png": "2414c3be6c8bbc360fd533a4734760adaf3a938a7f55d6fa0b3346bea20f19cb",
+    "pal-money-bag.png": "733d889f20bb369cc93b64e6ee3130be0a3e25cdfbc5013d4b65e1ab77fac382",
+    "pcm-payload.json": "e8be2fa5edd33bfc2360da4eb1e79029ba46f57ed308bc08661b4514c91b7f76",
+    "ranked-playthrough.json": "4384fa82057bd3960650016e9dd6a0f5d8e53333d628e3b6576991bda6a6a9ca",
+    "reproducible-build.json": "61e75ec5b63073b61b2ea8b8e00c98cce55c52ea947743ef23468fa7d0a838bb",
+    "title-return-pixels.json": "2d184a0832a50df0b22f50cd97d2c34a062633bf89377976d2f3b77166dbe775"
+  }
+}

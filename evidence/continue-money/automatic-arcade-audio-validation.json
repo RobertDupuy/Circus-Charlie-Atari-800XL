@@ -1,0 +1,295 @@
+{
+  "streams": [
+    {
+      "file": "ntsc-13.json",
+      "frames": 8112,
+      "max_cpu_cycles": 471
+    },
+    {
+      "file": "ntsc-14.json",
+      "frames": 3681,
+      "max_cpu_cycles": 427
+    },
+    {
+      "file": "ntsc-15.json",
+      "frames": 3373,
+      "max_cpu_cycles": 425
+    },
+    {
+      "file": "ntsc-16.json",
+      "frames": 3073,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "ntsc-17.json",
+      "frames": 279,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "ntsc-18.json",
+      "frames": 3478,
+      "max_cpu_cycles": 481
+    },
+    {
+      "file": "ntsc-19.json",
+      "frames": 2549,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "ntsc-1a.json",
+      "frames": 2531,
+      "max_cpu_cycles": 432
+    },
+    {
+      "file": "ntsc-1b.json",
+      "frames": 2196,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "ntsc-1c.json",
+      "frames": 3864,
+      "max_cpu_cycles": 481
+    },
+    {
+      "file": "ntsc-1d.json",
+      "frames": 1657,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "ntsc-41.json",
+      "frames": 121,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-42.json",
+      "frames": 109,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-43.json",
+      "frames": 91,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-44.json",
+      "frames": 33,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-45.json",
+      "frames": 55,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-46.json",
+      "frames": 84,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-47.json",
+      "frames": 36,
+      "max_cpu_cycles": 350
+    },
+    {
+      "file": "ntsc-48.json",
+      "frames": 55,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-49.json",
+      "frames": 27,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-4a.json",
+      "frames": 43,
+      "max_cpu_cycles": 350
+    },
+    {
+      "file": "ntsc-4b.json",
+      "frames": 132,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-4c.json",
+      "frames": 68,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-4d.json",
+      "frames": 81,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-4e.json",
+      "frames": 101,
+      "max_cpu_cycles": 376
+    },
+    {
+      "file": "ntsc-4f.json",
+      "frames": 18,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-50.json",
+      "frames": 137,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-51.json",
+      "frames": 194,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "ntsc-52.json",
+      "frames": 33,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-13.json",
+      "frames": 6750,
+      "max_cpu_cycles": 428
+    },
+    {
+      "file": "pal-14.json",
+      "frames": 3063,
+      "max_cpu_cycles": 431
+    },
+    {
+      "file": "pal-15.json",
+      "frames": 2807,
+      "max_cpu_cycles": 427
+    },
+    {
+      "file": "pal-16.json",
+      "frames": 2557,
+      "max_cpu_cycles": 431
+    },
+    {
+      "file": "pal-17.json",
+      "frames": 233,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "pal-18.json",
+      "frames": 2894,
+      "max_cpu_cycles": 461
+    },
+    {
+      "file": "pal-19.json",
+      "frames": 2121,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "pal-1a.json",
+      "frames": 2106,
+      "max_cpu_cycles": 428
+    },
+    {
+      "file": "pal-1b.json",
+      "frames": 1827,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "pal-1c.json",
+      "frames": 3215,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "pal-1d.json",
+      "frames": 1379,
+      "max_cpu_cycles": 422
+    },
+    {
+      "file": "pal-41.json",
+      "frames": 101,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-42.json",
+      "frames": 91,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-43.json",
+      "frames": 76,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-44.json",
+      "frames": 28,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-45.json",
+      "frames": 46,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-46.json",
+      "frames": 70,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-47.json",
+      "frames": 31,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-48.json",
+      "frames": 46,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-49.json",
+      "frames": 23,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-4a.json",
+      "frames": 36,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-4b.json",
+      "frames": 110,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-4c.json",
+      "frames": 57,
+      "max_cpu_cycles": 348
+    },
+    {
+      "file": "pal-4d.json",
+      "frames": 68,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-4e.json",
+      "frames": 84,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-4f.json",
+      "frames": 16,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-50.json",
+      "frames": 114,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-51.json",
+      "frames": 162,
+      "max_cpu_cycles": 347
+    },
+    {
+      "file": "pal-52.json",
+      "frames": 28,
+      "max_cpu_cycles": 351
+    }
+  ],
+  "simultaneous_peak_cycles": 608
+}

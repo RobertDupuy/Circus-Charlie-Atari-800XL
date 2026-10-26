@@ -1,0 +1,801 @@
+{
+  "standard": "ntsc",
+  "car_sha256": "3cced8898f5dc62a97f6aa1645683a1bb2eb3092f33766feda78b02778a3ff55",
+  "unmodified_cartridge": true,
+  "natural_demo_win": true,
+  "samples": [
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1401,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1422,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1436,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1450,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1464,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1478,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1490,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1504,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1519,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1533,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1548,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1562,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1576,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1590,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1603,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1616,
+      "presented": 680,
+      "elapsed": 4,
+      "pcm_active": 1,
+      "pcm_pending": 0,
+      "interval": 4,
+      "fault": 0,
+      "missed": 0,
+      "music_active": true,
+      "music_audible": true
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1630,
+      "presented": 682,
+      "elapsed": 10,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1644,
+      "presented": 685,
+      "elapsed": 17,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1657,
+      "presented": 688,
+      "elapsed": 23,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1671,
+      "presented": 692,
+      "elapsed": 31,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1685,
+      "presented": 695,
+      "elapsed": 37,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1699,
+      "presented": 699,
+      "elapsed": 45,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1713,
+      "presented": 702,
+      "elapsed": 51,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1727,
+      "presented": 706,
+      "elapsed": 59,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1741,
+      "presented": 709,
+      "elapsed": 65,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1755,
+      "presented": 713,
+      "elapsed": 73,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1769,
+      "presented": 716,
+      "elapsed": 79,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1783,
+      "presented": 720,
+      "elapsed": 87,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1797,
+      "presented": 723,
+      "elapsed": 93,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1811,
+      "presented": 727,
+      "elapsed": 101,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1825,
+      "presented": 730,
+      "elapsed": 108,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1839,
+      "presented": 734,
+      "elapsed": 116,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1853,
+      "presented": 737,
+      "elapsed": 122,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1867,
+      "presented": 741,
+      "elapsed": 130,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1881,
+      "presented": 744,
+      "elapsed": 136,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1894,
+      "presented": 748,
+      "elapsed": 144,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1908,
+      "presented": 751,
+      "elapsed": 150,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1921,
+      "presented": 756,
+      "elapsed": 160,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1935,
+      "presented": 760,
+      "elapsed": 168,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1949,
+      "presented": 763,
+      "elapsed": 174,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1963,
+      "presented": 768,
+      "elapsed": 184,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1977,
+      "presented": 775,
+      "elapsed": 199,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    },
+    {
+      "mode": 4,
+      "act": 0,
+      "host": 1991,
+      "presented": 782,
+      "elapsed": 213,
+      "pcm_active": 0,
+      "pcm_pending": 0,
+      "interval": 226,
+      "fault": 0,
+      "missed": 0,
+      "music_active": false,
+      "music_audible": false
+    }
+  ],
+  "stalls": [
+    {
+      "host_frames": 21,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 12,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 15,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 15,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 13,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 13,
+      "presented_frames": 0,
+      "elapsed": 4
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 2,
+      "elapsed": 10
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 17
+    },
+    {
+      "host_frames": 13,
+      "presented_frames": 3,
+      "elapsed": 23
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 31
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 37
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 45
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 51
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 59
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 65
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 73
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 79
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 87
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 93
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 101
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 108
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 116
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 122
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 130
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 136
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 150
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 4,
+      "elapsed": 168
+    },
+    {
+      "host_frames": 14,
+      "presented_frames": 3,
+      "elapsed": 174
+    }
+  ],
+  "pcm_seen": true,
+  "audio_seconds": 10.08,
+  "audio_rms": 0.10254,
+  "longest_silent_seconds": 1.9
+}

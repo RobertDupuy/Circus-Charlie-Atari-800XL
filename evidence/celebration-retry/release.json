@@ -1,0 +1,14 @@
+{
+  "implementation_commit": "cdcb91e391736f8dddaf84104bac3cacccda1ce7",
+  "before_car_sha256": "3cced8898f5dc62a97f6aa1645683a1bb2eb3092f33766feda78b02778a3ff55",
+  "profiles": {
+    "arcade": {
+      "car_sha256": "8ae71ec9314cc6ab49fa63c3159f4da8c5e40ce4dcaa29dbe35853f5697aa2f1",
+      "rom_sha256": "27b3a8969f4611a98cfc20697a85ee49132b26eeeeb65e7c4c3bf61ee065f96f"
+    },
+    "automatic": {
+      "car_sha256": "88b8979592a3960a2c5087a1ce0c2b8c9fca92ea96c95356f3a9e38ee9f76cef",
+      "rom_sha256": "a54905263164ddff2861de7b50d7b4f4e97a5b56aadc319d22ec68c4a4bd0e94"
+    }
+  }
+}

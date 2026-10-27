@@ -278,9 +278,9 @@
  bne :+
  lda water
  bne :+
- lda #<1536
+ lda #<1344
  sta z_pos
- lda #>1536
+ lda #>1344
  sta z_pos+1
  jmp @limit
 :
@@ -450,7 +450,7 @@
  ldy mode
  cpy #4
  bne :+
- lda #142
+ lda #141
 :
  cpx #4
  bne :+
@@ -562,7 +562,7 @@
  jmp lion_hoop_foreground
 @monkeys:
  jsr gfx_monkeys
- jmp @plainchar
+ jmp tramp_plain_char
 @tramp:
  lda water
  beq :+
@@ -571,7 +571,7 @@
  sec
  sbc jump_pixels
  sta feet
- jmp @plainchar
+ jmp tramp_plain_char
 :
  jsr draw_flames
  jsr gfx_trampolines
@@ -581,7 +581,7 @@
  clc
  adc death_drop
  sta feet
- jmp @plainchar
+ jmp tramp_hero_entry
 @horse:
  jsr gfx_springs
 @pony:
@@ -594,9 +594,10 @@
  lda #0
  sbc #0
  sta sprite_xhi
- lda sprite_x
+ lda finish_pony
+ and #252 ; Keep the departing pony on its prepared four-pixel drawing grid.
  clc
- adc finish_pony
+ adc sprite_x
  sta sprite_x
  lda #134
  sta sprite_y
@@ -612,7 +613,8 @@
  adc #HORSE
  sta sprite_pose
  jsr gfx_horse
- jmp @plainchar
+ jsr draw_finish
+ jmp tramp_plain_char
 @balls:
  jsr prepare_balls
  lda #0
@@ -646,7 +648,8 @@
  lda z_hazard
  cmp #16
  bcc @ball
- jmp @plainchar
+ jsr draw_finish
+ jmp tramp_plain_char
 @trapeze:
  lda mode
  cmp #4
@@ -654,6 +657,7 @@
  rts
 :
  jsr mech_rope_draw
+tramp_plain_char:
 @plainchar:
  lda mode
  cmp #4
@@ -677,8 +681,6 @@
  lda #0
  sbc #0
  sta sprite_xhi
- lda #CHAR_STAND
- sta sprite_pose
  lda mode
  cmp #3
  beq @fallen
@@ -694,7 +696,7 @@
  lda mode
  cmp #4
  bne :+
- lda #CHAR_WALK1
+ jsr tightrope_clear_pose
  sta sprite_pose
  jmp @draw
 :
@@ -729,6 +731,11 @@
  lda #$3A
  sta $D500
  jmp tramp_draw
+.endproc
+.proc tramp_hero_entry
+ lda #$3A
+ sta $D500
+ jmp tramp_hero_draw
 .endproc
 .proc tramp_prepare_entry
  lda #$3A

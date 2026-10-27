@@ -120,6 +120,11 @@
  jeq fidelity_ball_land
  jsr fidelity_reward
 @ground:
+ ; Waiting on the rope is safe until an actual monkey reaches Charlie or
+ ; the visible course countdown expires. Never kill him for neutral input.
+ lda act
+ cmp #1
+ beq @collision
  lda f_direction
  bne @active
  inc f_idle
@@ -131,6 +136,48 @@
  lda #0
  sta f_idle
 @collision:
+ lda act
+ cmp #1
+ bne @ball_finish
+ ; Arcade walking continues underneath the raised deck and stops at X=192.
+ ; Touching the goal's side is not itself a death. Monkeys remain dangerous.
+ lda world
+ cmp #<1489
+ lda world+1
+ sbc #>1489
+ bcc :+
+ lda #<1489
+ sta world
+ lda #>1489
+ sta world+1
+:
+ lda jumping
+ beq @hazards
+ lda velocity
+ bpl @hazards
+ lda jump_pixels
+ cmp #20
+ bcs @hazards
+ cmp #16
+ bcc @hazards ; A late approach underneath the lip must not snap upward.
+ lda world
+ cmp #<1459 ; A shoe may overlap the near lip by six scaled pixels.
+ lda world+1
+ sbc #>1459
+ bcc @hazards
+ lda #0
+ sta jumping
+ lda #19
+ sta jump_pixels
+ ; Settle the landing so both shoes stand on the raised deck.
+ lda world
+ cmp #<1473
+ bcs :+
+ lda #<1473
+ sta world
+:
+ jmp finish_act
+@ball_finish:
  lda world
  cmp stage_end
  lda world+1
@@ -396,6 +443,13 @@
  and #3
  beq @schedule
 @increment:
+ ; A small first-course breathing space; later schedules remain exact.
+ lda rank
+ bne :+
+ lda scene_clock
+ and #15
+ beq @schedule
+:
  inc f_counter
 @schedule:
  lda f_sequence
@@ -1002,35 +1056,46 @@ monkey_page_hi: .byte >(monkey_schedule+0),>(monkey_schedule+0),>(monkey_schedul
 @move:
  jsr fidelity_horse_move
  jsr fidelity_horse_gravity
+ ; The visible podium starts at 3664 and is 48 pixels wide. The horse
+ ; reaches its face; there is no invisible killing gap ahead of it.
  lda world
  sec
- sbc stage_end
+ sbc #<3664
  sta z_tmp
  lda world+1
- sbc stage_end+1
+ sbc #>3664
  bmi @collision
  bne @fell
  lda z_tmp
- cmp #33
- bcs @fell
+ cmp #48
+ bcs @beyond
+ lda jump_pixels
+ cmp #28
+ bcs @collision
  lda jumping
- bne @collision
+ beq @fell
+ lda velocity
+ bpl @fell
+ lda previous_height
+ cmp #27
+ bcc @fell
+ lda #27
+ sta jump_pixels
+ lda #0
+ sta jumping
+ sta velocity
  lda #1
  sta horse_finish
  jmp finish_act
+@beyond:
+ lda jumping
+ bne @collision
 @fell:
  jmp hurt
 @collision:
- ; The horse cannot carry Charlie through the final gap.
- lda world
- sec
- sbc #<3620
- lda world+1
- sbc #>3620
- bmi @springs
- lda jumping
- beq @fell
 @springs:
+ lda #255
+ sta spring_hit
  ldx #15
 @next:
  lda h_width,x
@@ -1072,28 +1137,37 @@ monkey_page_hi: .byte >(monkey_schedule+0),>(monkey_schedule+0),>(monkey_schedul
  beq @land_on_spring
  bcs @crash
 @land_on_spring:
- lda #152
- sec
- sbc horse_y,x
- sta jump_pixels
- jsr fidelity_horse_bounce
- txa
- pha
- jsr fidelity_horse_input
- jsr fidelity_spring_points
- pla
- tax
- lda #1
- sta jumping
- sta sound_fx
- lda #0
- sta sound_age
+ ; Classify all overlapping contacts against the incoming motion. Bouncing
+ ; inside this loop made the next valid deck appear to be an underside hit.
+ ldy spring_hit
+ bmi @remember
+ lda horse_y,x
+ cmp horse_y,y
+ bcs @skip
+@remember:
+ stx spring_hit
  jmp @skip
 @crash:
  jmp hurt
 @skip:
  dex
  jpl @next
+ ldx spring_hit
+ bmi @done
+ lda #152
+ sec
+ sbc horse_y,x
+ sta jump_pixels
+ jsr fidelity_horse_bounce
+ jsr fidelity_horse_input
+ ldx spring_hit
+ jsr fidelity_spring_points
+ lda #1
+ sta jumping
+ sta sound_fx
+ lda #0
+ sta sound_age
+@done:
  rts
 .endproc
 .proc fidelity_horse_move

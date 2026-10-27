@@ -90,7 +90,7 @@
  bcc @bounce
 @next:
  inx
- cpx #25
+ cpx #22
  bne @platform
  jmp @miss
 @bounce:
@@ -114,8 +114,16 @@
  sbc #3
  bcs @mod
 @short:
+ ldy f_direction
+ cpy #4
+ bne @right_gap
+ cmp #0
+ beq @short_arc
+ bne @reset
+@right_gap:
  cmp #2
  bne @reset
+@short_arc:
  lda #1
  sta f_tramp_arc
  bne @reset
@@ -140,9 +148,9 @@
  cmp #74
  bcc @flame
  ldx tramp_index
- lda passed,x
+ lda t_bag_taken,x
  bne @flame
- inc passed,x
+ inc t_bag_taken,x
  jsr complete_tramp_prize
 @flame:
  lda f_tramp_arc
@@ -163,11 +171,11 @@
 .endproc
 trampoline_arc_0: .byte 0,4,7,10,13,16,19,22,24,26,28,30,32,33,34,35,36,37,37,37,37,37,37,37,37,37,37,37,37,36,35,34,33,32,30,28,26,24,22,19,16,13,10,7,0
 trampoline_arc_1: .byte 0,3,6,9,12,15,17,19,21,23,25,26,27,28,29,30,30,30,30,30,30,30,30,30,30,30,30,29,28,27,26,25,23,21,19,17,15,12,9,6,0
-trampoline_arc_2: .byte 0,4,8,11,14,17,20,23,26,28,30,32,34,36,37,38,39,40,41,41,41,41,41,41,41,41,41,41,41,41,40,39,38,37,36,34,32,30,28,26,23,20,17,14,11,8,0
-trampoline_arc_3: .byte 0,5,9,13,17,21,25,28,31,34,37,40,43,45,47,49,51,53,54,55,56,57,58,58,58,58,58,58,58,58,58,58,58,58,57,56,55,54,53,51,49,47,45,43,40,37,34,31,28,25,21,17,13,9,0
-trampoline_arc_4: .byte 0,6,12,17,22,27,32,37,41,45,49,53,57,60,63,66,69,72,75,77,79,81,83,85,86,87,88,89,90,90,90,90,90,90,90,90,90,90,90,90,89,88,87,86,85,83,81,79,77,75,72,69,66,63,60,57,53,49,45,41,37,32,27,22,17,12,0
+trampoline_arc_2: .byte 0,4,8,11,14,17,20,23,26,28,30,32,34,36,37,38,39,40,41,41,41,41,41,41,41,41,40,39,38,37,36,34,32,30,28,26,23,20,17,14,11,8,0
+trampoline_arc_3: .byte 0,5,9,13,17,21,25,28,31,34,37,40,43,45,47,49,51,53,54,55,56,57,58,58,58,58,58,58,58,58,57,56,55,54,53,51,49,47,45,43,40,37,34,31,28,25,21,17,13,9,0
+trampoline_arc_4: .byte 0,6,12,17,22,27,32,37,41,45,49,53,57,60,63,66,69,72,75,77,79,81,83,85,86,87,88,89,90,90,90,90,90,90,90,90,89,88,87,86,85,83,81,79,77,75,72,69,66,63,60,57,53,49,45,41,37,32,27,22,17,12,0
 trampoline_arc_5: .byte 0,7,14,21,28,35,42,49,56,63,70,77,84,91,92
 trampoline_arc_lo: .byte <trampoline_arc_0,<trampoline_arc_1,<trampoline_arc_2,<trampoline_arc_3,<trampoline_arc_4,<trampoline_arc_5
 trampoline_arc_hi: .byte >trampoline_arc_0,>trampoline_arc_1,>trampoline_arc_2,>trampoline_arc_3,>trampoline_arc_4,>trampoline_arc_5
-trampoline_arc_length: .byte 44,40,46,54,66,255
+trampoline_arc_length: .byte 44,40,42,50,62,255
 

@@ -352,7 +352,9 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  cmp #3
  bne @ordinary
  ; Reserve the last four codes of each private rolling-ball font pool.
- lda ball_merge_limit
+ lda bg_count+2
+ clc
+ adc #27
  jmp @pool
 @fixed:
  ; Main trampolines and trapeze use fewer than 100 bottom-font codes,
@@ -397,6 +399,8 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  ldy z_band
  lda band_font,y
  sta sign_cache_font,x
+ lda sign_copy
+ beq @ready_map
  lda detail_sign_index
  .repeat 3
  lsr
@@ -412,6 +416,7 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  lda z_rom+1
  adc #>detail_sign_tiles
  sta z_rom+1
+@ready_map:
  lda #0
  sta detail_sign_cell
 @cell:
@@ -454,6 +459,8 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  ldy #0
  sta (z_cell),y
 @skip:
+ lda sign_copy
+ beq @advance_cell
  lda z_rom
  clc
  adc #8
@@ -461,6 +468,7 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  bcc :+
  inc z_rom+1
 :
+@advance_cell:
  inc detail_sign_col
  inc detail_sign_glyph
  inc detail_sign_cell
@@ -487,6 +495,7 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  sbc #1
 :
  sta z_hazard
+ sta detail_prize_first
 @next:
  ldx z_hazard
  lda arcade_tramp_lo,x
@@ -513,12 +522,16 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
 @skip:
  inc z_hazard
  lda z_hazard
- cmp #25
+ cmp #22
  bne @next
 @prize:
- ldx tramp_index
- lda passed,x
- bne @done
+ lda z_hazard
+ sta detail_prize_last
+ ldx detail_prize_first
+ stx z_hazard
+@bag:
+ lda t_bag_taken,x
+ bne @next_bag
  lda arcade_tramp_lo,x
  sta z_pos
  lda arcade_tramp_hi,x
@@ -526,11 +539,16 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  jsr screen_position
  lda #8
  jsr gfx_visible_width
- bcs @done
+ bcs @next_bag
  lda sprite_x
  and #$FC
  sta sprite_x
- jmp detail_high_bag
+ jsr detail_high_bag
+@next_bag:
+ inc z_hazard
+ ldx z_hazard
+ cpx detail_prize_last
+ bcc @bag
 @done:
  rts
 .endproc

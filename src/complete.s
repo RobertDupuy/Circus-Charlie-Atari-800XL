@@ -20,10 +20,23 @@
  clc
  adc death_drop
 @top:
+ jsr trapeze_clip_budget
+ bcs @done
  tax
  cpx #64
  bcs :+
  lda trapeze_top_budget,x
+ ; The attached swing pose needs at most 21 cells. Reserving the jump
+ ; pose's 25 can leave no glyph for a nearby rope at a high swing.
+ cmp #22
+ bcc @reserve
+ ldy mode
+ cpy #2
+ bne @reserve
+ ldy jumping
+ bne @reserve
+ lda #21
+@reserve:
  sta gfx_reserve
 :
  txa
@@ -46,6 +59,40 @@
  rts
 .endproc
 .include "trapeze-budget.inc"
+; The native pony writer may spill at most seven cells into the next row
+; when leaving the right edge. Restore those otherwise empty left-field cells
+; immediately. This keeps the final cropped departure on the fast path.
+.proc complete_horse_edge
+ lda #<(17*40)
+ sta z_src
+ sta z_dst
+ lda #>(BASEMAP+17*40)
+ sta z_src+1
+ lda z_map+1
+ clc
+ adc #>(17*40)
+ sta z_dst+1
+ ldx #5
+@row:
+ ldy #7
+@copy:
+ lda (z_src),y
+ sta (z_dst),y
+ dey
+ bpl @copy
+ lda z_src
+ clc
+ adc #40
+ sta z_src
+ sta z_dst
+ bcc :+
+ inc z_src+1
+ inc z_dst+1
+:
+ dex
+ bne @row
+ rts
+.endproc
 ; Draw while the rope's screen coordinates are still available, avoiding
 ; another world/camera pass over the off-screen apparatus.
 .proc complete_rope_bar_endpoint
@@ -216,9 +263,9 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  cpx #8
  jcs detail_dispatch
  cpx #0
- beq complete_begin
+ jeq complete_begin_entry
  cpx #1
- beq complete_tick
+ jeq complete_tick
  cpx #2
  jeq complete_draw
  cpx #3
@@ -234,6 +281,7 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  jmp detail_dispatch
 .endproc
 
+.segment "XL"
 .proc complete_begin
  lda #0
  sta clear_elapsed
@@ -245,7 +293,28 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  eor #1
  sta clear_reward
  lda act
- jne @done
+ beq @lion
+ cmp #2
+ beq @tramp
+ cmp #3
+ bne @done
+ ; Settle both shoes onto the low Rolling Balls podium.
+ lda #15
+ bne @settle
+@tramp:
+ lda water
+ bne @done
+ ; Centre the victory dancer over the 32-pixel trampoline goal.
+ lda #16
+@settle:
+ clc
+ adc stage_end
+ sta world
+ lda stage_end+1
+ adc #0
+ sta world+1
+ jmp update_camera
+@lion:
  lda #1
  sta clear_bird
  sta lion_goal
@@ -260,6 +329,7 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  rts
 .endproc
 
+.segment "DETAILS"
 .proc complete_tick
  inc clear_elapsed
  lda clear_bird
@@ -282,7 +352,7 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  cmp #4
  jne @done
  lda finish_pony
- cmp #96
+ cmp #128
  jcs @done
  inc finish_pony
 @done:

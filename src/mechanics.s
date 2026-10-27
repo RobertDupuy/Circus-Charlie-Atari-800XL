@@ -489,14 +489,6 @@ gfx_dma_opcode: .byte $D0,$F0,$F0,$D0,$F0,$F0
 .proc draw_rope_cells
  rts
 .endproc
-rope_first_block:
- .repeat 32,I
- .if I<3
- .byte 0
- .else
- .byte (I*64-132+95)/96
- .endif
- .endrepeat
 
 crowd_high_mod:
  .repeat 256,I
@@ -810,9 +802,6 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lsr
  lsr
  sta r_draw_full
- clc
- adc r_draw_partial
- tax
  lda z_rom
  clc
  adc #8
@@ -820,15 +809,7 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  bcc :+
  inc z_rom+1
 :
- ldy #0
-@copy:
- .repeat 3
- lda (z_rom),y
- sta r_record,y
- iny
- .endrepeat
- dex
- bne @copy
+ jsr apparatus_record_addresses
  lda r_draw_left
  lsr
  lsr
@@ -875,8 +856,6 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lda #$78
 @cachepage:
  sta r_draw_cachepage
- lda r_atlas_bank
- sta $D500
  lda #0
  sta r_draw_offset
  lda r_draw_full
@@ -898,15 +877,17 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  jmp apparatus_draw_supports
 .endproc
 .proc apparatus_draw_cells
-@cell:
+cell:
  ldx r_draw_offset
+record_row = *
  lda r_record+1,x
  sta r_draw_row
  cmp r_draw_bottomrow
- jcc @rowvisible
- jeq @rowvisible
- jmp @next
-@rowvisible:
+ jcc rowvisible
+ jeq rowvisible
+ jmp next
+rowvisible:
+record_column = *
  lda r_record,x
  and #15
  sta r_draw_col
@@ -919,16 +900,16 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
 :
  lda r_draw_col
  cmp r_draw_mincol
- jcc @next
+ jcc next
  cmp r_draw_maxcol
  bcc :+
  beq :+
- jmp @next
+ jmp next
 :
  clc
  adc r_draw_basecol
  cmp #40
- jcs @next
+ jcs next
  sta z_left
  ldy r_draw_row
  lda row_lo,y
@@ -941,8 +922,10 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  sta z_off+1
  ora z_map+1
  sta z_cell+1
+record_id = *
  lda r_record+2,x
  sta r_draw_id
+record_flags = *
  lda r_record,x
  and #128
  asl
@@ -952,45 +935,47 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lda #255
  sta r_draw_mask
  lda r_draw_sign
- beq @rightedge
+ beq rightedge
  lda r_draw_col
  cmp r_draw_mincol
- bne @maskready
- beq @endmask
-@rightedge:
+ bne maskready
+ beq endmask
+rightedge:
  lda r_draw_col
  cmp r_draw_maxcol
- bne @maskready
-@endmask:
+ bne maskready
+endmask:
  lda r_draw_endmask
  sta r_draw_mask
-@maskready:
+maskready:
  lda r_draw_mask
  cmp #255
- jne @allocate
+ jne allocate
  lda r_draw_row
  cmp r_draw_bottomrow
- bcc @cached
+ bcc cached
  lda r_draw_lastline
  cmp #7
- bne @allocate
-@cached:
+ bne allocate
+cached:
  lda r_draw_cachepage
  clc
  adc r_draw_id+1
- sta @cache_read+2
+ sta cache_read+2
  ldx r_draw_id
-@cache_read:
+cache_read:
  lda $7800,x
  cmp #255
- beq @allocate
+ beq allocate
  ldy #0
  sta (z_cell),y
- jmp @dirty
-@allocate:
+ jmp dirty
+allocate:
+ lda r_atlas_bank
+ sta $D500
  lda free_glyph
  cmp #128
- jcs @overflow
+ jcs overflow
  inc free_glyph
  ldy #0
  sta (z_cell),y
@@ -1003,19 +988,19 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lda r_draw_id+1
  clc
  adc #$74
- sta @atlaslo+2
+ sta atlaslo+2
  adc #2
- sta @atlashi+2
+ sta atlashi+2
  ldx r_draw_id
-@atlaslo:
+atlaslo:
  lda $7400,x
  sta z_data
-@atlashi:
+atlashi:
  lda $7600,x
  sta z_data+1
  lda r_draw_mask
  cmp #255
- jne@partial
+ jne partial
  lda r_draw_row
  asl
  asl
@@ -1023,19 +1008,19 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  clc
  adc #7
  cmp r_draw_bottom
- bcc @whole
- beq @whole
- jmp @partial
-@whole:
+ bcc whole
+ beq whole
+ jmp partial
+whole:
  lda r_draw_sign
- bne @mirror
+ bne mirror
  .repeat 8,I
  ldy #I
  lda (z_data),y
  sta (z_glyph),y
  .endrepeat
- jmp @dirty
-@mirror:
+ jmp dirty
+mirror:
  .repeat 8,I
  ldy #I
  lda (z_data),y
@@ -1043,8 +1028,8 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lda $7A00,x
  sta (z_glyph),y
  .endrepeat
- jmp @dirty
-@partial:
+ jmp dirty
+partial:
  lda r_draw_row
  asl
  asl
@@ -1053,10 +1038,10 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  lda r_draw_row
  beq :+
  jsr rope_partial_fast
- jmp @dirty
+ jmp dirty
 :
  ldy #0
-@byte:
+byte:
  lda (z_data),y
  ldx r_draw_sign
  beq :+
@@ -1069,51 +1054,53 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
  clc
  adc r_draw_top
  cmp r_draw_bottom
- bcc @within
- beq @within
+ bcc within
+ beq within
  lda #0
  sta z_tmp
-@within:
+within:
  lda r_draw_row
- bne @store
+ bne store
  tya
- beq @gold
+ beq gold
  cmp #2
- bne @store
+ bne store
  lda r_draw_mask
  eor #255
  and #$AA
  ora z_tmp
  sta z_tmp
- jmp @store
-@gold:
+ jmp store
+gold:
  lda r_draw_mask
  eor #255
  ora z_tmp
  sta z_tmp
-@store:
+store:
  lda z_tmp
  sta (z_glyph),y
  iny
  cpy #8
- bne @byte
-@dirty:
+ bne byte
+dirty:
+ lda z_bank
+ sta $D500
  ldy z_num
  lda z_off
  sta (z_dirtylo),y
  lda z_off+1
  sta (z_dirtyhi),y
  inc z_num
- jmp @next
-@overflow:
+ jmp next
+overflow:
  inc fault
-@next:
+next:
  lda r_draw_offset
  clc
  adc #3
  sta r_draw_offset
  dec r_draw_count
- jne @cell
+ jne cell
  rts
 .endproc
 r_keep_right: .byte 255,63,15,3
@@ -1324,31 +1311,33 @@ leg_offsets: .byte 24,4
  beq :+
  lda #255
 :
- sta @column_xor+1
+ sta column_xor+1
  lda r_draw_basecol
  cpx #0
  beq :+
  clc
  adc #13
 :
- sta @column_add+1
+ sta column_add+1
  lda r_draw_cachepage
- sta @cache_read+2
+ sta cache_read+2
  clc
  adc #1
- sta @cache_high+2
-@cell:
+ sta cache_high+2
+cell:
  ldx r_draw_offset
+record_column = *
  lda r_record,x
  and #15
-@column_xor:
+column_xor:
  eor #0
  clc
-@column_add:
+column_add:
  adc #0
  cmp #40
- jcs @next
+ jcs next
  sta z_left
+record_row = *
  lda r_record+1,x
  tay
  lda row_lo,y
@@ -1363,33 +1352,39 @@ leg_offsets: .byte 24,4
  sta z_cell+1
  ; Select the cached page directly from the prepared ID's ninth bit.
  ; The full atlas address is needed only on the uncommon uncached path.
+record_id = *
  ldy r_record+2,x
+record_flags = *
  lda r_record,x
- bmi @high_id
-@cache_read:
+ bmi high_id
+cache_read:
  lda $7800,y
- jmp @cached
-@high_id:
-@cache_high:
+ jmp cached
+high_id:
+cache_high:
  lda $7900,y
-@cached:
+cached:
  cmp #255
- beq @allocate
+ beq allocate
  ldy #0
  sta (z_cell),y
- jmp @dirty
-@allocate:
+ jmp dirty
+allocate:
+alloc_id = *
  lda r_record+2,x
  sta r_draw_id
+alloc_flags = *
  lda r_record,x
  and #128
  asl
  lda #0
  rol
  sta r_draw_id+1
+ lda r_atlas_bank
+ sta $D500
  lda free_glyph
  cmp #128
- jcs @overflow
+ jcs overflow
  inc free_glyph
  ldy #0
  sta (z_cell),y
@@ -1402,25 +1397,25 @@ leg_offsets: .byte 24,4
  lda r_draw_id+1
  clc
  adc #$74
- sta @atlaslo+2
+ sta atlaslo+2
  adc #2
- sta @atlashi+2
+ sta atlashi+2
  ldx r_draw_id
-@atlaslo:
+atlaslo:
  lda $7400,x
  sta z_data
-@atlashi:
+atlashi:
  lda $7600,x
  sta z_data+1
  lda r_draw_sign
- bne @mirror
+ bne mirror
  .repeat 8,I
  ldy #I
  lda (z_data),y
  sta (z_glyph),y
  .endrepeat
- jmp @dirty
-@mirror:
+ jmp dirty
+mirror:
  .repeat 8,I
  ldy #I
  lda (z_data),y
@@ -1428,27 +1423,43 @@ leg_offsets: .byte 24,4
  lda $7A00,x
  sta (z_glyph),y
  .endrepeat
-@dirty:
+dirty:
+ lda z_bank
+ sta $D500
  ldy z_num
  lda z_off
  sta (z_dirtylo),y
  lda z_off+1
  sta (z_dirtyhi),y
  inc z_num
- jmp @next
-@overflow:
+ jmp next
+overflow:
  inc fault
-@next:
+next:
  lda r_draw_offset
  clc
  adc #3
  sta r_draw_offset
  dec r_draw_count
- jne @cell
+ jne cell
  rts
 .endproc
 
 .proc apparatus_blend
+ ; Spill compositors use a tagged address in the unused presentation-bank
+ ; tail. Return to the directory bank before the next glyph lookup.
+ bit z_tempword+1
+ bmi @call
+ lda z_tempword+1
+ eor #$C0
+ sta z_tempword+1
+ lda #$31
+ sta $D500
+ jsr @call
+ lda #$27
+ sta $D500
+ rts
+@call:
  jmp (z_tempword)
 .endproc
 .proc apparatus_blend_prepare
@@ -1540,3 +1551,45 @@ horse_cached_cell=draw_stamp::spring_cache_anchor
 sprite_cache_base=draw_stamp::spring_cache_base_anchor
 sprite_cache_mid_adjust=draw_stamp::spring_mid_adjust_anchor
 sprite_cache_bottom_limit=draw_stamp::spring_bottom_limit_anchor
+
+.segment "XL"
+; Point the resident rope readers directly at their cartridge records.
+; Cached cells need no ROM glyph fetch; uncached/end cells switch to the
+; atlas briefly and restore z_bank. This removes a per-frame record copy.
+.proc apparatus_record_addresses
+ lda z_rom
+ ldy z_rom+1
+ sta apparatus_draw_cells::record_column+1
+ sty apparatus_draw_cells::record_column+2
+ sta apparatus_draw_cells::record_flags+1
+ sty apparatus_draw_cells::record_flags+2
+ sta apparatus_draw_full::record_column+1
+ sty apparatus_draw_full::record_column+2
+ sta apparatus_draw_full::record_flags+1
+ sty apparatus_draw_full::record_flags+2
+ sta apparatus_draw_full::alloc_flags+1
+ sty apparatus_draw_full::alloc_flags+2
+ clc
+ adc #1
+ bcc :+
+ iny
+:
+ sta apparatus_draw_cells::record_row+1
+ sty apparatus_draw_cells::record_row+2
+ sta apparatus_draw_full::record_row+1
+ sty apparatus_draw_full::record_row+2
+ clc
+ adc #1
+ bcc :+
+ iny
+:
+ sta apparatus_draw_cells::record_id+1
+ sty apparatus_draw_cells::record_id+2
+ sta apparatus_draw_full::record_id+1
+ sty apparatus_draw_full::record_id+2
+ sta apparatus_draw_full::alloc_id+1
+ sty apparatus_draw_full::alloc_id+2
+ rts
+.endproc
+
+.segment "MECHANICS"

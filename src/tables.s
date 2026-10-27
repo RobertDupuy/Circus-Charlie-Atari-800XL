@@ -111,7 +111,7 @@ pause_text: .asciiz "PAUSED - OPTION TO CONTINUE             "
 act_messages: .word help0,help1,help2,help3,help4,help5,help6
 help0: .asciiz "JUMP THROUGH HOOPS AND OVER FIRE POTS"
 help1: .asciiz "JUMP THE MONKEYS - PURPLE ONES LEAP!"
-help2: .asciiz "3 BOUNCES: MONEY BAG / 4TH: BIG TOP!"
+help2: .asciiz "HIGH: MARKED BAGS / 4TH: BIG TOP!"
 help3: .asciiz "JUMP TO THE NEXT BALL BEFORE THEY TOUCH"
 help4: .asciiz "L/R: PACE - FIRE: JUMP, ALSO AT FINISH"
 help5: .asciiz "L/R: SWING - FIRE: RELEASE AND CATCH"

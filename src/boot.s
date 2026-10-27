@@ -65,6 +65,13 @@ loader:
  sta $83
  ldx #2
  jsr copy
+ ldx #191
+@topclip:
+ lda $A340,x
+ sta $0E40,x
+ dex
+ cpx #255
+ bne @topclip
  lda #$3E
  sta $D500
  jmp $1000

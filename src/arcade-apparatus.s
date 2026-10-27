@@ -66,6 +66,11 @@
  adc r_length,x
  clc
  adc #16
+ ldy rank
+ bne :+
+ sec
+ sbc #16                ; First course: twelve Atari pixels closer per rope.
+:
  sta z_tmp
  lsr
  lsr
@@ -277,6 +282,8 @@
  sta r_depth
  lda r_dyhi,x
  sta r_depth+1
+ lda #0
+ sta r_depth_page
  rts
 .endproc
 .proc apparatus_step
@@ -302,6 +309,12 @@
  adc #2
  sta r_goal_rope
  tax
+ ldy #14
+ lda rank
+ bne :+
+ ldy #8                  ; Match the first course's six-pixel shorter transfers.
+:
+ sty z_tmp2
  lda r_length,x
  lsr
  lsr
@@ -310,7 +323,7 @@
  sec
  sbc z_tmp
  clc
- adc #14
+ adc z_tmp2
  clc
  adc r_pivot_lo,x
  sta stage_end
@@ -370,6 +383,17 @@
  lda r_depth+1
  adc r_vertical+1
  sta r_depth+1
+ ; Retain the signed page when a high recovery bounce crosses screen Y=0.
+ ; Testing the wrapped integer byte alone mistakes its apex for the floor.
+ ldx #0
+ bit r_vertical+1
+ bpl :+
+ dex
+:
+ txa
+ adc r_depth_page
+ sta r_depth_page
+ bmi @catch
  lda r_vertical+1
  bmi @catch
  lda r_goal_ready
@@ -416,6 +440,14 @@
  dec release_guard
  jmp @position
 @testcatch:
+ lda r_depth_page
+ beq :+
+ ; Above-screen hands can still reach a bar, but a much higher bounce must
+ ; not wrap into a false contact with a visible endpoint.
+ lda r_depth+1
+ cmp #243
+ jcc @position
+:
  ldx r_first
 @candidate:
  lda r_goal_ready
@@ -442,6 +474,11 @@
  bne :+
  lda #7
  sta z_tmp
+:
+ lda rank
+ bne :+
+ inc z_tmp
+ inc z_tmp               ; Two-pixel hand reach on the first course only.
 :
  lda z_pos
  cmp z_tmp
@@ -473,7 +510,7 @@
 @next:
  inx
  cpx r_limit
- bne @candidate
+ jne @candidate
 @position:
  ; The working set follows Charlie, preserving the original five pendulums.
  ldx r_center
@@ -651,6 +688,7 @@
  sta r_depth+1
  lda #0
  sta r_depth
+ sta r_depth_page
  lda #2
  sta flying
  lda #0
@@ -711,6 +749,18 @@ r_rescue_hi: .byte $FB,$FB,$FB,$F9
  lda #1
  sta r_freeze
  jsr apparatus_clocks
+ ; A new life gets fresh ropes, retaining their visible swing positions.
+ ldx r_first
+@fresh:
+ lda #60
+ sec
+ sbc r_length,x
+ lsr
+ lsr
+ sta r_age,x
+ inx
+ cpx r_limit
+ bcc @fresh
  lda #0
  sta r_freeze
  ldx held_rope

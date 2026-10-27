@@ -43,6 +43,8 @@
 .if ::ARCADE_CHOOSER
 .include "chooser.s"
 .endif
+.include "tightrope-finish.s"
+.include "trapeze-top-clip.s"
 
 .segment "MASK"
 .repeat 256,I

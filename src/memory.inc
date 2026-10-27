@@ -398,10 +398,13 @@ r_depth=$0985
 r_vertical=$0987
 r_old_depth=$098A
 r_start_index=$098B
+; Legacy operand base only: apparatus_record_addresses redirects all readers
+; to ROM before use. $0E40-$0EFF now holds the resident top-clipping helpers.
 r_record=$0E80
 r_hist_xfrac=$0910
 r_hist_xlo=$0914
 r_hist_xhi=$0918
+r_depth_page=$0918 ; Signed extension of r_depth; X history never used this byte.
 r_hist_yfrac=$091C
 r_hist_yhi=$0920
 ; Renderer workspace, separate from simulation and interrupt state.
@@ -441,6 +444,7 @@ r_blend_enabled=$09BC
 r_spring_code=$09BD
 
 ; Act 3 state shares apparatus-only RAM; no interrupts use it.
+t_bag_taken=$0900 ; 25 site flags; full block is saved per player on a loss.
 t_active=$D900
 t_timer=$D920
 t_anim=$D940
@@ -538,3 +542,5 @@ sign_cache_font=$06FD
 sign_copy=$06FF
 detail_fast_try=$09FA
 clear_text_cache=$09FB ; Private top-font base, one per display buffer.
+detail_prize_first=$09FD
+detail_prize_last=$09FE

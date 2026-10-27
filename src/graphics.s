@@ -303,21 +303,16 @@ lion_field_colour: .byte $C8,$C6,$C4
  lda water
  jne @done
  lda act
- jeq @done
- cmp #1
- jeq @done
- cmp #4
- jeq @done
- cmp #2
- jeq @done
+ cmp #3
+ beq @active
+ cmp #5
+ jne @done
+@active:
  lda #$26
  sta $D500
  lda gfx_hero_pose
- cmp #84
- bcc :+
- sec
- sbc #76
-:
+ cmp #8
+ jcs @prepared ; Prepared victory poses have their colours in the playfield.
  tax
  sta z_tmp
  asl
@@ -390,6 +385,7 @@ lion_field_colour: .byte $C8,$C6,$C4
  lda (z_src),y
  clc
  adc gfx_hero_y
+ clc
  adc #40
  sta gfx_overlay_y
  ldx back
@@ -458,6 +454,19 @@ lion_field_colour: .byte $C8,$C6,$C4
  dey
  bpl @copy
 @done:
+ rts
+@prepared:
+ ; Balls reserve player zero for Charlie's ordinary colour overlay. Hide
+ ; that previous pose when the victory colours move into the playfield.
+ lda back
+ asl
+ asl
+ asl
+ asl
+ asl
+ tay
+ lda #0
+ sta $0E00,y
  rts
 .endproc
 
@@ -702,12 +711,23 @@ lion_field_colour: .byte $C8,$C6,$C4
  bne :+
  jmp lion_arcade_finish_draw
 :
+ cmp #1
+ bne :+
+ lda #$20
+ sta $D500
+ jmp tightrope_finish_draw
+:
  cmp #5
  bne :+
  jmp apparatus_finish_draw
 :
  lda water
  bne @done
+ lda act
+ cmp #3
+ beq @platform
+ cmp #4
+ beq @platform
  lda stage_end
  sta z_pos
  lda stage_end+1
@@ -715,32 +735,11 @@ lion_field_colour: .byte $C8,$C6,$C4
  jsr screen_position
  jsr gfx_visible
  bcs @done
- lda act
- cmp #1
- beq @platform
- cmp #4
- beq @platform
- cmp #3
- bne @soft
+ jmp @soft
 @platform:
- lda sprite_x
- sta pm_x+3
- lda #142
- ldx act
- cpx #1
- bne :+
- lda #96
-:
- cpx #4
- bne :+
- lda #152
-:
- sta pm_y+3
- lda #16
- sta pm_id+3
- lda #$0E
- sta pm_color+3
- rts
+ lda #$20
+ sta $D500
+ jmp ground_finish_draw
 @soft:
  lda #11
  sta gfx_cached_kind
@@ -839,6 +838,10 @@ gfx_glyph_hi:
  bcs @slow
  jmp gfx_native_cached
 @wide:
+ ; Horse's clipped right edge is repaired by gfx_horse after native stores.
+ lda gfx_cached_kind
+ cmp #10
+ bcc @native
  lda sprite_x
  cmp #129
  bcs @slow
@@ -1047,6 +1050,7 @@ gfx_glyph_hi:
  lda #0
  dex
  bpl @init
+ jsr trapeze_clip_top
 @row:
  lda z_row
  clc
@@ -1427,6 +1431,8 @@ gfx_glyph_hi:
 
 .proc gfx_horse
  lda sprite_x
+ cmp #160
+ bcs @done
  and #3
  cmp #1
  bne @slow
@@ -1434,12 +1440,20 @@ gfx_glyph_hi:
  sec
  sbc #4
  sta gfx_cached_kind
- jmp gfx_cached_select
+ jsr gfx_cached_select
+ lda sprite_x
+ cmp #129
+ bcc @done
+ lda #$3C
+ sta $D500
+ jmp complete_horse_edge
+@done:
+ rts
 @slow:
  jmp draw_stamp
 .endproc
 
-.segment "CODE"
+.segment "AUX"
 .proc gfx_visible_width
  ldx sprite_xhi
  beq @right

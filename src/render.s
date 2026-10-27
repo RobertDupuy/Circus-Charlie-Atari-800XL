@@ -80,6 +80,13 @@
  sta gfx_reserve+1
  jmp @clear_budget_done
 @other_clear:
+ cmp #4
+ bne :+
+ lda #0
+ sta gfx_reserve+1 ; The prepared victory pose uses ordinary middle glyphs.
+ sta gfx_reserve+2 ; No falling/riding Charlie needs the bottom reservation.
+ beq @clear_budget_done
+:
  cmp #5
  bne :+
  lda #0
@@ -113,12 +120,17 @@
  bpl @hide
  jsr detail_track_signs
  lda act
- bne :+
+ cmp #2
+ bcs :+
  jsr draw_finish
 :
  jsr draw_scene
  lda act
- beq :+
+ cmp #2
+ beq @late_finish
+ cmp #5
+ bne :+
+@late_finish:
  jsr draw_finish
 :
  jsr fidelity_clear_text_entry
@@ -363,10 +375,17 @@ ds_spring_normal:
  jmp ds_next
 spring_fallback_anchor = *
 ds_spring_fallback:
- lda z_old
  ldx z_band
+ lda z_old
  cmp bg_count,x
  bcc ds_allocate
+ ; Podium rim patterns are shared across many cells. Victory feet must
+ ; composite into a new cell instead of modifying that repeated pattern.
+ lda sprite_pose
+ lsr
+ cmp #50
+ beq ds_allocate
+ lda z_old
  sta z_new
  jmp ds_pointers
 ds_allocate:
@@ -876,15 +895,15 @@ ds_done:
 :
  sta bg_count+2
  clc
- adc #27
+ adc #20 ; Seven immutable podium codes, then four private meter-board codes.
  sta ball_merge_limit
  lda bg_count+2
  ldx mode
  cpx #2
  beq :+
- ; The fallen actor also occupies this font. Reserve its four bottom rows.
+ ; Four bottom rows of the 16-pixel fall pose use at most sixteen cells.
  clc
- adc #20
+ adc #16
 :
  sta free_glyph+2
  lda anim_clock

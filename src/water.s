@@ -195,7 +195,9 @@ water_hazards = water_land::water_hazards
  stx tramp_index
  lda w_pedestal_lo,x
  clc
- adc #8
+ ; Restore the same +16 takeoff point used by the fresh course.
+ ; Centering at +8 leaves the final 66-pixel jump two pixels short.
+ adc #16
  sta world
  lda w_pedestal_hi,x
  adc #0

@@ -1,4 +1,13 @@
 .proc tramp_init
+ ; All 25 flags use the unused ball-position block, whose complete 32
+ ; bytes already belong to each player's checkpoint record.
+ ldx #24
+@prizes:
+ lda tramp_bag_unavailable,x
+ sta t_bag_taken,x
+ dex
+ bpl @prizes
+reset:
  lda #1
  sta jumping
  lda #60
@@ -38,18 +47,20 @@
  sta $691B
  lda #8
  sta gfx_reserve+2 ; Room for the low landing of a visible death fall.
- lda #<1656
+ lda #<1464
  sta stage_end
- lda #>1656
+ lda #>1464
  sta stage_end+1
  rts
 .endproc
+tramp_bag_unavailable:
+ .byte 1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1,1
 
 .proc tramp_resume
  ; Retry on the last reached trampoline; discard the old attack pool.
  lda tramp_index
  pha
- jsr tramp_init
+ jsr tramp_init::reset
  pla
  tax
  stx tramp_index
@@ -168,6 +179,7 @@
  jmp @next
 @spawn:
  lda t_period
+ ; Fire and swords retain the original rank's cadence.
  sta t_timer,x
  lda #0
  sta t_anim,x
@@ -274,51 +286,15 @@
 @collision:
  lda grace
  jne @pnext
- lda t_proj_xlo,x
- clc
- adc #4
- sta z_pos
- lda t_proj_xhi,x
- adc #0
- sta z_pos+1
- jsr distance_to_player
- lda z_pos+1
- jne @pnext
- lda z_pos
- cmp #7
- jcs @pnext
- lda #176
- sec
- sbc jump_pixels
- sta z_tmp
  lda t_proj_kind,x
  cmp #1
- bne @sword_hit
- lda t_proj_y,x
- sec
- sbc #4
- jmp @dy
-@sword_hit:
- lda t_proj_y,x
- clc
- adc #8
-@dy:
- sec
- sbc z_tmp
- bcs :+
- eor #255
- clc
- adc #1
-:
- ldy t_proj_kind,x
- cpy #1
- bne @blade
- cmp #10
- bcs @pnext
+ bne :+
+ jsr tramp_fire_contact
+ bcc @pnext
  lda #2
  jmp detail_hurt_entry
-@blade:
- cmp #8
+:
+ jsr tramp_sword_contact
  bcs @pnext
  lda #3
  jmp detail_hurt_entry
@@ -333,7 +309,29 @@
  rts
 .endproc
 
+.include "trampoline-hero.s"
+
 .proc tramp_draw
+ ; The eight original body poses use ordinary masked cells. Reserve the
+ ; old private hero pool only for the generic loss/celebration renderer.
+ ldy #0
+ lda mode
+ cmp #2
+ beq :+
+ cmp #4
+ beq :+ ; Dance poses use the ordinary glyph pool.
+ ldy #32
+:
+ sty gfx_reserve
+ sty gfx_reserve+1
+ tya
+ clc
+ adc bg_count
+ sta free_glyph
+ tya
+ clc
+ adc bg_count+1
+ sta free_glyph+1
  jsr tramp_clear
  lda t_first
  sta t_draw
@@ -345,8 +343,11 @@
  jeq @next
  sta t_kind
  lda t_positions_lo,x
+ sec
+ sbc #8
  sta z_pos
  lda t_positions_hi,x
+ sbc #0
  sta z_pos+1
  jsr screen_position
  lda #16
@@ -401,8 +402,11 @@
  jcs @pnext
 :
  lda t_proj_xlo,x
+ sec
+ sbc #12
  sta z_pos
  lda t_proj_xhi,x
+ sbc #0
  sta z_pos+1
  jsr screen_position
  lda #8
@@ -479,11 +483,11 @@
  inc t_pm_count
  ; Anchor both sword flights to their performer, retaining their real drift.
  lda t_positions_lo,y
- clc
- adc #3
+ sec
+ sbc #9
  sta z_pos
  lda t_positions_hi,y
- adc #0
+ sbc #0
  sta z_pos+1
  jsr screen_position
  ldx z_obj

@@ -3,17 +3,20 @@ import json
 from pathlib import Path
 R=Path(__file__).resolve().parents[1]
 def pack(rom,chooser=True):
- ranges=[(26,0x1bc0,0x1e00),(26,0x2000,0x3f00),(28,0xd00,0x1000),(30,0x3d60,0x3f00),(27,0x1200 if chooser else 0,0x3f00),(28,0x1600,0x3f00),(29,0x3900,0x3f00)]
+ ranges=[(26,0x1d00,0x1e00),(26,0x3000,0x3f00),(28,0xd00,0x1000),(30,0x3e00,0x3f00),(27,0x1100 if chooser else 0,0x3f00),(28,0x1600,0x3f00),(29,0x3900,0x3f00)]
+ # Reuse padding between the selector code and art. These bounds are also
+ # checked against the linker map and the prepared art in build.py.
+ if chooser:ranges.append((27,0x500,0x800))
  ranges += [(b,0x2900,0x3f00) for b in (2,4,5)]+[(1,0x2c00,0x3f00),(3,0x2c00,0x3000),(3,0x3c00,0x3f00),(6,0x2d00,0x2e00),(6,0x3990,0x3f00)]
  ends={b:0 for b in range(8,26)};ends[7]=0x3c00
  for b,n in json.loads((R/'assets/native-cache.json').read_text()).items():ends[int(b)]=max(ends[int(b)],n)
  ends[17]=max(ends[17],0xe00) # Banked presentation and trampoline rules.
  ranges += [(b,n,0x3f00) for b,n in ends.items() if 0x3f00-n>=16]
- ranges += [(0,0x3000,0x3f00),(31,0x39c0,0x3f00)]
+ ranges += [(0,0x3390,0x3f00),(31,0x39c0,0x3f00)]
  # The common block includes rolling-ball flags through $2FBF.
  # It is copied to RAM at boot; its apparently unused tail is not audio space.
- protected=[(17,0,0xe00),(26,0,0x1bc0),(26,0x1e00,0x2000),(28,0,0xd00),(28,0x1000,0x1600),(0,0x2000,0x3000),(30,0,0x3d60),(29,0,0x3900)]
- if chooser:protected.append((27,0,0x1200))
+ protected=[(17,0,0xe00),(26,0,0x1d00),(26,0x1e00,0x3000),(28,0,0xd00),(28,0x1000,0x1600),(0,0x2000,0x3390),(30,0,0x3e00),(29,0,0x3900)]
+ if chooser:protected.extend([(27,0,0x500),(27,0x800,0x1100)])
  for bank_,lo_,hi_ in ranges:
   assert all(bank_!=b or hi_<=lo or lo_>=hi for b,lo,hi in protected), ('audio overlap',bank_,lo_,hi_)
  region=0;bank,pos,end=ranges[0];used=0;catalog=[]
@@ -54,7 +57,9 @@ def pack(rom,chooser=True):
  for i,name in enumerate(('audio_bank','audio_lo','audio_hi')):
   text+=name+': .byte '+','.join(str(x[i]) for x in catalog)+'\n'
  # PCM uses short blocks so even fragmented cartridge tails can be used.
- pcm=(R/'assets/audio/applause.bin').read_bytes();chunks=[]
+ # The retired blocking applause player is never used by gameplay. Keep
+ # its source recording outside the cartridge; victory music stays intact.
+ pcm=b'';chunks=[]
  i=0
  while i<len(pcm):
   while pos+5>end:
@@ -66,7 +71,7 @@ def pack(rom,chooser=True):
   chunks.append((a[0]|32,a[1]&255,0x80+(a[1]>>8),n));i+=n
  assert len(chunks)<256
  for i,name in enumerate(('pcm_bank','pcm_lo','pcm_hi','pcm_size')):
-  text+=name+': .byte '+','.join(str(x[i]) for x in chunks)+'\n'
+  text+=name+': .byte '+(','.join(str(x[i]) for x in chunks) or '0')+'\n'
  text+='PCM_BLOCKS='+str(len(chunks))+'\n'
  (R/'build/audio_directory.inc').write_text(text)
  (R/'build/audio-packing.json').write_text(json.dumps({'bytes':used,'free_ranges':ranges,'catalog':catalog},indent=2))

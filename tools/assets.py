@@ -232,6 +232,7 @@ def build():
     act3.tables();act3.sword_masks()
     bg=bold.backgrounds();ims,names,tx,ty=poses();ims,names=bold.actors(ims,names);rom=[Bank([255]*16384) for _ in range(32)]
     trapeze_budget(ims)
+    act3.hero_contacts()
     from completion_assets import poses as completion_poses
     core=bold.hoop(0);core[core==1]=0
     cached=[bold.install_resident(bg,0,core,72),bold.install_resident(bg,2,act3.pedestal(),128),bold.install_resident(bg,5,bold.trampoline(),164)]
@@ -347,28 +348,67 @@ def build():
     ims,names=completion_poses(ims,names)
     from details_assets import install as install_details
     ims,names=install_details(ims,names)
+    # MAME's Tightrope clear alternates sprite quadrants AD-B0 and B1-B4.
+    # Slots 100/101 had no emitted payload; Act 3 uses cached poses 96-99.
+    for pid,base in ((100,0xad),(101,0xb1)):
+        ims[pid]=bold.charlie(base,pid);names[pid]='tightrope-victory-'+str(pid-100)
+    ims[99]=bold.tightrope_goal_decks();names[99]='tightrope-raised-decks'
+    # The goal has fixed Y and four-pixel scenery alignment. A tiny tile atlas
+    # is installed in RAM once per stage; subsequent frames only write codes.
+    canvas=np.zeros((32,56),np.uint8);canvas[5:25]=ims[99]
+    patterns=[];records=[]
+    for row in range(4):
+        for col in range(14):
+            tile=canvas[row*8:row*8+8,col*4:col*4+4]
+            if not tile.any():continue
+            pat,alt=bold.tile_bytes(tile)
+            if pat not in patterns:patterns.append(pat)
+            records.extend((col,9+row,56+patterns.index(pat)|alt))
+    data='; Generated raised Tightrope deck tiles and clipped cell records.\n'
+    data+='TIGHTROPE_GOAL_COUNT='+str(56+len(patterns))+'\n'
+    data+='tightrope_goal_tiles:\n .byte '+','.join(map(str,b''.join(patterns)))+'\n'
+    assert len(patterns)*8<128
+    data+='TIGHTROPE_GOAL_BYTES='+str(len(patterns)*8)+'\n'
+    data+='.proc tightrope_goal_blit\n'
+    for row in sorted(set(records[1::3])):
+        cells=[(records[i],records[i+2]) for i in range(0,len(records),3) if records[i+1]==row]
+        data+=' lda #<'+str(row*40)+'\n sta z_cell\n ldy z_col\n'
+        if cells[0][0]:data+=' tya\n clc\n adc #'+str(cells[0][0])+'\n tay\n'
+        prior=None
+        for col,glyph in cells:
+            data+=' cpy #40\n bcs @row'+str(row)+'\n'
+            if glyph!=prior:data+=' lda #'+str(glyph)+'\n'
+            data+=' sta (z_cell),y\n iny\n';prior=glyph
+        data+='@row'+str(row)+':\n'
+    data+=' rts\n.endproc\n'
+    (ROOT/'src/tightrope-finish-data.inc').write_text(data)
     # A small gold grip at the exact rope endpoint. Reuse an unused pose;
     # new directory entries would overlap the native compositor tail.
     ims[110]=np.full((1,5),3,np.uint8);names[110]='trapeze-handlebar'
     for pid in leg_ids:names[pid]='horse-support-legs'
     # Actors are now immutable shared glyphs, split across the last two fonts.
     ims.append(bold.money_bag());names.append("hoop-bag-precomposed")
+    while len(ims)<119:ims.append(np.zeros((1,1),np.uint8));names.append('unused')
+    for pid,im in zip(act3.TRAMP_HERO_IDS,act3.hero_poses()):
+        ims[pid]=im;names[pid]='trampoline-Charlie-'+str(act3.TRAMP_HERO_IDS.index(pid))
     directory=bytearray(16384);bank=8;used=0;dedup={};records=0;cellsmax=0;bag_records={}
     for pid,original_im in enumerate(ims):
         im=leg_images.get(pid,original_im)
-        # Runtime uses combined lion/rider stamps and resident ball fonts.
-        # Keep IDs stable but omit their unused standalone animation payloads.
-        unused=(pid in (7,82,83,95) or 96<=pid<102) and pid not in leg_images
+        # The trapeze goal/rescue decks use cached objects 25/26; their duplicate
+        # generic poses 42/43 are never dispatched. Keep every ID and cached
+        # deck unchanged while reclaiming the duplicate bytes for the finish.
+        unused=(pid in (7,42,43,82,83,95) or 96<=pid<100) and pid not in leg_images and pid not in act3.TRAMP_HERO_IDS
         for sx in range(4):
             for sy in range(8):
                 # Ropes have a fixed vertical anchor; duplicate directory entries,
                 # not payloads, for the seven unused Y variants.
-                yy=3 if pid in (0,5) else 0 if pid==111 else 0 if pid in leg_images else 0 if pid in (8,9,10,14,15,16,17,93) or 18<=pid<82 or pid==116 else 7 if 102<=pid<106 else 0 if 96<=pid<102 else sy
+                yy=3 if pid in (0,5) else 5 if pid==99 else (2 if sy==2 else 7) if pid in (100,101) else 0 if pid==111 else 0 if pid in leg_images else 0 if pid in (8,9,10,14,15,16,17,93) or 18<=pid<82 or pid==116 else 7 if 102<=pid<106 else 0 if 96<=pid<99 else sy
                 # Spring decks are snapped to even pixels by gfx_springs.
                 # Duplicate odd directory slots instead of storing unused art.
                 # The victory composite is anchored at X=108 by complete_begin
                 # in every rank. Share its unused X shifts as well as Y shifts.
-                xx=0 if pid in (0,5) else sx&2 if 30<=pid<=41 else sx
+                xx=0 if pid in (0,5,99,100,101) else sx&2 if 30<=pid<=41 else sx
+                if pid in act3.TRAMP_HERO_IDS:xx=sx&2;yy=sy&6
                 a=np.zeros((((im.shape[0]+yy+7)//8)*8,((im.shape[1]+xx+3)//4)*4),np.uint8)
                 a[yy:yy+im.shape[0],xx:xx+im.shape[1]]=im
                 data=bytearray();count=0
@@ -694,7 +734,7 @@ def build():
     assert native_ends[20] <= 0x3600, native_ends[20]
     mem={n:int(v,16) for n,v in re.findall(r'^(\w+)=\$([0-9A-Fa-f]+)',(ROOT/'src/memory.inc').read_text(),re.M)}
     foreground_bank=23;foreground_used=(native_ends[23]+127)&~127
-    foreground_ranges=[(23,foreground_used),(24,0),(25,0),(bank,used)]+[(b,0) for b in range(bank+1,18)]
+    foreground_ranges=[(23,foreground_used),(24,0),(25,0),(bank,max(used,0x1400 if bank==17 else 0))]+[(b,0x1400 if b==17 else 0) for b in range(bank+1,18)]
     foreground_region=0;foreground_bytes=0
     for pose in range(8):
         near=bold.hoop(pose&3,pose>=4).copy()
@@ -809,7 +849,7 @@ def build():
     # Allocate after their recorded end, never after the stale sprite cursor.
     while True:
         assert bank<18,'Native decks exceed the animation ROM pool'
-        used=max(used,native_ends.get(bank,0))
+        used=max(used,native_ends.get(bank,0),0x1400 if bank==17 else 0)
         if used+len(board_blob)<=16128:break
         bank+=1;used=0
     addresses=[0x8000+used+off for off in board_offsets]
@@ -831,13 +871,18 @@ def build():
     if weights.exists():freq=Counter({bytes.fromhex(k):v for k,v in json.loads(weights.read_text()).items()})
     extra_weights=ROOT/'assets/hero-extra-weights.json'
     if extra_weights.exists():freq.update({bytes.fromhex(k):v for k,v in json.loads(extra_weights.read_text()).items()})
+    original_native=set(freq)
+    # Longer sessions expose expensive masks absent from the earlier routes.
+    # Preserve the original programs, then fill a bounded spill region.
+    additions=json.loads((ROOT/'assets/hero-retry-weights.json').read_text())
+    freq.update({bytes.fromhex(k):v for k,v in additions.items()})
     for variant in range(len(hero_blend)):
         lists[variant]=hp;address=0x8000+hp
         directory[0x1600+variant*2:0x1602+variant*2]=bytes((address&255,address>>8))
         hp+=len(hero_blend[variant])*2
-    programs={};tail=0x3A80;suffixes={}
+    programs={};tail=0x3B80;suffixes={};spill=0x0E00;spill_suffixes={}
     assert len(ims)*128<=tail
-    for pixels,_ in freq.most_common():
+    for pixels in sorted(freq,key=lambda p:(p in original_native,freq[p]),reverse=True):
         rows=[]
         for y,pixel in enumerate(pixels):
             mask=sum(3<<shift for shift in (0,2,4,6) if pixel&(3<<shift)==0)
@@ -861,16 +906,35 @@ def build():
             address=hp;hp+=len(code)
         elif tail+len(code)<=0x3F00:
             address=tail;tail+=len(code)
-        else:continue
+        else:
+            # Bank 17's first 0x0E00 bytes hold presentation code; its tail
+            # is unused by animation, audio, and all other native programs.
+            cut=len(rows);jump=None
+            for i in range(len(rows)):
+                suffix=b''.join(rows[i:])
+                if len(suffix)>3 and suffix in spill_suffixes:
+                    cut=i;jump=spill_suffixes[suffix];break
+            if cut==0:
+                programs[pixels]=jump^0xC000;continue
+            code=bytearray(b''.join(rows[:cut]))
+            if jump is not None:code.extend((0x4c,jump&255,jump>>8))
+            if spill+len(code)>0x1400:continue  # Native spring decks start here.
+            address=0x8000+spill;programs[pixels]=address^0xC000
+            rom[17][spill:spill+len(code)]=code;spill+=len(code)
+            offset=0
+            for i,row in enumerate(rows[:cut]):
+                spill_suffixes[b''.join(rows[i:])]=address+offset;offset+=len(row)
+            continue
         programs[pixels]=0x8000+address;directory[address:address+len(code)]=code
         offset=0
         for i,row in enumerate(rows[:cut]):
             suffixes[b''.join(rows[i:])]=0x8000+address+offset;offset+=len(row)
+    native_ends[17]=max(native_ends.get(17,0),spill)
     for variant,pixels in hero_blend.items():
         for i,pixel in enumerate(pixels):
             address=programs.get(pixel,0);offset=lists[variant]+i*2
             directory[offset:offset+2]=bytes((address&255,address>>8))
-    print('Native trapeze compositors',len(programs),'of',len(freq),'bytes',hp-0x1600+tail-0x3A80)
+    print('Native trapeze compositors',len(programs),'of',len(freq),'bytes',hp-0x1600+tail-0x3B80)
     native_ends[7]=max(0x3C00,tail)
     (ROOT/'assets/native-cache.json').write_text(json.dumps(native_ends))
     rom[7]=directory
@@ -893,8 +957,15 @@ def build():
                         code=len(patterns);patterns[pattern]=code;f[code*8:code*8+8]=pattern
                     ball_flags.append(patterns[pattern]|alt)
         assert len(patterns)<=66,('Ball font leaves insufficient composition space',phase,len(patterns))
+        # The goal uses seven fixed codes in each screen's private pool.
+        # Merging always reserves these codes, so earlier ball contacts cannot
+        # overwrite a podium pattern before it enters view.
+        goal=bytes([0,0,0,0,0,15,15,170,0,0,0,0,0,255,255,170,
+                    0,0,0,0,0,240,240,170]+[255]*8+[170]*8+
+                   [255]*5+[170,0,0]+[170]*6+[0,0])
+        for base in (86,117):f[base*8:(base+7)*8]=goal
         ballbank[phase*1024:(phase+1)*1024]=f
-    assert bank<17, 'Bank 17 reserves presentation code'
+    assert bank<=17, 'Bank 17 is the last animation bank (its prefix is reserved)'
     assert bank<30, 'Bank 30 reserves the XL upper-RAM program source'
     rom[31]=ballbank
     # Hero overlay metadata and three 8-bit masks per pose in a background tail.
@@ -909,6 +980,15 @@ def build():
     rom[6][0x2c00:0x2d00]=(ROOT/'assets/pal-map.bin').read_bytes()
     common=bytearray(4096);common[:1024]=font()
     pm,hs,sz=pm_shapes();pm=bytearray(pm)
+    # The formerly unused PM 12 is the raised Tightrope goal's lattice tower.
+    # Eight logical pixels, 88 scanlines; no rectangle overwrites the audience.
+    tower=np.zeros((88,8),np.uint8)
+    tower[:,0]=tower[:,5]=tower[:,7]=1
+    for y in range(88):
+        tower[y,1+(y%8)//2]=1;tower[y,4-(y%8)//2]=1
+        if y%8==0:tower[y,:]=1
+    pm[12*96:13*96]=bytes(sum(int(v)<<(7-x) for x,v in enumerate(row)) for row in tower).ljust(96,b'\0')
+    hs[12]=88;sz[12]=0
     for phase in range(4):
         a=bold.hoop(phase)==1;hs[phase]=72
         shape=bytes(sum(int(np.any(row[x*2:x*2+2]))<<(7-x) for x in range(8)) for row in a).ljust(96,b'\0')

@@ -11,6 +11,67 @@ def convert(src,w,h):
  return a
 
 def tile(code,pal=0):return A['lookup'][pal,A['pixels'][code]]
+
+TRAMP_HERO_IDS=(96,97,98,99,42,43,117,118)
+
+def hero_poses():
+ # Original 32x32 sprite quadrants, without cropping/stretching the body.
+ # Horizontal movement uses the six poses observed in MAME at phases
+ # 0,1,6,11,16,21 (returning upright at 26). Neutral jumps raise both arms.
+ frames=[]
+ for base,flip in ((25,False),(149,False),(153,False),(161,False),(165,False),(161,True)):
+  q=np.block([[tile(base),tile(base+1)],[tile(base+2),tile(base+3)]])
+  if flip:q=np.flip(q,(0,1))
+  frames.append(convert(q,24,32))
+ for base in (315,311):
+  frames.append(convert(np.block([[tile(base),np.fliplr(tile(base))],
+                                  [tile(base+1),np.fliplr(tile(base+1))]]),24,32))
+ return frames
+
+def hero_contacts():
+ # Exact displayed body/blade overlap, retaining the one-pixel fringe.
+ # Share run-length encoded dy rows: this fits all eight poses into 3 KB.
+ art={};sprites(art,{})
+ rows=[];patterns={}
+ for h in hero_poses():
+  solid=h!=0;body=np.zeros_like(solid)
+  body[1:-1,1:-1]=(solid[1:-1,1:-1]&solid[:-2,1:-1]&solid[2:,1:-1]
+                    &solid[1:-1,:-2]&solid[1:-1,2:])
+  for kind in range(5):
+   if kind==0:
+    proj=art[82]!=0;bias=31;parity=0
+   else:
+    flip=(kind-1)//2;parity=(kind-1)%2;bias=15
+    proj=np.zeros((16,8),bool);proj[:,parity:parity+6]=art[110+flip]!=0
+    proj=proj.reshape(16,4,2).any(axis=2).repeat(2,axis=1)
+   py,px=np.nonzero(proj);px=px-parity
+   for dx in range(-7,25):
+    flags=[]
+    for dy in range(-bias,32):
+     valid=(py+dy>=0)&(py+dy<32)&(px+dx>=0)&(px+dx<24)
+     flags.append(bool(body[(py+dy)[valid],(px+dx)[valid]].any()))
+    encoded=[];start=None
+    for i,hit in enumerate(flags+[False]):
+     if hit and start is None:start=i
+     elif not hit and start is not None:encoded.extend((start,i));start=None
+    key=bytes(encoded+[255]);patterns.setdefault(key,None);rows.append(key)
+ # All run records fit in $AB80..$AFFF. Store each absolute pointer as a
+ # low byte plus a shared high nibble, avoiding 640 redundant high bytes.
+ data=bytearray(len(rows)*3//2)
+ for key in patterns:patterns[key]=0xa400+len(data);data.extend(key)
+ for i,key in enumerate(rows):
+  addr=patterns[key];data[i]=addr&255
+  data[len(rows)+i//2]|=((addr>>8)&15)<<((i&1)*4)
+ assert len(data)<=3072,('Trampoline contact cache',len(data))
+ (R/'assets/trampoline-hero-contacts.bin').write_bytes(data.ljust(3072,b'\xff'))
+ text='; Generated original-pose contact row directories in bank 26.\n'
+ text+='tramp_contact_lo: .byte '+','.join(str((0xa400+i*32)&255)for i in range(40))+'\n'
+ text+='tramp_contact_hi: .byte '+','.join(str((0xa400+i*32)>>8)for i in range(40))+'\n'
+ text+='tramp_contact_bits_lo: .byte '+','.join(str((0xa900+i*16)&255)for i in range(40))+'\n'
+ text+='tramp_contact_bits_hi: .byte '+','.join(str((0xa900+i*16)>>8)for i in range(40))+'\n'
+ text+='tramp_hero_ids: .byte '+','.join(map(str,TRAMP_HERO_IDS))+'\n'
+ (R/'src/trampoline-hero-tables.inc').write_text(text)
+ print('Trampoline body contacts:',len(data),'bytes')
 def performer(base,flip=False):
  parts=[tile(256+base-2+i) for i in range(4)]
  if flip:parts=[np.flipud(p) for p in parts]
@@ -24,7 +85,8 @@ def sprites(ims,names):
   else:ims[pid]=performer(base,flip)
   names[pid]='act3-performer-'+str(pid-96)
  for pid,pal in [(82,3),(83,4)]:
-  ims[pid]=convert(np.concatenate([tile(273,pal),tile(272,pal)]),8,32);names[pid]='act3-fire-'+str(pid-82)
+  # MAME puts code 110 above code 111: the flame head leads its trailing tip.
+  ims[pid]=convert(np.concatenate([tile(272,pal),tile(273,pal)]),8,32);names[pid]='act3-fire-'+str(pid-82)
  for pid,flip in [(110,False),(111,True)]:
   src=tile(203,7)
   if flip:src=np.flipud(src)
@@ -48,11 +110,15 @@ def tables():
  triggers=[p-119 for p in positions]
  for name,seq in [('t_positions',positions),('t_triggers',triggers)]:
   put(name+'_lo',[v&255 for v in seq]);put(name+'_hi',[v>>8 for v in seq])
- for rank in range(5):
-  put('t_schedule_'+str(rank),sum(d['schedules'][min(5,rank+1)][1:9],[]))
- put('t_schedule_lo',['<t_schedule_'+str(min(i,4))for i in range(6)])
- put('t_schedule_hi',['>t_schedule_'+str(min(i,4))for i in range(6)])
- put('t_intervals',[d['intervals'][i+1]for i in range(6)])
+ for rank in range(6):
+  # Begin with the original Easy first-wave map described by the arcade
+  # guide. Each repeat advances one original schedule, including double throws.
+  schedule=sum(d['schedules'][rank][1:9],[])
+  put('t_schedule_'+str(rank),schedule)
+ put('t_schedule_lo',['<t_schedule_'+str(i)for i in range(6)])
+ put('t_schedule_hi',['>t_schedule_'+str(i)for i in range(6)])
+ intervals=d['intervals'][:6]
+ put('t_intervals',intervals)
  # Fire waits eight ticks at the mouth, then rises by the high byte of $0400,
  # subtracting $0010 each tick. It vanishes eight ticks after velocity < $0100.
  y=210;v=0x400;fire=[y]*8
@@ -79,7 +145,7 @@ def sword_masks():
    for y,x in zip(*np.nonzero(sword)):canvas[y,x+drift]=True
    data.extend(sum(int(np.any(row[x*2:x*2+2]))<<(7-x) for x in range(8)) for row in canvas)
  (R/'assets/act3-sword-masks.bin').write_bytes(data)
-if __name__=='__main__':tables();sword_masks()
+if __name__=='__main__':tables();sword_masks();hero_contacts()
 
 def bags(bg,im,water=False):
  # Crowd and prize share the camera, so the exact background under each

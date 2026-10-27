@@ -82,6 +82,18 @@ def goal_platform():
  d.line((1,0,30,0),fill=3);d.line((0,2,31,2),fill=2)
  return np.array(im)
 
+def tightrope_goal_decks():
+ # Arcade silhouette: a raised landing deck and a lower ledge beyond the rope.
+ # Gold edge substitutes for the arcade green within the Atari playfield palette.
+ im=Image.new('L',(56,20));d=ImageDraw.Draw(im)
+ d.line((14,0,48,0),fill=1);d.line((13,1,47,1),fill=1)
+ d.line((13,2,47,2),fill=3)
+ d.line((2,16,55,16),fill=1);d.line((1,17,55,17),fill=1)
+ d.line((0,18,55,18),fill=3)
+ # The small hanging tip at the right-hand end of the upper deck.
+ d.line((47,3,46,6),fill=3);d.line((44,7,47,7),fill=3)
+ return np.array(im)
+
 def distance_sign(label):
  tiny={'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],
  '2':['111','001','111','100','111'],'3':['111','001','111','001','111'],

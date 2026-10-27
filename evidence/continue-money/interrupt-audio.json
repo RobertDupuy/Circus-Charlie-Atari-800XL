@@ -1,7 +1,0 @@
-{
-  "interrupt_cases": 328,
-  "chooser_interrupt_cases": 49,
-  "graphics_unchanged": true,
-  "decimal_score_restored": true,
-  "banked_calls_return_correctly": true
-}

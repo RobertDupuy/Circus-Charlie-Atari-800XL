@@ -1,8 +1,0 @@
-{
-  "car_sha256": "53ebafb2634bae33129b2cdf2be0fc9f4ec4456017e26ae2eeec88bbe55b7454",
-  "clean_source_build_identical": true,
-  "graphics_regeneration_identical": true,
-  "original_arcade_rom_required": false,
-  "clean_source_acceptance_suites": 20,
-  "clean_source_acceptance_passed": true
-}

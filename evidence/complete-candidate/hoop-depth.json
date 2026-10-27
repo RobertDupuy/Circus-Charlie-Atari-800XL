@@ -1,9 +1,0 @@
-{
-  "pixel_reference_cases": 960,
-  "cases_with_visible_occlusion": 584,
-  "near_side_pixel_changes": 12364,
-  "far_side_unchanged": true,
-  "screen_codes_and_resident_glyphs_unchanged": true,
-  "peak_render_cpu_cycles": 23300,
-  "foreground_audio_interrupt_cases": 58
-}

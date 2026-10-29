@@ -1,7 +1,23 @@
 ; Two striped arcade-style podiums. Prepared glyphs are copied into each
 ; visible font's private pool; repeated body rows share the same seven codes.
-; Called from RAM after the balls/pony and before Charlie, with bank 0 mapped.
+; Called from RAM before balls, or after the pony, with bank 0 mapped.
 .proc ground_finish_draw
+.if ::ARCADE_CHOOSER
+ ; The final Balls camera fixes the goal at column 30. Its prepared stores
+ ; leave time for the ball rims to be composited in front on NTSC.
+ lda act
+ cmp #3
+ bne :+
+ lda camera
+ cmp #<1345
+ bne :+
+ lda camera+1
+ cmp #>1345
+ bne :+
+ lda #$3B
+ jmp ground_finish_goal_entry
+:
+.endif
  lda stage_end
  ldx act
  cpx #4
@@ -150,3 +166,51 @@ ground_goal_tiles:
  .byte $AA,$AA,$AA,$AA,$AA,$AA,$AA,$AA
  .byte $FF,$FF,$FF,$FF,$FF,$AA,0,0
  .byte $AA,$AA,$AA,$AA,$AA,$AA,0,0
+
+.if ::ARCADE_CHOOSER
+.segment "CHOOSER"
+.proc ground_finish_goal_cached
+ lda #<(17*40+30)
+ sta z_cell
+ lda z_map+1
+ clc
+ adc #>(17*40+30)
+ sta z_cell+1
+ lda bg_count+2
+ clc
+ adc #20
+ ; Both buffer bases keep every sum below 256; stores preserve carry.
+ .repeat 6,K
+  .if K=0
+   ldy #0
+   sta (z_cell),y
+  .elseif K=1
+   adc #1
+   .repeat 9,I
+    ldy #I+1
+    sta (z_cell),y
+   .endrepeat
+  .elseif K<4
+    .if K=2
+    adc #130
+   .else
+    adc #1
+   .endif
+   .repeat 2,R
+    .repeat 5,I
+     ldy #40+R*40+I*2+K-2
+     sta (z_cell),y
+    .endrepeat
+   .endrepeat
+  .else
+   adc #1
+   .repeat 5,I
+    ldy #120+I*2+K-4
+    sta (z_cell),y
+   .endrepeat
+  .endif
+ .endrepeat
+ rts
+.endproc
+.segment "WATER"
+.endif

@@ -72,6 +72,16 @@ loader:
  dex
  cpx #255
  bne @topclip
+ ; One resident dispatcher in previously unused RAM under the disabled OS.
+ ; Its source occupies audited padding in the crowd bank.
+ lda #$32
+ sta $D500
+ lda #$85
+ sta $81
+ lda #$FE
+ sta $83
+ ldx #2
+ jsr copy
  lda #$3E
  sta $D500
  jmp $1000

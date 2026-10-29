@@ -7,27 +7,26 @@
  sta world
  lda #0
  sta world+1
- sta first_hazard
+ sta lion_bias
+ sta bonus
+ sta f_scroll
+ sta f_scroll+1
+ sta f_previous
  lda #<1362
  sta stage_end
  lda #>1362
  sta stage_end+1
  lda #12
  sta lion_gap+1
- lda #2
- sta lion_bias
  lda #16
  sta lion_lastgap
- lda rank
- asl
- asl
- asl
- sta z_step
- lda #5
+ lda #$58
+ sta bonus+1
+ jsr apparatus_clock_reset
  ldx rank
- beq :+
- lda #8
-:
+ lda lion_potoffsets,x
+ sta z_step
+ lda lion_potcounts,x
  sta lion_potcount
  ldx #0
 @pots:
@@ -39,8 +38,10 @@
  sta lion_potlo,x
  lda lion_pots_hi,y
  sta lion_pothi,x
+ lda lion_pots_frac,y
+ sta lion_potfrac,x
  inx
- cpx #8
+ cpx lion_potcount
  bne @pots
  rts
 .endproc
@@ -76,6 +77,25 @@
  ldx lion_phase
  lda lion_jump,x
  sta jump_pixels
+ ; Arcade $739B..$73B1 tests the prospective height before horizontal
+ ; movement. Its scroll predicate is strictly past the platform edge.
+ cmp #12
+ bcs @not_finished
+ lda lion_frac
+ cmp #1
+ lda world
+ sbc stage_end
+ lda world+1
+ sbc stage_end+1
+ bcc @not_finished
+ lda #11
+ sta jump_pixels
+ lda #0
+ sta jumping
+ lda #1
+ sta lion_goal
+ jmp finish_act
+@not_finished:
  cpx #63
  bcc @move
  lda #0
@@ -99,6 +119,8 @@
  beq @move
 @launch:
  lda #1
+ jsr hidden_entry
+ lda #1
  sta jumping
  sta sound_fx
  lda #0
@@ -107,137 +129,17 @@
 @move:
  jsr lion_arcade_move
  jsr lion_arcade_rings
- lda jumping
- beq @done
- lda lion_phase
- cmp #32
- bcc @done
- lda jump_pixels
- cmp #12
- bcs @done
- lda world
- cmp stage_end
- lda world+1
- sbc stage_end+1
- bcc @done
- lda #11
- sta jump_pixels
- lda #0
- sta jumping
- lda #1
- sta lion_goal
- jmp finish_act
 @done:
  rts
 .endproc
 
-.proc lion_arcade_move
- lda #0
- sta lion_velocity_lo
- sta lion_velocity_hi
- lda lion_direction
- cmp #8
- beq @right
- cmp #4
- bne @apply
- lda #$1C
- sta lion_velocity_lo
- lda #$FF
- sta lion_velocity_hi
- bne @apply
-@right:
- lda #$20
- sta lion_velocity_lo
- lda #1
- sta lion_velocity_hi
-@apply:
- lda lion_frac
- clc
- adc lion_velocity_lo
- sta lion_frac
- lda world
- adc lion_velocity_hi
- sta world
- lda lion_velocity_hi
- bpl :+
- lda #255
- bne @high
-:
- lda #0
-@high:
- adc world+1
- sta world+1
- bmi @minimum
- bne @limit
- lda world
- cmp #48
- bcs @limit
-@minimum:
- lda #48
- sta world
- lda #0
- sta world+1
- sta lion_frac
-@limit:
- lda world
- cmp #<1374
- lda world+1
- sbc #>1374
- bcc @relative
- lda #<1374
- sta world
- lda #>1374
- sta world+1
-@relative:
- lda lion_velocity_lo
- clc
- adc #$60
- sta lion_relative_lo
- lda lion_velocity_hi
- adc #0
- sta lion_relative_hi
- rts
-.endproc
-
 .proc lion_arcade_rings
- ldx #3
-@ring:
- lda lion_active,x
- beq @next
- lda lion_ringfrac,x
- sec
- sbc #$60
- sta lion_ringfrac,x
- lda hazard_xlo,x
- sbc #0
- sta hazard_xlo,x
- lda hazard_xhi,x
- sbc #0
- sta hazard_xhi,x
- ; Retire once more than 64 pixels behind the hero.
- lda world
- sec
- sbc hazard_xlo,x
- sta z_tmp
- lda world+1
- sbc hazard_xhi,x
- bmi @next
- bne @retire
- lda z_tmp
- cmp #80
- bcc @next
-@retire:
- lda #0
- sta lion_active,x
-@next:
- dex
- bpl @ring
- ; The final approach stops the ring stream, as at arcade $77B8.
+ ; The original advances its spawn clock before moving/retiring actors.
  lda world
  cmp #<1200
  lda world+1
  sbc #>1200
- jcs @done
+ bcs clock_done
  lda lion_gap
  sec
  sbc lion_relative_lo
@@ -245,12 +147,59 @@
  lda lion_gap+1
  sbc lion_relative_hi
  sta lion_gap+1
+clock_done:
+ php
+ lda #$3A
+ sta $D500
+ jsr lion_rear_hoop
+ ldx #0
+ring:
+ lda lion_active,x
+ beq next
+ lda lion_ringfrac,x
+ sec
+drift_lo:
+ sbc #$60
+ sta lion_ringfrac,x
+ lda hazard_xlo,x
+drift_hi:
+ sbc #0
+ sta hazard_xlo,x
+ lda hazard_xhi,x
+ sbc #0
+ sta hazard_xhi,x
+ jsr lion_right_exit
+ ; Arcade retires a hoop when its screen coordinate crosses zero.
+ lda world
+ sec
+ sbc hazard_xlo,x
+ sta z_tmp2
+ lda world+1
+ sbc hazard_xhi,x
+ bmi next
+ bne retire
+ lda z_tmp2
+ cmp #49
+ bcs retire
+ cmp #48
+ bne next
+ lda lion_frac
+ cmp lion_ringfrac,x
+ beq next
+ bcc next
+retire:
+ jsr lion_retire_hoop
+next:
+ inx
+ cpx #4
+ bne ring
+ plp
  lda lion_relative_hi
- jmi @done
- jcs @done
+ jmi done
+ jcs done
  lda rank
  clc
- adc #1
+ adc #1 ; Normal DIP starts at slice 1; each Lion clear advances one slice.
  asl
  asl
  asl
@@ -269,36 +218,37 @@
  clc
  adc lion_bias
  and #3
- bne @normal
+ bne normal
  lda lion_lastgap
  cmp #96
- bcs @money
+ bcs money
  inc lion_bias
-@normal:
+normal:
  lda #0
  sta z_kind
  ldx #0
-@slot:
+slot:
  lda lion_active,x
- beq @spawn
+ ora f_direction,x ; Arcade allocates before this frame's retirements.
+ beq spawn
  inx
  cpx #3
- bcc @slot
- jmp @reload
-@money:
+ bcc slot
+ jmp reload
+money:
  lda #2
  sta z_kind
  ldx #3
  lda #96
  ldy rank
- bne :+
+ bne :+ ; Original $7876: only the first course uses the free-running clock.
  lda scene_clock
  clc
- adc #38
+ adc #244
  ora #128
 :
  sta z_tmp
-@spawn:
+spawn:
  lda #1
  sta lion_active,x
  lda z_kind
@@ -307,16 +257,27 @@
  sta passed,x
  ; 255.5 arcade screen pixels minus the 64-pixel hero anchor, scaled 3/4.
  lda lion_frac
+ sec
+ sbc lion_relative_lo
+ sta z_tmp2
+ lda #0
+ sbc lion_relative_hi
+ sta z_value
+ lda z_tmp2
  clc
  adc #$A0
  sta lion_ringfrac,x
- lda world
+ lda z_value
  adc #143
+ clc
+ adc world
  sta hazard_xlo,x
  lda world+1
  adc #0
  sta hazard_xhi,x
-@reload:
+ lda #3
+ jsr hidden_entry
+reload:
  inc lion_wave
  lda z_tmp
  sta lion_lastgap
@@ -339,26 +300,402 @@
  lda lion_gap+1
  adc z_tempword+1
  sta lion_gap+1
-@done:
+done:
+ lda #242
+ sta $D500
+ jsr hidden_motion
+ lda #0
+ sta $D500
  rts
 .endproc
 
+; Original $789C rear-entry counter, in source 8.8 units. These existing
+; fidelity bytes are included in both players' checkpoints. The inactive
+; trampoline contact bank has room without disturbing any audio packets.
+.segment "TRAMPCONTACT"
+.proc lion_rear_hoop
+ lda #0
+ ldx #3
+clear_retired:
+ sta f_direction,x
+ dex
+ bpl clear_retired
+ lda lion_relative_hi
+ bmi reverse
+ tay
+ lda #128
+ cpy #0
+ beq forward
+ lda #0
+ ldy #2
+forward:
+ clc
+ adc f_scroll
+ sta f_scroll
+ tya
+ adc f_scroll+1
+ sta f_scroll+1
+ rts
+reverse:
+ lda f_scroll
+ sec
+ sbc #176
+ sta z_tempword
+ lda f_scroll+1
+ sbc #0
+ bcc reenter
+ sta f_scroll+1
+ lda z_tempword
+ sta f_scroll
+ rts
+reenter:
+ ; Pre-movement left edge, in native 16.8 units. Existing actors have
+ ; not drifted yet. The arcade blocks re-entry if an actor's integer
+ ; screen coordinate is 1..64, including the raised money hoop.
+ lda lion_frac
+ sec
+ sbc lion_velocity_lo
+ sta z_s0
+ lda world
+ sbc lion_velocity_hi
+ sta z_s1
+ lda world+1
+ sbc #255
+ sta z_s2
+ lda z_s1
+ sec
+ sbc #48
+ sta z_s1
+ bcs :+
+ dec z_s2
+:
+ ldx #3
+scan:
+ lda lion_active,x
+ beq next
+ lda lion_ringfrac,x
+ sec
+ sbc z_s0
+ sta z_tmp
+ lda hazard_xlo,x
+ sbc z_s1
+ sta z_tmp2
+ lda hazard_xhi,x
+ sbc z_s2
+ bne next
+ lda z_tmp2
+ beq low
+ cmp #48
+ bcc done
+ bne next
+ lda z_tmp
+ cmp #192
+ bcc done
+ bcs next
+low:
+ lda z_tmp
+ cmp #192
+ bcs done
+next:
+ dex
+ bpl scan
+ lda f_previous
+ bne money
+ ldx #0
+slot:
+ lda lion_active,x
+ beq spawn
+ inx
+ cpx #3
+ bcc slot
+ rts
+money:
+ lda #0
+ sta f_previous
+ ldx #3
+spawn:
+ lda #1
+ sta lion_active,x
+ lda z_s0
+ clc
+ adc #192
+ sta lion_ringfrac,x
+ lda z_s1
+ adc #0
+ sta hazard_xlo,x
+ lda z_s2
+ adc #0
+ sta hazard_xhi,x
+ lda #0
+ cpx #3
+ bne :+
+ lda #2
+:
+ sta hoop_type,x
+done:
+ rts
+.endproc
+.proc lion_retire_hoop
+ lda #4
+ jsr hidden_entry
+ inc f_direction,x
+ lda #0
+ sta lion_active,x
+ sta f_scroll+1
+ sta f_previous
+ cpx #3
+ bne :+
+ inc f_previous
+:
+ rts
+.endproc
+.proc lion_right_retire
+ lda #5
+ jsr hidden_entry
+ inc f_direction,x
+ dec lion_wave
+ lda #0
+ sta lion_active,x
+ ; Original clears only the source counter's integer byte. Since the
+ ; native value is scaled 3/4, retain its remainder modulo 192, not 256.
+ lda lion_gap+1
+mod3:
+ cmp #3
+ bcc scale
+ sbc #3
+ bcs mod3
+scale:
+ .repeat 6
+ asl
+ .endrepeat
+ clc
+ adc lion_gap
+ bcc reduce
+ adc #63
+ bcc save
+reduce:
+ cmp #192
+ bcc save
+ sbc #192
+save:
+ sta lion_gap
+ lda #0
+ sta lion_gap+1
+ rts
+.endproc
+.segment "TRAMPOLINE"
+.proc lion_right_exit
+ lda lion_ringfrac,x
+ sec
+ sbc lion_frac
+ lda hazard_xlo,x
+ sbc world
+ sta z_tmp
+ lda hazard_xhi,x
+ sbc world+1
+ bmi done
+ bne retire
+ lda z_tmp
+ cmp #144
+ bcc done
+retire:
+ jmp lion_right_retire
+done:
+ rts
+.endproc
+.segment "MECHANICS"
+
+.proc lion_arcade_move
+ lda #$60
+ sta lion_arcade_rings::drift_lo+1
+ lda #0
+ sta lion_velocity_lo
+ sta lion_velocity_hi
+ sta lion_arcade_rings::drift_hi+1
+ lda lion_direction
+ cmp #8
+ beq @right
+ cmp #4
+ bne @apply
+ sec
+ jsr lion_left_boundary
+ bcc @apply
+ lda #$1C
+ sta lion_velocity_lo
+ lda #$FF
+ sta lion_velocity_hi
+ bne @apply
+@right:
+ lda #$20
+ sta lion_velocity_lo
+ lda #1
+ sta lion_velocity_hi
+@apply:
+ lda lion_frac
+ clc
+ adc lion_velocity_lo
+ sta lion_frac
+ lda world
+ adc lion_velocity_hi
+ sta world
+ lda #0
+ bit lion_velocity_hi
+ bpl :+
+ lda #255
+:
+ adc world+1
+ sta world+1
+ lda lion_velocity_hi
+ bpl @relative
+ sec
+ jsr lion_left_boundary
+ bcs @relative
+ ; On the field that crosses the left boundary the arcade freezes screen
+ ; movement after updating its scroll counter. Preserve that fractional edge.
+ lda #$44
+ sta lion_arcade_rings::drift_lo+1
+ lda #1
+ sta lion_arcade_rings::drift_hi+1
+ lda #0
+ sta lion_velocity_lo
+ sta lion_velocity_hi
+@relative:
+ lda lion_velocity_lo
+ clc
+ adc #$60
+ sta lion_relative_lo
+ lda lion_velocity_hi
+ adc #0
+ sta lion_relative_hi
+ rts
+.endproc
+.segment "TOPCLIP"
+; Caller sets carry: a positive high byte is necessarily right of the edge.
+.proc lion_left_boundary
+ lda world+1
+ bne @done
+ lda world
+ cmp #48
+ bne @done
+ lda lion_frac
+ cmp #1
+@done:
+ rts
+.endproc
+.segment "MECHANICS"
+
+
+
+
+.segment "GFX"
+.proc lion_source_distance
+ pha
+ lda #$3E
+ sta $D500
+ pla
+ jmp lion_source_distance_impl
+.endproc
+.segment "FIDELITY"
+.proc lion_source_distance_impl
+ sec
+ sbc lion_frac
+ sta z_tempword
+ lda z_pos
+ sbc world
+ sta z_tempword+1
+ lda z_pos+1
+ sbc world+1
+ sta z_pos+1
+ sta z_flag
+ bpl @positive
+ lda #0
+ sec
+ sbc z_tempword
+ sta z_tempword
+ lda #0
+ sbc z_tempword+1
+ sta z_tempword+1
+ lda #0
+ sbc z_pos+1
+ sta z_pos+1
+ ; Round a negative delta away from zero before taking its absolute value.
+ lda z_tempword
+ clc
+ adc #191
+ sta z_tempword
+ bcc @positive
+ inc z_tempword+1
+ bne @positive
+ inc z_pos+1
+@positive:
+ lda z_pos+1
+ bne @done
+ lda z_tempword+1
+ cmp #24
+ bcc :+
+ inc z_pos+1
+ rts
+:
+ ; floor((integer*256+fraction)/192) = floor((integer*4+
+ ; floor(fraction/64))/3). The range guard above bounds this index to 0..95.
+ ; Use the exact quotient table to leave more display time near several pots.
+ lda z_tempword
+ asl
+ rol z_tempword+1
+ asl
+ rol z_tempword+1
+ ldy z_tempword+1
+ lda lion_distance_thirds,y
+ sta z_pos
+@done:
+ rts
+.endproc
+lion_distance_thirds:
+ .repeat 96,I
+  .byte I/3
+ .endrepeat
 .segment "XL"
+
 .proc lion_arcade_collision
+ lda $D500
+ pha
+ lda #242
+ sta $D500
+ jsr hidden_lion_collision
+ pla
+ sta $D500
+ rts
+.endproc
+.segment "HIDDEN"
+.proc hidden_lion_collision
  ldx #0
 @ring:
  lda lion_active,x
- beq @next
+ jeq @next
  lda hazard_xlo,x
  sta z_pos
  lda hazard_xhi,x
  sta z_pos+1
- jsr distance_to_player
+ lda lion_ringfrac,x
+ jsr hidden_distance
  lda z_pos+1
  bne @next
  lda z_pos
- cmp #11
+ cmp #14
  bcs @next
+ lda hoop_type,x
+ cmp #3
+ bcc @ordinary_contact
+ bne @next
+ lda jump_pixels
+ cmp #41 ; Original $7345: hero Y strictly below $A8.
+ bcc @next
+ inc hoop_type,x
+ lda #3
+ sta hidden_life
+ jsr hidden_extra_life
+ jmp @next
+@ordinary_contact:
  tay
  lda #26
  ldy hoop_type,x
@@ -368,11 +705,10 @@
  sec
  sbc jump_pixels
  bcc @award
- ldy z_pos
  clc
- adc lion_collision_distance,y
+ adc z_pos
  cmp #29
- bcc @crash
+ jcc @crash
 @award:
  lda hoop_type,x
  beq @normal_award
@@ -382,7 +718,7 @@
  bcs @paid
 @normal_award:
  lda jumping
- beq @next
+ jeq @next
 @paid:
  lda passed,x
  bne @next
@@ -392,32 +728,37 @@
  lda hoop_type,x
  beq @ordinary
  inc bag_awards
- jsr complete_lion_bag
+ jsr hidden_money
  jmp @scored
 @ordinary:
  ldy #1
 @score:
  lda #0
- jsr add_points
+ jsr hidden_points
 @scored:
  pla
  tax
 @next:
  inx
  cpx #4
- bne @ring
+ jne @ring
  ldx #0
 @pot:
  lda lion_potlo,x
  sta z_pos
  lda lion_pothi,x
  sta z_pos+1
- jsr distance_to_player
+ lda lion_potfrac,x
+ jsr hidden_distance
  lda z_pos+1
  bne @potnext
  lda z_pos
- cmp #18
- bcs @potnext
+ cmp #23
+ bcc @potcontact
+ bne @potnext
+ bit z_flag
+ bpl @potnext
+@potcontact:
  lda jump_pixels
  cmp #11
  bcc @crash
@@ -428,7 +769,7 @@
  pha
  lda #0
  ldy #5
- jsr add_points
+ jsr hidden_points
  pla
  tax
 @potnext:
@@ -439,6 +780,7 @@
 @crash:
  jmp hurt
 .endproc
+.segment "XL"
 
 .proc lion_arcade_draw
  lda #0
@@ -448,6 +790,14 @@
  ldx z_hazard
  lda lion_active,x
  jeq @next
+ lda hoop_type,x
+ cmp #3
+ bcc @ordinary
+ jne @next
+ lda #9
+ jsr hidden_entry
+ jmp @next
+@ordinary:
  jsr get_hazard
  ; Ring positions denote their centre; prepared graphics start at its left.
  lda z_pos
@@ -495,7 +845,7 @@
  lda hoop_type,x
  beq @next
  lda passed,x
- bne @next
+ jne @next
  lda sprite_x
  clc
  adc #3

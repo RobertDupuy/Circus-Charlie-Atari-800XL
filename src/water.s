@@ -1,106 +1,135 @@
 .export water_hazards
-; Bank 28: water uses arcade trampoline arcs and four live dolphin slots.
+; MAME 0.285: collision, generator, actor motion, hero motion, timer.
+; Physics remains in original integer coordinates; scale only for drawing.
 .proc water_step
- lda #0
- sta z_dx
+ jsr water_collision_entry
+ lda mode
+ cmp #2
+ bne @done
+ jsr water_actors
+ inc f_phase
  lda f_direction
- beq @height
+ beq @vertical
  cmp #4
  beq @left
- lda f_fraction
- clc
- adc #128
- sta f_fraction
- lda world
- adc #1
- sta world
- lda world+1
- adc #0
- sta world+1
- jmp @height
-@left:
- lda f_fraction
- sec
- sbc #128
- sta f_fraction
- lda world
- sbc #1
- sta world
- lda world+1
- sbc #0
- sta world+1
- bpl @height
- lda #60
- sta world
- lda #0
- sta world+1
-@height:
- inc f_phase
- ldx f_tramp_arc
- lda water_arc_lo,x
- sta z_ptr
- lda water_arc_hi,x
- sta z_ptr+1
- ldy f_phase
- lda (z_ptr),y
- sta jump_pixels
- lda water_arc_length,x
- cmp f_phase
- beq @land
- lsr
- cmp f_phase
- lda #1
- bcs :+
- lda #255
+ lda f_scroll+1
+ cmp #7
+ bcc :+
+ lda f_scroll
+ bne @right_edge
 :
- sta velocity
- jmp water_hazards
-@land:
+ inc f_scroll
+ inc f_scroll
+ bne @vertical
+ inc f_scroll+1
+ bne @vertical
+@right_edge:
+ lda w_hero_x
+ cmp #192
+ bcs @vertical
+ inc w_hero_x
+ inc w_hero_x
+ bne @vertical
+@left:
+ lda f_scroll
+ ora f_scroll+1
+ beq @vertical
+ lda f_scroll+1
+ cmp #7
+ bcc @scroll_left
+ lda f_scroll
+ beq @scroll_left
+ lda w_hero_x
+ cmp #80
+ beq @scroll_left
+ dec w_hero_x
+ dec w_hero_x
+ bne @vertical
+@scroll_left:
+ lda f_scroll
+ bne :+
+ dec f_scroll+1
+:
+ dec f_scroll
+ dec f_scroll
+@vertical:
+ jsr water_vertical
+ jsr water_publish
+ jsr water_bag_spawn
+@done:
+ rts
+.endproc
+
+.proc water_vertical
+ lda w_hero_phase
+ cmp #1
+ beq @up
+ lda w_hero_y
+ clc
+ adc w_hero_v+1
+ sta w_hero_y
+ lda w_hero_v
+ clc
+ adc #$30
+ sta w_hero_v
+ lda w_hero_v+1
+ adc #0
+ sta w_hero_v+1
+ cmp w_hero_limit+1
+ bne @done
+ lda w_hero_v
+ cmp w_hero_limit
+ bne @done
+ lda w_hero_y
+ clc
+ adc w_hero_limit+1
+ sta w_hero_y
  jmp water_land
+@up:
+ lda w_hero_y
+ sec
+ sbc w_hero_v+1
+ sta w_hero_y
+ lda bounce_count
+ beq @decelerate
+ lda w_hero_v+1
+ beq @turn
+@decelerate:
+ lda w_hero_v
+ sec
+ sbc #$30
+ sta w_hero_v
+ lda w_hero_v+1
+ sbc #0
+ sta w_hero_v+1
+ ora w_hero_v
+ bne @prize
+@turn:
+ lda #0
+ sta w_hero_v
+ inc w_hero_phase
+ lda bounce_count
+ cmp #4
+ bne @prize
+ inc w_hero_y
+ inc w_hero_y
+ lda #8
+ sta w_hero_state
+ jmp water_hurt
+@prize:
+ jmp water_hazards
+@done:
+ rts
 .endproc
 
 .proc water_land
- lda world
- cmp stage_end
- lda world+1
- sbc stage_end+1
- bcc @apparatus
- lda stage_end
- clc
- adc #32
- sta z_pos
- lda stage_end+1
- adc #0
- sta z_pos+1
- lda world
- cmp z_pos
- lda world+1
- sbc z_pos+1
- jcs hurt
- jmp finish_act
-@apparatus:
- ldx #0
-@platform:
- lda w_pedestal_lo,x
- clc
- adc #8
- sta z_pos
- lda w_pedestal_hi,x
- adc #0
- sta z_pos+1
- jsr distance_to_player
- lda z_pos+1
- bne @next
- lda z_pos
- cmp #13
- bcc @bounce
-@next:
- inx
- cpx #25
- bne @platform
- jmp hurt
-@bounce:
- stx tramp_index
+ lda f_direction
+ cmp #8
+ bne :+
+ lda #$20
+ ldy #0
+ jsr add_points
+:
  lda z_joy
  and #12
  cmp #12
@@ -108,114 +137,187 @@
  lda #0
 :
  sta f_direction
- cmp #0
- beq @stationary
- lda #0
- sta bounce_count
- sta f_tramp_arc
- txa
-@mod:
- cmp #3
- bcc @short
- sbc #3
- bcs @mod
-@short:
- cmp #2
- bne @reset
- lda #1
- sta f_tramp_arc
- bne @reset
-@stationary:
- inc bounce_count
- lda bounce_count
- cmp #4
- jcs hurt
- clc
- adc #1
- sta f_tramp_arc
-@reset:
  lda #0
  sta f_phase
- sta jump_pixels
- sta sound_age
  lda #1
- sta sound_fx
-water_hazards = *
+ sta w_hero_phase
+ lda f_direction
+ bne @moving
+ ldx bounce_count
+ lda w_launch_lo,x
+ sta w_hero_v
+ sta w_hero_limit
+ lda w_launch_hi,x
+ sta w_hero_v+1
+ sta w_hero_limit+1
+ inc bounce_count
+ jmp @goal
+@moving:
+ lda #0
+ sta bounce_count
+ lda #$20
+ sta w_hero_v
+ sta w_hero_limit
+ lda #4
+ sta w_hero_v+1
+ sta w_hero_limit+1
+ ; Right short arc at original scroll $xx48..57; left at $xxF8..07.
+ lda #0
+ sec
+ sbc f_scroll
+ ldx f_direction
+ cpx #4
+ beq @left
+ cmp #$48
+ bcc @goal
+ cmp #$58
+ bcs @goal
+ bcc @short
+@left:
+ cmp #$F8
+ bcs @short
+ cmp #8
+ bcs @goal
+@short:
+ lda #$C0
+ sta w_hero_v
+ sta w_hero_limit
+ lda #3
+ sta w_hero_v+1
+ sta w_hero_limit+1
+@goal:
+ lda f_scroll+1
+ cmp #7
+ bcc @done
+ lda f_scroll
+ beq @done
+ lda w_hero_x
+ cmp #160
+ bcc @done
+ cmp #202
+ bcs @miss
+ clc
+ adc #4
+ sta w_hero_x
+ lda #170
+ sta w_hero_y
+ lda #4
+ sta w_hero_state
+ jsr water_publish
+ jmp water_finish
+@miss:
+ jmp water_hurt
+@done:
+ rts
+.endproc
+.segment "XL"
+w_launch_lo: .byte $50,$10,$30,$10
+w_launch_hi: .byte 4,5,6,8
 
+.segment "COMPLETE"
+.proc water_hazards
  lda bounce_count
  cmp #3
- bne @flame
- lda jump_pixels
+ bne @done
+ lda w_hero_y
  cmp #80
- bcc @flame
+ bcc @done
+ cmp #104
+ bcs @done
  ldx tramp_index
  lda passed,x
- bne @flame
+ bne @done
  inc passed,x
  inc water_bags
+ inc w_prizes
  jsr complete_tramp_prize
-@flame:
- jmp water_actors
+@done:
+ rts
 .endproc
-water_hazards = water_land::water_hazards
 
 .proc water_init
- lda #1
- sta jumping
- lda #60
- sta world
  lda #0
- sta world+1
- sta f_fraction
- sta f_phase
- sta f_tramp_arc
+ sta f_scroll
+ sta f_scroll+1
+ sta w_prizes
+ ldx #24
+@bags:
+ lda w_bag_unavailable,x
+ sta passed,x
+ dex
+ bpl @bags
+ lda #0
+reset:
  sta f_direction
  sta bounce_count
- sta tramp_index
- sta w_cursor
+ sta f_phase
  sta w_spawned
+ sta grace
+ sta timer_div
+ sta r_clock_fraction
+ sta r_clock_fraction+1
+ sta r_clock_fraction+2
  ldx #3
 @clear:
  sta w_active,x
  dex
  bpl @clear
- lda #<1656
+ sta bonus
+ lda #$40
+ sta bonus+1
+ lda #80
+ sta w_hero_x
+ lda #180
+ sta w_hero_y
+ lda #$20
+ sta w_hero_v
+ sta w_hero_limit
+ lda #4
+ sta w_hero_v+1
+ sta w_hero_limit+1
+ lda #1
+ sta w_hero_phase
+ sta w_hero_state
+ sta jumping
+ lda #<1464
  sta stage_end
- lda #>1656
+ lda #>1464
  sta stage_end+1
- rts
+ jsr apparatus_clock_reset
+ jmp water_publish
 .endproc
 
 .proc water_resume
- lda tramp_index
+ ; Source $86B5: retreat one scroll page, or two past page $FA.
+ lda f_scroll+1
+ ldx f_scroll
+ bne @round
+ cmp #0
+ beq @round
+ sec
+ sbc #1
+@round:
+ cmp #6
+ bcc :+
+ sec
+ sbc #1
+:
  pha
  jsr water_init
  pla
- tax
- stx tramp_index
- lda w_pedestal_lo,x
- clc
- ; Restore the same +16 takeoff point used by the fresh course.
- ; Centering at +8 leaves the final 66-pixel jump two pixels short.
- adc #16
- sta world
- lda w_pedestal_hi,x
- adc #0
- sta world+1
- ldx #0
-@skip:
- lda world
- cmp w_triggers_lo,x
- lda world+1
- sbc w_triggers_hi,x
+ sta f_scroll+1
+ jsr water_publish
+ lda f_scroll+1
+ cmp #3
  bcc @done
- inx
- cpx #24
- bcc @skip
+ lda #$35
+ ldx f_scroll+1
+ cpx #5
+ bcc :+
+ lda #$30
+:
+ sta bonus+1
 @done:
- stx w_cursor
- lda #90
- sta grace
  inc checkpoint_restores
  jmp update_camera
 .endproc
@@ -224,24 +326,49 @@ water_hazards = water_land::water_hazards
  lda f_direction
  cmp #8
  bne @move
- ldx w_cursor
- cpx #24
- bcs @move
- lda world
- cmp w_triggers_lo,x
- lda world+1
- sbc w_triggers_hi,x
- bcc @move
+ lda f_scroll
+ ldy #0
+ cmp #$3C
+ beq @trigger
+ iny
+ cmp #$8C
+ beq @trigger
+ iny
+ cmp #$E8
+ bne @move
+@trigger:
+ sty w_pair
+ lda f_scroll+1
+ asl
+ clc
+ adc f_scroll+1
+ clc
+ adc w_pair
+ sta w_cursor
  ldy rank
+ ; Each prize threshold advances the original six-row difficulty schedule.
+ ldx #0
+@difficulty:
+ lda w_prizes
+ cmp w_thresholds,x
+ bcc @schedule
+ iny
+ inx
+ cpx #9
+ bcc @difficulty
+@schedule:
+ cpy #6
+ bcc :+
+ ldy #5
+:
  lda w_schedule_lo,y
  sta z_ptr
  lda w_schedule_hi,y
  sta z_ptr+1
- txa
- tay
+ ldy w_cursor
  lda (z_ptr),y
  sta w_kind
- beq @spawn_done
+ beq @move
  and #3
  cmp #3
  bne @single
@@ -252,35 +379,14 @@ water_hazards = water_land::water_hazards
  sta w_kind
 @single:
  jsr water_spawn
-@spawn_done:
- inc w_cursor
 @move:
  ldx #0
-@slot:
+slot:
  lda w_active,x
  jeq @next
- ; Dolphins move two original pixels left per simulation frame.
- lda w_xfrac,x
- sec
- sbc #128
- sta w_xfrac,x
- lda w_xlo,x
- sbc #1
- sta w_xlo,x
- sta z_pos
- lda w_xhi,x
- sbc #0
- sta w_xhi,x
- sta z_pos+1
- jsr screen_position
- lda sprite_xhi
- bpl @vertical
- lda sprite_x
- cmp #232
- bcs @vertical
- lda #0
- sta w_active,x
- jmp @next
+ jsr water_actor_x
+ lda w_active,x
+ jeq @next
 @vertical:
  lda w_phase,x
  and #1
@@ -307,6 +413,9 @@ water_hazards = water_land::water_hazards
  lda w_vel_hi,x
  sbc #0
  sta w_vel_hi,x
+ lda w_vel_hi,x
+ ora w_vel_lo,x
+ beq @turn
  jmp @next
 @turn:
  lda #0
@@ -374,8 +483,41 @@ water_hazards = water_land::water_hazards
 @next:
  inx
  cpx #4
- jne @slot
- jmp water_collision
+ jne water_actors::slot
+ rts
+.endproc
+
+
+.proc water_actor_x
+ lda #2
+ sta z_tmp
+ lda f_scroll
+ ora f_scroll+1
+ beq @move
+ lda f_direction
+ beq @move
+ cmp #4
+ beq @done
+ asl z_tmp
+@move:
+ lda w_raw_x,x
+ sec
+ sbc z_tmp
+ sta w_raw_x,x
+ cmp #241
+ bcc @done
+ cmp #244
+ bcs @done
+ lda w_special,x
+ beq @remove
+ lda #0
+ sta w_special,x
+ rts
+@remove:
+ lda #0
+ sta w_active,x
+@done:
+ rts
 .endproc
 
 .proc water_spawn
@@ -392,23 +534,13 @@ water_hazards = water_land::water_hazards
  lda #1
  sta w_active,x
  lda #0
- sta w_xfrac,x
  sta w_special,x
- ldy w_cursor
- lda w_positions_lo,y
- sta w_xlo,x
- lda w_positions_hi,y
- sta w_xhi,x
- tya
-@mod:
- cmp #3
- bcc @index
- sbc #3
- bcs @mod
-@index:
+ lda #241
+ sta w_raw_x,x
+ lda w_pair
  sta w_bounces,x
  lda #$80
- ldy w_bounces,x
+ ldy w_pair
  bne :+
  lda #$20
 :
@@ -433,49 +565,47 @@ water_hazards = water_land::water_hazards
  lda #0
  sta w_vel_lo,x
  sta w_vel_hi,x
- lda #45
- ldy w_bounces,x
+ lda #245
+ ldy w_pair
  bne :+
- lda #37
+ lda #237
 :
- clc
- adc w_y,x
  sta w_y,x
- lda #30
+ lda #25
  cpy #0
  bne :+
- lda #24
+ lda #17
 :
- clc
- adc w_xlo,x
- sta w_xlo,x
- bcc @done
- inc w_xhi,x
+ sta w_raw_x,x
 @done:
  rts
 .endproc
 
+.segment "CONTACT"
 .proc water_collision
- lda grace
- bne @done
  ldx #0
 @slot:
  lda w_active,x
  beq @next
- lda w_xlo,x
- sta z_pos
- lda w_xhi,x
- sta z_pos+1
- jsr distance_to_player
- lda z_pos+1
- bne @next
- lda z_pos
- cmp #9
+ ; Original 8-bit sprite centers and strict 11 / 8 / 17 cutoffs.
+ lda w_raw_x,x
+ clc
+ adc #16
+ sta z_tmp
+ lda w_hero_x
+ clc
+ adc #16
+ sec
+ sbc z_tmp
+ bcs :+
+ eor #255
+ clc
+ adc #1
+:
+ cmp #11
  bcs @next
  sta z_tmp
- lda #180
- sec
- sbc jump_pixels
+ lda w_hero_y
  sec
  sbc w_y,x
  bcs :+
@@ -487,18 +617,191 @@ water_hazards = water_land::water_hazards
  bcs @next
  clc
  adc z_tmp
- cmp #15
+ cmp #17
  bcs @next
+ ; Preserve the arcade broad phase, then reject blank silhouette gaps.
+ jsr water_visible_contact
+ bcc @next
  inc water_hits
+ lda #7
+ sta w_hero_state
  jmp hurt
 @next:
  inx
  cpx #4
  bne @slot
-@done:
  rts
 .endproc
 
+.proc water_visible_contact
+ ; Every negative Y offset in the original hit window visibly touches.
+ lda w_y,x
+ sec
+ sbc w_hero_y
+ bmi @touch
+ sta z_body
+ lda w_raw_x,x
+ sec
+ sbc w_hero_x
+ clc
+ adc #10
+ sta z_left
+ lda f_scroll
+ clc
+ adc w_hero_x
+ and #3
+ asl
+ asl
+ asl
+ asl
+ asl
+ clc
+ adc z_left
+ sta z_ptr
+ lda w_phase,x
+ sec
+ sbc #1
+ lsr
+ clc
+ adc #>water_contact_limits
+ sta z_ptr+1
+ ; Select the low/high half-page for each phase pair.
+ lda w_phase,x
+ and #1
+ bne :+
+ lda z_ptr
+ ora #$80
+ sta z_ptr
+:
+ ldy #0
+ lda (z_ptr),y
+ cmp z_body
+ rts
+@touch:
+ sec
+ rts
+.endproc
+
+.align 256
+water_contact_limits:
+.include "dolphin-contact.inc"
+
+.segment "XL"
+.proc water_scale
+ ; z_pos * 3/4, retaining source-space precision in the simulation.
+ lda z_pos
+ sta z_tempword
+ lda z_pos+1
+ sta z_tempword+1
+ asl z_pos
+ rol z_pos+1
+ lda z_pos
+ clc
+ adc z_tempword
+ sta z_pos
+ lda z_pos+1
+ adc z_tempword+1
+ sta z_pos+1
+ lsr z_pos+1
+ ror z_pos
+ lsr z_pos+1
+ ror z_pos
+ rts
+.endproc
+.segment "COMPLETE"
+.proc water_publish
+ lda f_scroll
+ clc
+ adc w_hero_x
+ sta z_pos
+ lda f_scroll+1
+ adc #0
+ sta z_pos+1
+ jsr water_scale
+ lda z_pos
+ sta world
+ lda z_pos+1
+ sta world+1
+ lda #180
+ sec
+ sbc w_hero_y
+ sta jump_pixels
+ lda #1
+ ldx w_hero_phase
+ cpx #1
+ beq :+
+ lda #255
+:
+ sta velocity
+ ; Current pedestal index for prizes and drawing only.
+ ldx #21
+@pedestal:
+ lda world
+ cmp w_pedestal_lo,x
+ lda world+1
+ sbc w_pedestal_hi,x
+ bcs @index
+ dex
+ bpl @pedestal
+ ldx #0
+@index:
+ stx tramp_index
+ ldx #0
+@actor:
+ lda w_raw_x,x
+ tay
+ clc
+ adc f_scroll
+ sta z_pos
+ lda f_scroll+1
+ adc #0
+ cpy #241
+ bcc :+
+ sec
+ sbc #1
+:
+ sta z_pos+1
+ jsr water_scale
+ lda z_pos
+ sta w_xlo,x
+ lda z_pos+1
+ sta w_xhi,x
+ inx
+ cpx #4
+ bne @actor
+ rts
+.endproc
+.segment "XL"
+w_bag_unavailable: .byte 1,1,1,1,2,1,2,1,1,2,1,1,1,2,1,2,1,1,2,1,1,2,1,1,1
+.segment "CODE"
+w_thresholds: .byte 8,10,12,14,16,19,22,25,28
+
+.segment "COMPLETE"
+.proc water_bag_spawn
+ lda f_direction
+ cmp #8
+ bne @done
+ ldx #6
+@find:
+ lda f_scroll
+ cmp w_bag_scroll_lo,x
+ bne @next
+ lda f_scroll+1
+ cmp w_bag_scroll_hi,x
+ bne @next
+ ldy w_bag_platform,x
+ lda #0
+ sta passed,y
+@next:
+ dex
+ bpl @find
+@done:
+ rts
+.endproc
+w_bag_scroll_lo: .byte 192,104,104,192,104,192,104
+w_bag_scroll_hi: .byte 0,1,2,3,4,5,6
+w_bag_platform: .byte 4,6,9,13,15,18,21
+.segment "COMPLETE"
 .proc water_draw
  ; Only visit pedestals that can intersect the 160-pixel viewport.
  lda camera+1
@@ -538,7 +841,7 @@ water_hazards = water_land::water_hazards
 @pnext:
  inc w_index
  lda w_index
- cmp #25
+ cmp #22
  bcc @platform
 @actors:
  lda #0
@@ -628,3 +931,29 @@ water_hazards = water_land::water_hazards
 .endproc
 
 .include "water-tables.inc"
+
+.segment "XL"
+.proc water_hurt
+ jsr hurt
+ lda #$3C
+ sta $D500
+ rts
+.endproc
+.segment "CODE"
+.proc water_finish
+ ; Arcade freezes the counter on the successful landing update.
+ sed
+ clc
+ lda bonus
+ adc #1
+ sta bonus
+ lda bonus+1
+ adc #0
+ sta bonus+1
+ cld
+ jsr finish_act
+ lda #$3C
+ sta $D500
+ rts
+.endproc
+.segment "COMPLETE"

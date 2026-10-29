@@ -315,8 +315,9 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  sta world+1
  jmp update_camera
 @lion:
+ lda #11
+ jsr hidden_entry
  lda #1
- sta clear_bird
  sta lion_goal
  lda #11
  sta jump_pixels
@@ -332,21 +333,10 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
 .segment "DETAILS"
 .proc complete_tick
  inc clear_elapsed
- lda clear_bird
- beq @horse
- lda clear_elapsed
- cmp #64
- bcc @horse
- cmp #144
- bcs @horse
- and #7
+ lda act
  bne @horse
- inc clear_prize
- lda clear_reward
- beq @horse
- lda #$40
- ldy #0
- jsr detail_points
+ lda #13
+ jsr hidden_entry
 @horse:
  lda act
  cmp #4
@@ -405,7 +395,8 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  lda #83
  sta sprite_cache_bottom_limit+1
 @done:
- rts
+ lda #0
+ jmp hidden_entry
 .endproc
 
 .proc complete_prize
@@ -423,80 +414,12 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
 .endproc
 
 .proc complete_reverse
- lda lion_direction
- cmp #4
- jne @done
- lda secret_visible
- ora secret_paid
- jne @done
- inc secret_jumps
- lda secret_jumps
- cmp #3
- jcc @done
- lda #1
- sta secret_visible
- lda #0
- sta secret_age
- lda world
- clc
- adc #24
- sta secret_world
- lda world+1
- adc #0
- sta secret_world+1
- lda #0
- ldy #8
- jsr detail_points
-@done:
- rts
+ lda #2
+ jmp hidden_entry
 .endproc
 
 .proc complete_secrets
- lda act
- jne @done
- lda secret_visible
- jeq @done
- inc secret_age
- lda secret_age
- cmp #180
- bcc :+
- lda #0
- sta secret_visible
- rts
-:
- ; A rising prize must be reached, not awarded just for appearing.
- lsr
- cmp #40
- bcc :+
- lda #40
-:
- sta secret_height
- lda secret_world
- sta z_pos
- lda secret_world+1
- sta z_pos+1
- jsr distance_to_player
- lda z_pos+1
- jne @done
- lda z_pos
- cmp #13
- jcs @done
- lda jump_pixels
- sec
- sbc secret_height
- clc
- adc #12
- cmp #24
- jcs @done
- lda #0
- sta secret_visible
- lda #1
- sta secret_paid
- lda #0
- ldy #$30
- jmp detail_points
-@done:
- rts
+ jmp hidden_contact
 .endproc
 
 .proc complete_draw
@@ -507,20 +430,8 @@ rope_bar_masks: .byte $FF,$3F,$0F,$03,$C0,$F0,$FC,$FF
  jne @done
  lda secret_visible
  jeq @done
- lda secret_world
- sta z_pos
- lda secret_world+1
- sta z_pos+1
- jsr screen_position
- lda sprite_xhi
- jne @done
- lda #146
- sec
- sbc secret_height
- sta sprite_y
- lda #93
- sta sprite_pose
- jmp complete_stamp
+ lda #10
+ jmp hidden_entry
 @clear:
  lda act
  cmp #5

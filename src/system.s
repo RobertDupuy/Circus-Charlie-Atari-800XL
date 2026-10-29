@@ -588,6 +588,8 @@
 .endproc
 
 .proc sys_checkpoint
+ lda #12
+ jsr hidden_entry
  jmp mech_save_checkpoint
 .endproc
 

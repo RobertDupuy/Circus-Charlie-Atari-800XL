@@ -50,3 +50,10 @@
 .repeat 256,I
  .byte ((I & $C0)=0)*$C0 + ((I & $30)=0)*$30 + ((I & $0C)=0)*$0C + ((I & $03)=0)*$03
 .endrepeat
+
+.segment "APPARATUS"
+.include "horse-arcade.s"
+
+.include "fused-hero.s"
+.include "compiled-actors.s"
+.include "hidden-rewards.s"

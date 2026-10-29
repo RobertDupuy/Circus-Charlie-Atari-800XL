@@ -97,15 +97,15 @@
  sta render_busy
  lda #1
  sta ready
- ; Use the idle part of the display interval for the next simulation batch.
+ ; Use the idle part of the display interval for every act's next simulation
+ ; batch, including Lion. The elapsed-field clock never advances game time
+ ; for fields that have not occurred.
  ; Rendering still waits for the atomic VBI flip before touching the buffer.
  lda mode
  cmp #2
  bne @main
  lda need_stage
  bne @main
- lda act
- beq @main
  jsr gfx_game_steps
  lda #1
  sta gfx_logic_prepared

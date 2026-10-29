@@ -396,19 +396,10 @@ gfx_dma_opcode: .byte $D0,$F0,$F0,$D0,$F0,$F0
  sta world
 @support:
  lda act
- cmp #3
- beq @ball
  cmp #2
  beq @tramp
  cmp #5
  beq @trapeze
- jmp @finish
-@ball:
- ldx current_ball
- lda ball_lo,x
- sta world
- lda ball_hi,x
- sta world+1
  jmp @finish
 @tramp:
  lda water
@@ -506,6 +497,25 @@ arcade_tramp_hi: .byte 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6
 ; selects the crowd bank next, so there is no bank to restore here.
 .proc rope_glyph_budget
  lda act
+ bne @other
+ ; The scrolling Lion anchor is cell-aligned: its nine approved poses use
+ ; at most 26 cells in that phase (28 in the three shifted goal phases).
+ ; Reserving the actual phase leaves room for both hidden reward objects.
+ lda world
+ sec
+ sbc camera
+ and #3
+ beq @aligned_lion
+ lda #28
+ bne @lion_budget
+@aligned_lion:
+ lda #26
+@lion_budget:
+ sta gfx_reserve
+ sta gfx_reserve+1
+ sta gfx_reserve+2
+ rts
+@other:
  cmp #4
  bne :+
  jmp horse_glyph_budget
@@ -1106,26 +1116,43 @@ next:
 r_keep_right: .byte 255,63,15,3
 r_keep_left: .byte 255,252,240,192
 .segment "GFX"
+.segment "XL"
 .proc apparatus_draw_supports
- lda r_first
- and #254
+ lda #0
  sta r_draw_index
 @next:
  ldx r_draw_index
- lda r_length,x
- lsr
- lsr
- sta z_tmp
- lda r_length,x
- sec
- sbc z_tmp
- sec
- sbc #12
+ lda r_drum_xhi,x
+ bmi @skip
+ lda r_drum_xlo,x
  clc
- adc r_pivot_lo,x
+ adc r_arc_x
  sta z_pos
- lda r_pivot_hi,x
- adc #0
+ lda r_drum_xhi,x
+ adc r_arc_x+1
+ sta z_pos+1
+ lda z_pos
+ sec
+ sbc #112
+ sta z_pos
+ lda z_pos+1
+ sbc #0
+ sta z_pos+1
+ ; Keep the drawing conversion local; the atlas uses other cartridge banks.
+ lda z_pos
+ sta z_tempword
+ lda z_pos+1
+ sta z_tempword+1
+ lsr z_tempword+1
+ ror z_tempword
+ lsr z_tempword+1
+ ror z_tempword
+ lda z_pos
+ sec
+ sbc z_tempword
+ sta z_pos
+ lda z_pos+1
+ sbc z_tempword+1
  sta z_pos+1
  jsr screen_position
  lda #32
@@ -1136,12 +1163,12 @@ r_keep_left: .byte 255,252,240,192
  jsr gfx_cached_select
 @skip:
  inc r_draw_index
- inc r_draw_index
  lda r_draw_index
- cmp r_limit
+ cmp #3
  bcc @next
  rts
 .endproc
+
 
 .segment "GFX"
 .proc apparatus_finish_draw
@@ -1217,8 +1244,10 @@ r_keep_left: .byte 255,252,240,192
 leg_offsets: .byte 24,4
 
 .proc fidelity_spring_points
- jsr mech_spring_reward
- lda #$3E
+ lda #$3D
+ sta $D500
+ jsr horse_arcade_points
+ lda #$3D
  sta $D500
  rts
 .endproc
@@ -1233,6 +1262,14 @@ leg_offsets: .byte 24,4
  inx
  cpx #32
  bne @copy
+ ldx #0
+@states:
+ lda h_state,x
+ sta (z_ptr),y
+ iny
+ inx
+ cpx #8
+ bne @states
  rts
 .endproc
 .proc apparatus_restore_horse
@@ -1244,6 +1281,14 @@ leg_offsets: .byte 24,4
  inx
  cpx #32
  bne @copy
+ ldx #0
+@states:
+ lda (z_ptr),y
+ sta h_state,x
+ iny
+ inx
+ cpx #8
+ bne @states
  rts
 .endproc
 .proc apparatus_save_rope
@@ -1265,6 +1310,16 @@ leg_offsets: .byte 24,4
  inx
  cpx #32
  bne @got
+ ; Reuse the irrelevant ball/hazard checkpoint area for trapeze state.
+ ldy #12
+ ldx #0
+@arcade:
+ lda r_arc_x,x
+ sta (z_ptr),y
+ iny
+ inx
+ cpx #38
+ bne @arcade
  rts
 .endproc
 .proc apparatus_restore_rope
@@ -1272,6 +1327,9 @@ leg_offsets: .byte 24,4
  ldx #31
 @clear:
  sta r_active,x
+ lda #255
+ sta r_angle,x
+ lda #0
  dex
  bpl @clear
  ldx r_first
@@ -1294,6 +1352,15 @@ leg_offsets: .byte 24,4
  inx
  cpx #32
  bne @got
+ ldy #12
+ ldx #0
+@arcade:
+ lda (z_ptr),y
+ sta r_arc_x,x
+ iny
+ inx
+ cpx #38
+ bne @arcade
  lda #$3D
  sta $D500
  jsr apparatus_resume
@@ -1462,6 +1529,7 @@ next:
 @call:
  jmp (z_tempword)
 .endproc
+.segment "LIONGFX"
 .proc apparatus_blend_prepare
  lda #0
  sta r_blend_enabled
@@ -1471,6 +1539,8 @@ next:
  and #3
  bne @done
  lda gfx_hero_pose
+ cmp #84
+ bcs @lion
  cmp #2
  bne :+
  lda gfx_hero_y
@@ -1505,7 +1575,31 @@ next:
  inc r_blend_enabled
 @done:
  rts
+@lion:
+ cmp #93
+ bcs @done
+ sec
+ sbc #84
+ asl
+ asl
+ asl
+ sta z_tmp
+ lda gfx_hero_y
+ and #7
+ ora z_tmp
+ asl
+ tax
+ lda #$32
+ sta $D500
+ lda $8701,x
+ beq @done ; Walking, clipped or unsupported variants use the generic merge.
+ sta z_ptr+1
+ lda $8700,x
+ sta z_ptr
+ inc r_blend_enabled
+ rts
 .endproc
+.segment "MECHANICS"
 
 ; The six crowd rows are rebuilt before objects on every frame. Do not erase
 ; those same cells a second time when restoring a trapeze actor rectangle.
@@ -1589,6 +1683,98 @@ sprite_cache_bottom_limit=draw_stamp::spring_bottom_limit_anchor
  sty apparatus_draw_full::record_id+2
  sta apparatus_draw_full::alloc_id+1
  sty apparatus_draw_full::alloc_id+2
+ rts
+.endproc
+
+.segment "MECHANICS"
+
+; Arcade raster: (18.432 MHz / 3) / (384 * 264) = 2000/33 Hz.
+; MAME corrected its former 60 Hz approximation in commit 8dad2bf5 (2025-06-16).
+; Derive game time from elapsed TV fields,
+; including fields missed by rendering, rather than one fixed batch per flip.
+.segment "XL"
+.proc apparatus_clock_reset
+ lda host_frames
+ sta r_logic_host
+ lda host_frames+1
+ sta r_logic_host+1
+ rts
+.endproc
+.proc apparatus_game_clock
+ ; Use the same snapshot for elapsed time and the next baseline. A VBI
+ ; between two host-counter reads must not silently discard one TV field.
+ ldx host_frames
+ txa
+ sec
+ sbc r_logic_host
+ sta r_elapsed_fields
+ stx r_logic_host
+ lda #0
+ sta logic_steps
+ lda r_elapsed_fields
+ jeq @done
+@field:
+ inc logic_steps
+ lda pal
+ bne @pal
+ ; NTSC: (2000/33) * (114 * 262) / 1789772.5 = 7964800/7874999.
+ lda r_clock_fraction
+ clc
+ adc #<89801
+ sta r_clock_fraction
+ lda r_clock_fraction+1
+ adc #>89801
+ sta r_clock_fraction+1
+ lda r_clock_fraction+2
+ adc #^89801
+ sta r_clock_fraction+2
+ lda r_clock_fraction
+ sec
+ sbc #<7874999
+ sta z_tempword
+ lda r_clock_fraction+1
+ sbc #>7874999
+ sta z_tempword+1
+ lda r_clock_fraction+2
+ sbc #^7874999
+ jmp @remainder
+@pal:
+ ; PAL: (2000/33) * (114 * 312) / 1773447 = 608000/500203.
+ lda r_clock_fraction
+ clc
+ adc #<107797
+ sta r_clock_fraction
+ lda r_clock_fraction+1
+ adc #>107797
+ sta r_clock_fraction+1
+ lda r_clock_fraction+2
+ adc #^107797
+ sta r_clock_fraction+2
+ lda r_clock_fraction
+ sec
+ sbc #<500203
+ sta z_tempword
+ lda r_clock_fraction+1
+ sbc #>500203
+ sta z_tempword+1
+ lda r_clock_fraction+2
+ sbc #^500203
+@remainder:
+ bcc @next
+ sta r_clock_fraction+2
+ lda z_tempword
+ sta r_clock_fraction
+ lda z_tempword+1
+ sta r_clock_fraction+1
+ inc logic_steps
+@next:
+ dec r_elapsed_fields
+ jne @field
+@tick:
+ jsr game_tick
+ dec logic_steps
+ bne @tick
+@done:
  rts
 .endproc
 

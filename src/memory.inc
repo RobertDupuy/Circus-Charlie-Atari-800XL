@@ -214,7 +214,27 @@ combo_awards=$06CE
 skip_awards=$06CF
 hud_menu_cache=$06D0
 player_records=$0800
-resume_balls=$0840
+; Hidden-reward state, independent for each player's interrupted course.
+; The old unused resume_balls alias occupied this otherwise unreferenced area.
+hidden_records=$0840 ; Two 32-byte player records.
+hidden_state=$08C0
+hidden_life=$08C0 ; Original $220A: dormant / armed / spawned / collected.
+hidden_doll=$08C1 ; Original $220B: dormant / released / collected.
+hidden_failed=$08C2 ; Original $220C: missed money hoop or a lost life.
+hidden_sides=$08C4 ; Original hoop +9 flags captured at takeoff.
+hidden_pot_jump=$08C8
+hidden_doll_y=$08CA ; Source 8.8 coordinates, little endian.
+hidden_doll_v=$08CC
+hidden_doll_frame=$08CE
+hidden_pot=$08CF
+hidden_doll_active=$08D0
+hidden_clear_hi=$08D1
+hidden_pot_live=$08D2 ; 0 ahead, 1 tracked, 2 retired/lost with the life.
+hidden_art=$08F8
+hidden_command=$08F9
+hidden_index=$08FA
+hidden_tmp=$08FB
+hidden_delta=$08FC
 bag_taken=$0930
 pot_passed=$093C
 hazard_xlo=$0940
@@ -325,9 +345,10 @@ lion_bias=$D906
 lion_lastgap=$D907
 lion_ringfrac=$D908
 lion_active=$D90C
-lion_potlo=$D920
-lion_pothi=$D928
-lion_potpaid=$D930
+lion_potfrac=$D914
+lion_potlo=$D91D
+lion_pothi=$D926
+lion_potpaid=$D92F
 lion_potcount=$D938
 lion_velocity_lo=$D939
 lion_velocity_hi=$D93A
@@ -544,3 +565,92 @@ detail_fast_try=$09FA
 clear_text_cache=$09FB ; Private top-font base, one per display buffer.
 detail_prize_first=$09FD
 detail_prize_last=$09FE
+
+; Act 6 simulation uses arcade pixels; only the drawing coordinates are scaled.
+r_raw_pivot_lo=$0200
+r_raw_pivot_hi=$0220
+r_raw_dxlo=$0240
+r_raw_dxhi=$0260
+r_arc_x=$0280
+r_arc_frac=$0282
+r_arc_goal=$0283
+r_catch_block=$0285
+r_launch_wait=$0286
+r_hist_index=$0287
+r_next_vx=$0288
+r_next_vy=$028A
+r_drum_xlo=$0290
+r_drum_xhi=$0293
+r_drum_first=$0296
+r_temp_x=$0298
+r_temp_y=$029A
+
+r_arc_joy=$029C
+
+r_drum_frac=$029D
+r_goal_screen=$02A0
+r_goal_frac=$02A2
+r_prev_x=$02A3
+
+; Page two is free after the cartridge disables the Atari OS.
+r_logic_host=$02B0
+r_clock_fraction=$02B2
+r_elapsed_fields=$02B5
+
+; Horse KONAMI-1 state, one parallel array per original descriptor field.
+h_state=$0F00
+h_delay=$0F10
+h_build=$0F20
+h_src_height=$0F30
+h_draw_scroll=$0F40
+h_screen=$0F50
+h_deck=$0F60
+h_goal_phase=$0999
+h_goal_build=$099A
+h_goal_scroll=$099B
+h_goal_x=$099C
+h_contact=$099D
+h_source_low=$099E
+h_body=$099F
+
+; Dolphin bonus source-space state (act-specific fidelity checkpoint bytes).
+w_hero_x=$0980
+w_hero_y=$0981
+w_hero_v=$0982
+w_hero_phase=$0984
+w_hero_limit=$0985
+w_hero_state=$0987
+w_prizes=$0988
+w_raw_x=$D930
+
+; Tightrope source-space state; scalar bytes participate in fidelity checkpoints.
+k_x=$0980
+k_subx=$0981
+k_left_clock=$0982
+k_frame=$0983
+k_state=$0985
+k_first=$0986
+k_skip=$0987
+k_brown=$0988
+k_pink=$0989
+k_reward_slot=$098A
+k_awards=$098B
+k_mx=$0F20
+k_frac=$0F28
+k_my=$0F30
+k_state_m=$0F38
+k_phase=$0F40
+k_under=$0F48
+k_wait=$0F50
+
+k_idle=$098C
+k_fire_pending=$098E
+
+; Rolling Balls source-space state (exclusive with other acts).
+b_x=$0940
+b_align=$0950
+b_hero_x=$0982
+b_first=$0985
+b_idle_spawn=$0984
+
+

@@ -163,32 +163,10 @@
  bne :+
  inc scene_clock+1
 :
- inc timer_div
- lda #6
- ldx act
- cpx #5
- bne :+
- lda #12
-:
- sta mech_timer_limit
- lda timer_div
- cmp mech_timer_limit
- bcc @actions
- lda #0
- sta timer_div
- sed
- sec
- lda bonus
- sbc #$10
- sta bonus
- lda bonus+1
- sbc #0
- sta bonus+1
- cld
- ora bonus
- bne @actions
- jsr hurt
- rts
+ jsr game_bonus_tick
+ lda mode
+ cmp #2
+ bne @done
 @actions:
  lda act
  bne :+
@@ -227,6 +205,78 @@
  rts
 .endproc
 
+.segment "XL"
+.proc game_bonus_tick
+ ; Trampoline counts after its landing/clear decision ($8C1F).
+ lda act
+ cmp #2
+ bne :+
+ lda water
+ beq done
+:
+ lda act
+ beq single
+ cmp #1
+ beq single
+ cmp #2
+ beq single
+ cmp #3
+ beq single
+ lda water
+ beq ordinary
+single:
+ lda #1
+ sta z_tmp
+ sta mech_timer_limit
+ bne count
+ordinary:
+ inc timer_div
+ lda #$10
+ sta z_tmp
+ lda #6
+ ldx act
+ cpx #4
+ bcc :+
+ lda #1
+ sta z_tmp
+ txa
+ sec
+ sbc #1
+:
+ sta mech_timer_limit
+ jmp compare
+count:
+ inc timer_div
+compare:
+ lda timer_div
+ cmp mech_timer_limit
+ bcc done
+ lda #0
+ sta timer_div
+ sed
+ sec
+ lda bonus
+ sbc z_tmp
+ sta bonus
+ lda bonus+1
+ sbc #0
+ sta bonus+1
+ cld
+ ora bonus
+ bne done
+ jsr hurt
+ rts
+done:
+ rts
+.endproc
+.proc game_tramp_bonus_tick
+ lda mode
+ cmp #4
+ beq @done
+ jmp game_bonus_tick::single
+@done:
+ rts
+.endproc
 .segment "XL"
 
 
@@ -554,7 +604,7 @@
  tax
  lda lion_dance_poses,x
  sta sprite_pose
- lda #107 ; Upright front-facing Charlie; lion feet remain at Y=154.
+ lda #97 ; Existing raised-foot Charlie on the lion; lion feet remain at Y=154.
  sta sprite_y
 :
  jsr gfx_tag_hero
@@ -617,10 +667,15 @@
  jmp tramp_plain_char
 @balls:
  jsr prepare_balls
+ ; Arcade balls pass in front of the goal. A rider is still on the ball,
+ ; not on the podium; only a successful dismount starts the celebration.
+ jsr draw_finish
  lda #0
  sta z_hazard
 @ball:
  ldx z_hazard
+ lda f_active,x
+ beq @ball_next
  lda ball_lo,x
  sec
  sbc #10
@@ -646,9 +701,8 @@
 @ball_next:
  inc z_hazard
  lda z_hazard
- cmp #16
+ cmp #5
  bcc @ball
- jsr draw_finish
  jmp tramp_plain_char
 @trapeze:
  lda mode
@@ -768,9 +822,15 @@ tramp_plain_char:
  rts
 .endproc
 
-.proc draw_finish
- jmp gfx_finish
+draw_finish=gfx_finish
+
+.if ::ARCADE_CHOOSER
+.proc ground_finish_goal_entry
+ ; Switch banks from resident RAM, after leaving the bank-0 dispatcher.
+ sta $D500
+ jmp ground_finish_goal_cached
 .endproc
+.endif
 
 
 .proc perf_begin
@@ -841,9 +901,12 @@ tramp_plain_char:
 
 ; Banked routines run only with bank zero selected. VBI/DLI use RAM exclusively.
 .proc water_collision_entry
+ lda #$FD
+ sta $D500
+ jsr water_collision
  lda #$3C
  sta $D500
- jmp water_collision
+ rts
 .endproc
 .proc water_draw_entry
  lda #$3C
@@ -1001,7 +1064,8 @@ speed_masks: .byte 255,7,3,1,1,1
 .proc fidelity_tramp_entry
  lda #$31
  sta $D500
- jmp fidelity_tramp_step
+ jsr fidelity_tramp_step
+ jmp game_tramp_bonus_tick
 .endproc
 .proc fidelity_resume_entry
  lda #$3E
@@ -1012,17 +1076,17 @@ speed_masks: .byte 255,7,3,1,1,1
  rts
 .endproc
 .proc fidelity_horse_gravity_entry
- lda #$3E
+ lda #$3D
  sta $D500
  jmp fidelity_horse_gravity
 .endproc
 .proc fidelity_horse_launch_entry
- lda #$3E
+ lda #$3D
  sta $D500
  jmp fidelity_horse_launch
 .endproc
 .proc fidelity_horse_init_entry
- lda #$3E
+ lda #$3D
  sta $D500
  jsr fidelity_horse_init
  lda #$3F
@@ -1030,7 +1094,7 @@ speed_masks: .byte 255,7,3,1,1,1
  rts
 .endproc
 .proc fidelity_horse_step_entry
- lda #$3E
+ lda #$3D
  sta $D500
  jmp fidelity_horse_step
 .endproc
@@ -1239,7 +1303,7 @@ speed_masks: .byte 255,7,3,1,1,1
 
 
 .proc horse_resume_entry
- lda #$3E
+ lda #$3D
  sta $D500
  jsr fidelity_horse_resume
  lda #$3F
@@ -1356,5 +1420,13 @@ lion_dance_poses: .byte 0,5,0,5
  sta $D500
  jmp detail_signs
 @done:
+ rts
+.endproc
+
+.segment "CODE"
+.proc fidelity_hurt
+ jsr hurt
+ lda #$3E
+ sta $D500
  rts
 .endproc

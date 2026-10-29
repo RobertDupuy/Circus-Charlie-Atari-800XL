@@ -167,6 +167,12 @@ pm_prepare_dispatch:
 @got:
  tax
  lda act
+ cmp #3
+ bne :+
+ jsr ball_crowd_cache
+ bcs @cached
+ lda act
+:
  cmp #1
  beq @high
  cmp #5
@@ -190,6 +196,8 @@ pm_prepare_dispatch:
  jmp $B000
 @trapB:
  jmp $B800
+@cached:
+ rts
 .endproc
 
 .proc draw_stamp
@@ -263,6 +271,7 @@ pm_prepare_dispatch:
  cmp #93
  bcs ds_regular
 ds_hero:
+hero_dispatch:
  jsr gfx_draw_hero
  jmp ds_done
 ds_regular:
@@ -839,6 +848,7 @@ ds_done:
 .endproc
 .segment "CODE"
 
+.segment "GFX"
 .proc hud_text
  ; Null-terminated ASCII to HUD at Y. Preserve X.
  sty z_value
@@ -858,6 +868,7 @@ ds_done:
  rts
 .endproc
 
+.segment "CODE"
 .proc prepare_balls
  ; This four-row strip is cheap to restore in full. Ball cells never enter
  ; the dirty-cell list, and a phase font is shared by every visible ball.
@@ -872,9 +883,11 @@ ds_done:
  sta z_dst+1
  ldy #159
 @strip:
+ .repeat 4
  lda (z_src),y
  sta (z_dst),y
  dey
+ .endrepeat
  cpy #255
  bne @strip
  lda anim_clock
@@ -882,6 +895,8 @@ ds_done:
  lsr
  and #3
  tax
+ lda ball_opacity_phase,x
+ sta gfx_stamp_row ; Phase mask scratch, finished before ordinary stamps.
  lda ball_font_high,x
  sta band_font+2
  ldx back
@@ -919,13 +934,40 @@ ds_done:
 .endproc
 
 .proc draw_ball
- lda #$3C
+ lda #238
  sta $D500
  jmp complete_draw_ball
 .endproc
 
-.segment "COMPLETE"
+.segment "TITLE"
+.proc ball_crowd_cache
+ ldy back
+ lda ball_cached_phase,y
+ cpx #16
+ bne @store
+ cmp #16
+ beq @same
+@store:
+ txa
+ sta ball_cached_phase,y
+ clc
+ rts
+@same:
+ sec
+ rts
+.endproc
+
+.segment "BALLDRAW"
 .proc complete_draw_ball
+ ; Identical drawer bytes in all four phase banks make this switch safe.
+ ; Only the compiled immutable pixel writers differ between phase banks.
+ lda anim_clock
+ lsr
+ lsr
+ and #3
+ clc
+ adc #238
+ sta $D500
  ; Prepared glyphs cover the 24-cell ball box; only shared edge cells
  ; need blending.
  lda sprite_x
@@ -967,7 +1009,10 @@ ball_row:
  sta z_left
  ldy z_new
  lda (gfx_ball_flags),y
- beq skip
+ ; Codes 0/1 are the restored background and floor line, not ball pixels.
+ ; Leaving them alone also prevents a floor line being painted over the goal.
+ cmp #2
+ bcc skip
  sta gfx_sprite_alt
  ldy z_left
  lda (z_cell),y
@@ -1007,17 +1052,26 @@ skip:
  lda gfx_sprite_alt
  and #127
  tax
- lda glyph_lo,x
- sta z_src
- lda glyph_hi,x
- ora band_font+2
- sta z_src+1
+ ; An opaque ball cell can directly replace the goal code. Only its rim
+ ; needs a new merged glyph, so a ball crossing the podium fits the pool.
+ lda ball_opacity,x
+ and gfx_stamp_row
+ beq @masked
+ lda gfx_sprite_alt
+ ldy z_left
+ sta (z_cell),y
+ rts
+@masked:
  lda z_old
  cmp #66
- bcs @destination
+ bcc @allocate
+ cmp ball_merge_limit
+ bcc @destination
+@allocate:
+ ; Podium patterns are shared by many cells. Never overwrite those codes.
  lda free_glyph+2
  cmp ball_merge_limit
- bcs @overflow
+ jcs merge_overflow
  inc free_glyph+2
 @destination:
  tax
@@ -1036,25 +1090,25 @@ skip:
  lda z_colorflag
  eor gfx_sprite_alt
  sta z_colorflag
- ldy #7
-@byte:
- lda (z_bg),y
- bit z_colorflag
- bpl :+
+ ; Keep the exact allocation/conversion decisions, but compile constant
+ ; approved source pixels instead of repeatedly loading and masking them.
+ lda gfx_sprite_alt
+ and #127
  tax
- lda $7C00,x
-:
- sta z_value
- lda (z_src),y
- tax
- lda $FC00,x
- and z_value
- ora (z_src),y
- sta (z_glyph),y
- dey
- bpl @byte
- rts
-@overflow:
+ lda z_colorflag
+ bmi merge_cyan
+ lda $8800,x
+ sta z_ptr
+ lda $8900,x
+ sta z_ptr+1
+ jmp (z_ptr)
+merge_cyan:
+ lda $8A00,x
+ sta z_ptr
+ lda $8B00,x
+ sta z_ptr+1
+ jmp (z_ptr)
+merge_overflow:
  inc fault
  rts
 .endproc

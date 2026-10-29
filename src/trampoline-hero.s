@@ -60,7 +60,7 @@
  sbc #0
  sta sprite_xhi
  jsr gfx_tag_hero
- jmp draw_stamp
+ jmp compiled_tramp_entry
 @old:
  jmp draw_scene::tramp_plain_char
 .endproc

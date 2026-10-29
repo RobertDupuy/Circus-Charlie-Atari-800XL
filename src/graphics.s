@@ -1,5 +1,21 @@
 ; Bold Arcade: palette scheduling, compact character objects and PM accents.
 .proc gfx_stage_setup
+ ; Select once per stage; unrelated acts pay no per-frame dispatch cost.
+ lda #<gfx_draw_hero
+ ldx #>gfx_draw_hero
+ ldy act
+ cpy #2
+ bcc :+
+ lda #<compiled_dense_entry
+ ldx #>compiled_dense_entry
+:
+ cpy #5
+ bne :+
+ lda #<trapeze_hero_dispatch
+ ldx #>trapeze_hero_dispatch
+:
+ sta draw_stamp::hero_dispatch+1
+ stx draw_stamp::hero_dispatch+2
  jsr complete_stage
  lda #0
  sta tramp_font_adjust+1
@@ -23,7 +39,9 @@
  lda #32
  ldx act
  bne :+
- lda #35
+ ; All nine approved Lion poses use at most 28 glyphs in any phase.
+ ; Leave the remaining cells available to the hanging extra-life Charlie.
+ lda #28
 :
  cpx #4
  bcc :+
@@ -499,6 +517,8 @@ lion_field_colour: .byte $C8,$C6,$C4
  sta z_obj
 @next:
  ldx z_hazard
+ lda f_active,x
+ jeq @skip
  jsr get_hazard
  jsr screen_position
  lda #12
@@ -561,8 +581,8 @@ lion_field_colour: .byte $C8,$C6,$C4
 @skip:
  inc z_hazard
  lda z_hazard
- cmp #16
- bne @next
+ cmp #7
+ jne @next
  rts
 .endproc
 
@@ -597,6 +617,8 @@ lion_field_colour: .byte $C8,$C6,$C4
  jcs @skip
  ldx z_hazard
  lda horse_y,x
+ sec
+ sbc #16
  sta sprite_y
  lda h_width,x
  asl
@@ -604,8 +626,14 @@ lion_field_colour: .byte $C8,$C6,$C4
  adc #26
  sta sprite_pose
  lda sprite_x
+ ; Round odd deck anchors to the next even pixel; do not retract the landing edge.
+ clc
+ adc #1
  and #254
  sta sprite_x
+ bcc :+
+ inc sprite_xhi
+:
  ; Both decks are supported by narrow legs reaching the arena floor.
  jsr gfx_spring_board
  ldx z_hazard
@@ -622,8 +650,6 @@ lion_field_colour: .byte $C8,$C6,$C4
  lda horse_leg_pose,y
  sta sprite_pose
  lda horse_y,x
- clc
- adc #16
  sta sprite_y
  inc sprite_x
  bne :+
@@ -989,7 +1015,7 @@ gfx_glyph_hi:
 @dance_size:
  lda #24
  sta gfx_rect_w
- lda #40
+ lda #58
  bne @height_size
 @lion_size:
  lda #24
@@ -1321,14 +1347,21 @@ gfx_glyph_hi:
  jsr apparatus_blend
  jmp @masknext
 @ordinary_mask:
+ ; A completely transparent row only copies the background. This frequent
+ ; case avoids the mask lookup and redundant read of the zero sprite row.
  .repeat 8,I
  ldy #I
  lda (z_glyph),y
+ beq :+
  tax
  lda $FC00,x
- beq :+
+ beq :+++
  and (z_bg),y
  ora (z_glyph),y
+ bne :++ ; The original sprite row is nonzero, so the merged row is too.
+:
+ lda (z_bg),y
+:
  sta (z_glyph),y
 :
  .endrepeat
@@ -1361,6 +1394,7 @@ gfx_glyph_hi:
  rts
 .endproc
 
+.segment "LIONGFX"
 .proc gfx_native_cached
  txa
  pha
@@ -1429,6 +1463,7 @@ gfx_glyph_hi:
 
 
 
+.segment "GFX"
 .proc gfx_horse
  lda sprite_x
  cmp #160
@@ -1480,7 +1515,7 @@ gfx_glyph_hi:
 .segment "CODE"
 .segment "MECHANICS"
 gfx_cached_w: .byte 16,24,16,16,16,8,8,30,30,30,32,32,32,32,32,32,16,32,16,16,16,16,16,16,16,32,32,16,16,16,16,24,1,1,1
-gfx_cached_h: .byte 72,48,10,24,24,28,28,32,32,32,48,48,4,4,4,4,56,11,8,8,8,8,8,8,8,4,10,32,32,32,32,48,22,14,6
+gfx_cached_h: .byte 72,48,10,24,24,28,28,32,32,32,48,48,4,4,4,4,56,11,8,8,8,8,8,8,8,4,10,32,32,32,32,48,38,30,22
 gfx_cached_y: .byte 72,128,164,142,142,138,138,134,134,134,128,128,164,164,164,164,72,155,168,168,168,168,168,168,168,64,164,144,144,144,144,128,144,152,160
 
 .segment "AUX"
@@ -1776,24 +1811,27 @@ gfx_uniform_end: .byte 22,13,22,17,22,13
 
 .segment "MECHANICS"
 .proc gfx_game_steps
+ lda act
+ beq @arcade_clock
+ cmp #1
+ beq @arcade_clock
+ cmp #3
+ beq @arcade_clock
+ lda water
+ bne @arcade_clock
+ lda act
+ cmp #4
+ bcc :+
+@arcade_clock:
+ lda mode
+ cmp #2
+ bne @reset_rope_clock
+ jmp apparatus_game_clock
+@reset_rope_clock:
+ jsr apparatus_clock_reset
+:
  lda #2
  sta logic_steps
- lda act
- bne @ordinary
- lda #1
- ldx pal
- beq :+
- lda #19
-:
- clc
- adc pal_acc
- cmp #44
- bcc @lionacc
- sbc #44
- inc logic_steps
-@lionacc:
- sta pal_acc
- jmp @steps
 @ordinary:
  lda pal
  beq @steps
@@ -2061,5 +2099,5 @@ gfx_edge_groups: .byte 0,0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,3,4
 @slow:
  jmp draw_stamp
 .endproc
-.segment "XL"
+.segment "FUSED"
 .include "horse-boards.inc"

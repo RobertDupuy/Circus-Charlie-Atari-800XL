@@ -138,33 +138,32 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
 .endproc
 
 .proc detail_lion_bird
- ; Approach from the left, hover above Charlie, then fly away.
+ ; Approved bird and bag art, with the complete arcade reward cadence.
  lda world
  sec
  sbc camera
  sec
  sbc #20
  sta detail_bird_x
+ lda hidden_clear_hi
+ bne @draw
  lda clear_elapsed
- cmp #64
- bcs @hover
+ cmp #199
+ bcs @draw
  eor #255
  clc
- adc #65
+ adc #200
+ sta z_tmp
+ lsr
+ lsr
+ sta z_tmp2
+ lda z_tmp
+ sec
+ sbc z_tmp2
  sta z_tmp
  lda detail_bird_x
  sec
  sbc z_tmp
- sta detail_bird_x
- jmp @draw
-@hover:
- cmp #160
- bcc @draw
- sec
- sbc #160
- asl
- clc
- adc detail_bird_x
  sta detail_bird_x
 @draw:
  lda detail_bird_x
@@ -187,8 +186,6 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  adc #9
  sta sprite_pose
  jsr complete_stamp
- ; The bird carries the sack below its beak. Its blue dollar sign is
- ; prepared in palette-4 cells, separate from the gold bird feathers.
  lda detail_bird_x
  clc
  adc #16
@@ -205,13 +202,15 @@ detail_timeout_text: .asciiz "TIME IS UP!                             "
  lda #94
  sta sprite_pose
  jsr complete_stamp
+ lda hidden_clear_hi
+ bne @coins
  lda clear_elapsed
- cmp #64
+ cmp #199
  bcc @done
- cmp #144
- bcs @done
- ; Ten visible drops hit the dancing Charlie, at the scoring cadence.
- and #7
+@coins:
+ lda clear_elapsed
+ and #3
+ asl
  asl
  asl
  clc

@@ -114,7 +114,7 @@ help1: .asciiz "JUMP THE MONKEYS - PURPLE ONES LEAP!"
 help2: .asciiz "HIGH: MARKED BAGS / 4TH: BIG TOP!"
 help3: .asciiz "JUMP TO THE NEXT BALL BEFORE THEY TOUCH"
 help4: .asciiz "L/R: PACE - FIRE: JUMP, ALSO AT FINISH"
-help5: .asciiz "L/R: SWING - FIRE: RELEASE AND CATCH"
+help5: .asciiz "L/R: SWING  FIRE: LET GO  AUTO CATCH"
 help6: .asciiz "DODGE DOLPHINS - THREE BOUNCES MAX"
 
 glyph_lo:
@@ -126,7 +126,11 @@ glyph_hi:
  .byte >(I*8)
  .endrepeat
 
+.segment "AUX"
 ball_glyph_base: .byte 2,26,50,74
+ball_font_high: .byte $48,$54,$6C,$70
+ball_opacity_phase: .byte 1,2,4,8
+.segment "CODE"
 
 title_controls: .asciiz "FIRE/START:PLAY SEL:1/2P OPT:DEMO      "
 demo_controls: .asciiz "DEMO - FIRE RETURNS TO TITLE            "
@@ -140,7 +144,8 @@ hud_template_hi:
  .byte >($A800+I*160)
  .endrepeat
 
-ball_font_high: .byte $48,$54,$6C,$70
+; Codes 0/1 are background; 64 glyph classes occupy common padding.
+ball_opacity=$7FBE
 
 choose_text: .byte 0
 complete_text: .byte 0

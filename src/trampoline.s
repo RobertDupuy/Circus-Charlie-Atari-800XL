@@ -71,6 +71,7 @@ tramp_bag_unavailable:
  lda arcade_tramp_hi,x
  adc #0
  sta world+1
+ jsr tramp_retry_bonus
  lda #90
  sta grace
  inc checkpoint_restores
@@ -769,3 +770,29 @@ t_clear_hi:
 .repeat 8,P
  .byte >.ident(.sprintf("t_clear_end_%d",P))
 .endrepeat
+
+.segment "MECHANICS"
+.proc tramp_retry_bonus
+ ; Original $BEBA / $FBE9: retry budget follows the restored scroll page.
+ ; At 3/4 scale, source scroll 512 and 1024 become worlds 444 and 828.
+ lda world
+ cmp #<445
+ lda world+1
+ sbc #>445
+ lda #$40
+ bcc @budget
+ lda world
+ cmp #<829
+ lda world+1
+ sbc #>829
+ lda #$35
+ bcc @budget
+ lda #$30
+@budget:
+ sta bonus+1
+ lda #0
+ sta bonus
+ sta timer_div
+ rts
+.endproc
+.segment "TRAMPOLINE"

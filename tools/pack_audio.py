@@ -3,10 +3,18 @@ import json
 from pathlib import Path
 R=Path(__file__).resolve().parents[1]
 def pack(rom,chooser=True):
- ranges=[(26,0x1d00,0x1e00),(26,0x3000,0x3f00),(28,0xd00,0x1000),(30,0x3e00,0x3f00),(27,0x1100 if chooser else 0,0x3f00),(28,0x1600,0x3f00),(29,0x3900,0x3f00)]
- # Reuse padding between the selector code and art. These bounds are also
- # checked against the linker map and the prepared art in build.py.
- if chooser:ranges.append((27,0x500,0x800))
+ ranges=[(30,0x3ef0,0x3f00),(26,0x1c00,0x1e00),(26,0x3000,0x3f00),(28,0xda0,0x1000),(27,0x1100 if chooser else 0x800,0x3f00),(28,0x1600,0x3f00),(29,0x3770,0x3f00)]
+ # The two raised-foot lion composites own $8500..$87FF in both profiles.
+ if not chooser:ranges.append((27,0,0x500))
+ # Reclaim exactly the two retired front-facing stamps, plus the unused end
+ # of the new composite slot. No live art or sound sequence is discarded.
+ ranges.extend([(8,0,285),(9,0x275d,0x28a2),(27,0x79e,0x800)])
+ # Both celebration overlays are empty one-row masks. Keep that row intact;
+ # the remaining 47 bytes of each fixed-size slot are never read by GTIA.
+ for pose in (0,5):
+  for channel in range(3):
+   start=0x3000+pose*144+channel*48
+   ranges.append((6,start+1,start+48))
  ranges += [(b,0x2900,0x3f00) for b in (2,4,5)]+[(1,0x2c00,0x3f00),(3,0x2c00,0x3000),(3,0x3c00,0x3f00),(6,0x2d00,0x2e00),(6,0x3990,0x3f00)]
  ends={b:0 for b in range(8,26)};ends[7]=0x3c00
  for b,n in json.loads((R/'assets/native-cache.json').read_text()).items():ends[int(b)]=max(ends[int(b)],n)
@@ -15,8 +23,10 @@ def pack(rom,chooser=True):
  ranges += [(0,0x3390,0x3f00),(31,0x39c0,0x3f00)]
  # The common block includes rolling-ball flags through $2FBF.
  # It is copied to RAM at boot; its apparently unused tail is not audio space.
- protected=[(17,0,0xe00),(26,0,0x1d00),(26,0x1e00,0x3000),(28,0,0xd00),(28,0x1000,0x1600),(0,0x2000,0x3390),(30,0,0x3e00),(29,0,0x3900)]
+ protected=[(17,0,0xe00),(26,0,0x1c00),(26,0x1e00,0x3000),(28,0,0xda0),(28,0x1000,0x1600),(0,0x2000,0x3390),(30,0,0x3ef0),(29,0,0x3770)]
  if chooser:protected.extend([(27,0,0x500),(27,0x800,0x1100)])
+ protected.append((27,0x500,0x79e))
+ protected.append((18,0x500,0x2000)) # Derived Lion mask programs and RAM loader.
  for bank_,lo_,hi_ in ranges:
   assert all(bank_!=b or hi_<=lo or lo_>=hi for b,lo,hi in protected), ('audio overlap',bank_,lo_,hi_)
  region=0;bank,pos,end=ranges[0];used=0;catalog=[]
